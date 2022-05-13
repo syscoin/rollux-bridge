@@ -10,9 +10,16 @@ import {
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
+
 import theme from "../components/theme";
+import { usePaliWallet } from "../contexts/PaliWallet/usePaliWallet";
 
 const Home: NextPage = () => {
+  const { connectWallet, connectedAccount } = usePaliWallet();
+
+  const connectPaliWallet = () => {
+    connectWallet();
+  };
   return (
     <ThemeProvider theme={theme}>
       <Box>
@@ -54,9 +61,19 @@ const Home: NextPage = () => {
                     alt="PaliWallet logo"
                   />
                   <Typography variant="body1">PaliWallet</Typography>
-                  <Button sx={{ ml: "auto" }} variant="contained">
-                    Connect
-                  </Button>
+                  {connectedAccount ? (
+                    <Typography variant="body1" color="secondary" sx={{ ml: "auto" }}>
+                      {connectedAccount}
+                    </Typography>
+                  ) : (
+                    <Button
+                      sx={{ ml: "auto" }}
+                      variant="contained"
+                      onClick={connectPaliWallet}
+                    >
+                      Connect
+                    </Button>
+                  )}
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <Image
