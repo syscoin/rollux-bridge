@@ -1,20 +1,7 @@
 import { createContext, ReactNode, useState } from "react";
 import { useMetamask } from "../Metamask/Provider";
 import { usePaliWallet } from "../PaliWallet/usePaliWallet";
-
-type UTXOWallet = "pali-wallet";
-
-type NEVMWallet = "metamask";
-
-interface UTXOInfo {
-  type: UTXOWallet;
-  account: string;
-}
-
-interface NEVMInfo {
-  type: NEVMWallet;
-  account: string;
-}
+import { UTXOInfo, NEVMInfo, UTXOWallet, NEVMWallet } from "./types";
 
 interface IConnectedWalletContext {
   utxo: Partial<UTXOInfo>;

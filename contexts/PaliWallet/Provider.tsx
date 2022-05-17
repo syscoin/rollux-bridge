@@ -73,7 +73,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     controller.onWalletUpdate(async () => {
       controller.getConnectedAccount().then((account) => {
-        setConnectedAccount(account.address.main);
+        setConnectedAccount(account ? account.address.main : undefined);
       });
     });
   }, [controller]);
