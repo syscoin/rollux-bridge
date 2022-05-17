@@ -1,12 +1,18 @@
-import { Box, styled, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardActionArea,
+  CardContent,
+  styled,
+  Typography,
+} from "@mui/material";
 import Image from "next/image";
 import { useConnectedWallet } from "../../contexts/ConnectedWallet/useConnectedWallet";
+import SyscoinLogo from "../Icons/syscoin";
 
-const NetworkContainer = styled(Box)({
-  border: "1px solid gray",
+const NetworkContainer = styled(Card)({
   padding: "0.5rem",
   margin: "0.5rem 0",
-  borderRadius: "0.25rem",
 });
 
 interface IProps {
@@ -26,14 +32,19 @@ const BridgeWalletInfo: React.FC<IProps> = ({ label, network, walletType }) => {
       <Typography variant="caption" color="gray">
         {label}
       </Typography>
-      <NetworkContainer>
-        <Typography variant="body1" display="block">
-          {network.name}
-        </Typography>
-        <Typography variant="caption" display="block" color="gray">
-          {network.symbol}
-        </Typography>
-      </NetworkContainer>
+      <Card variant="outlined" sx={{ mb: 1 }}>
+        <CardContent sx={{ p: "1rem !important" }}>
+          <SyscoinLogo />
+          <Box display="inline-block" sx={{ ml: 1 }}>
+            <Typography variant="body1" display="block">
+              {network.name}
+            </Typography>
+            <Typography variant="caption" display="block" color="gray">
+              {network.symbol}
+            </Typography>
+          </Box>
+        </CardContent>
+      </Card>
       {walletType === "utxo" && utxo.type === "pali-wallet" && (
         <Box display="flex" alignItems="center">
           <Image
