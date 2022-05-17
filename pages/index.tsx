@@ -46,7 +46,7 @@ const Home: NextPage = () => {
             </Typography>
             <WalletList />
             {isReady && (
-              <Link href="/transfer">
+              <Link href="/bridge">
                 <Button variant="contained">
                   Continue
                   <ArrowForwardIcon />
