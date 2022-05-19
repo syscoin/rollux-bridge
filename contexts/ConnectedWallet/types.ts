@@ -5,6 +5,7 @@ export type NEVMWallet = "metamask";
 export interface UTXOInfo {
   type: UTXOWallet;
   account: string;
+  xpub: string
 }
 
 export interface NEVMInfo {

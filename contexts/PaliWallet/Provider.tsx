@@ -16,6 +16,7 @@ interface ConnectionsController {
   disconnectWallet: () => Promise<void>;
   getConnectedAccount: () => Promise<IAccount>;
   onWalletUpdate: (fn: () => Promise<any>) => Promise<any>;
+  getConnectedAccountXpub: () => Promise<string>;
 }
 
 declare global {
@@ -39,6 +40,7 @@ interface SyscoinEvent extends WindowEventMap {
 interface IPaliWalletContext {
   isInstalled: boolean;
   connectedAccount?: string;
+  xpubAddress?: string;
   connectWallet: () => void;
 }
 
@@ -50,6 +52,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const [controller, setController] = useState<ConnectionsController>();
   const [isInstalled, setIsInstalled] = useState(false);
   const [connectedAccount, setConnectedAccount] = useState<string>();
+  const [xpubAddress, setXpubAddress] = useState<string>();
 
   useEffect(() => {
     if (window === undefined) {
@@ -72,9 +75,10 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
     controller.onWalletUpdate(async () => {
-      controller.getConnectedAccount().then((account) => {
-        setConnectedAccount(account ? account.address.main : undefined);
-      });
+      const xpubAddress = await controller.getConnectedAccountXpub();
+      const account = await controller.getConnectedAccount();
+      setConnectedAccount(account ? account.address.main : undefined);
+      setXpubAddress(xpubAddress);
     });
   }, [controller]);
 
@@ -87,7 +91,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <PaliWalletContext.Provider
-      value={{ isInstalled, connectedAccount, connectWallet }}
+      value={{ isInstalled, connectedAccount, connectWallet, xpubAddress }}
     >
       {children}
     </PaliWalletContext.Provider>

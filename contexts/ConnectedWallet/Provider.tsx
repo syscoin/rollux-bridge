@@ -50,6 +50,7 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
         utxo: {
           type: utxoWalletType,
           account: utxoAccount,
+          xpub: paliWallet.xpubAddress,
         },
         connectNEVM,
         connectUTXO,
