@@ -1,19 +1,25 @@
 import { TransferType } from "../types";
 
-export const SetType = (type: TransferType) => ({
+export const setType = (
+  transferType: TransferType
+): {
+  type: "set-type";
+  payload: TransferType;
+} => ({
   type: "set-type",
-  payload: {
-    type,
-  },
+  payload: transferType,
 });
 
-export const SetAmount = (amount: string) => ({
+export const setAmount = (
+  amount: string
+): {
+  type: "set-amount";
+  payload: string;
+} => ({
   type: "set-amount",
-  payload: {
-    amount,
-  },
+  payload: amount,
 });
 
 export type TransferActions =
-  | ReturnType<typeof SetType>
-  | ReturnType<typeof SetAmount>;
+  | ReturnType<typeof setType>
+  | ReturnType<typeof setAmount>;

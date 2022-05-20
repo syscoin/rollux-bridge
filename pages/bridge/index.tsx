@@ -19,6 +19,8 @@ import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import DrawerPage from "../../components/DrawerPage";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import TransferProvider from "../../contexts/Transfer/Provider";
+import { useTransfer } from "../../contexts/Transfer/useTransfer";
+import BridgeSysToSysxForm from "../../components/Bridge/SysToSysxForm";
 
 const Bridge: NextPage = () => {
   return (
@@ -78,27 +80,7 @@ const Bridge: NextPage = () => {
           </Stepper>
           <Grid container>
             <Grid item xs="auto" sx={{ mx: "auto" }}>
-              <Card component="form">
-                <CardContent sx={{ display: "flex", flexDirection: "column" }}>
-                  <TextField
-                    label="Amount"
-                    placeholder="0.01"
-                    margin="dense"
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">SYS</InputAdornment>
-                      ),
-                    }}
-                  />
-                  <Typography variant="caption" sx={{ mt: 2 }}>
-                    # This will convert SYS into SYSX (SPT version of SYS)
-                  </Typography>
-                  <Button variant="contained">
-                    Burn
-                    <LocalFireDepartmentIcon />
-                  </Button>
-                </CardContent>
-              </Card>
+              <BridgeSysToSysxForm />
             </Grid>
           </Grid>
         </Container>

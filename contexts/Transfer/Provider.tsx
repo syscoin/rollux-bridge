@@ -11,8 +11,8 @@ import { useConnectedWallet } from "../ConnectedWallet/useConnectedWallet";
 
 interface ITransferContext {
   transfer: ITransfer;
-  dispatch: Dispatch<TransferActions>;
   startTransfer: (type: TransferType) => void;
+  updateAmount: (amount: string) => void;
 }
 
 export const TransferContext = createContext({} as ITransferContext);
@@ -79,9 +79,7 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     if (transferType === "sys-to-nevm") {
       dispatch({
         type: "set-type",
-        payload: {
-          type: transferType,
-        },
+        payload: transferType,
       });
       startSysToNevmTransfer();
     }
@@ -91,8 +89,15 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     const data = await sysToSysx(transfer.amount, utxo.xpub!, utxo.account!);
   };
 
+  const updateAmount = (amount: string) => {
+    dispatch({
+      type: "set-amount",
+      payload: amount,
+    });
+  };
+
   return (
-    <TransferContext.Provider value={{ transfer, startTransfer, dispatch }}>
+    <TransferContext.Provider value={{ transfer, startTransfer, updateAmount }}>
       {children}
     </TransferContext.Provider>
   );
