@@ -1,12 +1,11 @@
-import { createContext, Dispatch, useReducer } from "react";
-import { TransferActions } from "./store/actions";
+import { createContext, useMemo, useReducer } from "react";
 import reducer from "./store/reducer";
 import { ITransfer, TransferType } from "./types";
 
 import { syscoin, utils as syscoinUtils } from "syscoinjs-lib";
 import satoshibitcoin from "satoshi-bitcoin";
 import BN from "bn.js";
-import { SYSX_ASSET_GUID } from "./constants";
+import { BlockbookAPIURL, SYSX_ASSET_GUID } from "./constants";
 import { useConnectedWallet } from "../ConnectedWallet/useConnectedWallet";
 
 interface ITransferContext {
@@ -34,7 +33,12 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
   id,
   children,
 }) => {
-  const { utxo } = useConnectedWallet();
+  const syscoinInstance = useMemo(
+    () =>
+      new syscoin(null, BlockbookAPIURL, syscoinUtils.syscoinNetworks.mainnet),
+    []
+  );
+  const { utxo, sendUtxoTransaction } = useConnectedWallet();
   const [transfer, dispatch] = useReducer<typeof reducer>(reducer, {
     ...initialState,
     id,
@@ -57,18 +61,16 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
           outputs: [
             {
               value: new BN(satoshibitcoin.toSatoshi(amount)),
-              address: sysAddress,
+              address: assetChangeAddress,
             },
           ],
         },
       ],
     ]);
-    const assetOpts = { ethaddress: Buffer.from("") };
-    const res = await syscoin.assetAllocationBurn(
-      assetOpts,
+    const res = await syscoinInstance.syscoinBurnToAssetAllocation(
       txOpts,
       assetMap,
-      sysAddress,
+      assetChangeAddress,
       feeRate,
       xpub
     );
@@ -85,8 +87,20 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     }
   };
 
-  const startSysToNevmTransfer = async () => {
-    const data = await sysToSysx(transfer.amount, utxo.xpub!, utxo.account!);
+  const startSysToNevmTransfer = () => {
+    const run = async () => {
+      const data = await sysToSysx(transfer.amount, utxo.xpub!, utxo.account!);
+      console.log({ serialized: data });
+      const tx = await sendUtxoTransaction(data);
+      console.log({ tx });
+    };
+    run()
+      .then(() => {
+        console.log("success");
+      })
+      .catch((err) => {
+        console.log({ err });
+      });
   };
 
   const updateAmount = (amount: string) => {

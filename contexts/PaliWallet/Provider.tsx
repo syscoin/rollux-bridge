@@ -1,4 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
+import { UTXOTransaction } from "syscoinjs-lib";
+import { utils as syscoinUtils } from "syscoinjs-lib";
 
 interface IAccount {
   address: { main: string };
@@ -17,6 +19,8 @@ interface ConnectionsController {
   getConnectedAccount: () => Promise<IAccount>;
   onWalletUpdate: (fn: () => Promise<any>) => Promise<any>;
   getConnectedAccountXpub: () => Promise<string>;
+  signAndSend: (psbt: UTXOTransaction) => Promise<UTXOTransaction>;
+  signPSBT: (psbt: UTXOTransaction) => Promise<UTXOTransaction>;
 }
 
 declare global {
@@ -26,22 +30,14 @@ declare global {
   }
 }
 
-interface SyscoinEvent {
-  detail: {
-    SyscoinInstalled: boolean;
-    ConnectionsController: boolean;
-  };
-}
-
-interface SyscoinEvent extends WindowEventMap {
-  SyscoinStatus: Event;
-}
-
 interface IPaliWalletContext {
   isInstalled: boolean;
   connectedAccount?: string;
   xpubAddress?: string;
   connectWallet: () => void;
+  sendTransaction: (
+    transaction: UTXOTransaction
+  ) => Promise<{ tx: string; error?: any }>;
 }
 
 export const PaliWalletContext = createContext({} as IPaliWalletContext);
@@ -89,9 +85,30 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     controller.connectWallet();
   };
 
+  const sendTransaction = async (transaction: UTXOTransaction) => {
+    if (!controller) {
+      return Promise.reject("No controller");
+    }
+    const signedTransaction = await controller.signAndSend(transaction);
+    const unserializedResp = syscoinUtils.importPsbtFromJson(
+      signedTransaction,
+      syscoinUtils.syscoinNetworks.mainnet
+    );
+    return {
+      tx: unserializedResp.psbt.extractTransaction().getId(),
+      error: null,
+    };
+  };
+
   return (
     <PaliWalletContext.Provider
-      value={{ isInstalled, connectedAccount, connectWallet, xpubAddress }}
+      value={{
+        isInstalled,
+        connectedAccount,
+        connectWallet,
+        xpubAddress,
+        sendTransaction,
+      }}
     >
       {children}
     </PaliWalletContext.Provider>

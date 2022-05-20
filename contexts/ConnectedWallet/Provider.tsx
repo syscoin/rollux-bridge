@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useState } from "react";
+import { UTXOTransaction } from "syscoinjs-lib";
 import { useMetamask } from "../Metamask/Provider";
 import { usePaliWallet } from "../PaliWallet/usePaliWallet";
 import { UTXOInfo, NEVMInfo, UTXOWallet, NEVMWallet } from "./types";
@@ -8,6 +9,7 @@ interface IConnectedWalletContext {
   nevm: Partial<NEVMInfo>;
   connectUTXO: (type: UTXOWallet) => void;
   connectNEVM: (type: NEVMWallet) => void;
+  sendUtxoTransaction: (transaction: UTXOTransaction) => Promise<{ tx: string; error?: any }>
 }
 
 export const ConnectedWalletContext = createContext(
@@ -40,6 +42,13 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
     setNevmWalletType(type);
   };
 
+  const sendUtxoTransaction = (transaction: UTXOTransaction) => {
+    if (utxoWalletType === "pali-wallet") {
+      return paliWallet.sendTransaction(transaction);
+    }
+    return Promise.reject(new Error("Wallet not connected"));
+  };
+
   return (
     <ConnectedWalletContext.Provider
       value={{
@@ -54,6 +63,7 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
         },
         connectNEVM,
         connectUTXO,
+        sendUtxoTransaction
       }}
     >
       {children}

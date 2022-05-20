@@ -1,6 +1,32 @@
 declare module "syscoinjs-lib" {
-  declare module syscoin {
-    export function assetAllocationBurn(
+  interface Network {
+    messagePrefix: string;
+    bech32: string;
+    bip32: {
+      public: number;
+      private: number;
+    };
+    pubKeyHash: number;
+    scriptHash: number;
+    wif: number;
+  }
+
+  export interface UTXOTransaction {
+    psbt: Psbt;
+    assets: string;
+  }
+
+  class syscoin {
+    constructor(p1, blockbookAPIURL: string, network: Network): syscoin;
+    syscoinBurnToAssetAllocation(
+      txOpts,
+      assetMap,
+      sysChangeAddress,
+      feeRate,
+      sysFromXpubOrAddress,
+      redeemOrWitnessScript?
+    ): Promise<{ psbt; assets }>;
+    assetAllocationBurn(
       txOpts,
       assetMap,
       sysChangeAddress,
@@ -11,8 +37,12 @@ declare module "syscoinjs-lib" {
     ): Promise<{ psbt; assets }>;
   }
   declare module utils {
-    export function exportPsbtToJson(psbt: Psbt, assets): { psbt; assets };
-    export function importPsbtFromJson(jsonData, network): { psbt; assets };
+    export function exportPsbtToJson(psbt: Psbt, assets): UTXOTransaction;
+    export function importPsbtFromJson(jsonData, network): UTXOTransaction;
+
+    export const syscoinNetworks: {
+      mainnet: Network;
+    };
   }
 }
 
