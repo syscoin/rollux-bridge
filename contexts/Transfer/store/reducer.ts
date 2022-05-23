@@ -28,6 +28,10 @@ export const reducer: Reducer<ITransfer, TransferActions> = (state, action) => {
 
     case "set-status":
       return { ...state, status: action.payload };
+
+    case "initialize": {
+      return action.payload;
+    }
     default:
       return state;
   }

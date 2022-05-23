@@ -1,4 +1,13 @@
 declare module "syscoinjs-lib" {
+  interface SPVProof {
+    transaction: string;
+    blockhash: string;
+    header: string;
+    siblings: string[];
+    index: number;
+    nevm_blockhash: string;
+    chainlock: boolean;
+  }
   interface Network {
     messagePrefix: string;
     bech32: string;
@@ -53,4 +62,11 @@ declare module "syscoinjs-lib" {
 declare module "satoshi-bitcoin" {
   export function toSatoshi(amount: number | string): number;
   export function toBitcoin(amount: number | string): number;
+}
+
+declare module "bitcoin-proof" {
+  export function getProof(
+    txIds: string[],
+    txIndex: number
+  ): { txId: string; txIndex: number; sibling: string[] };
 }
