@@ -9,7 +9,13 @@ interface IConnectedWalletContext {
   nevm: Partial<NEVMInfo>;
   connectUTXO: (type: UTXOWallet) => void;
   connectNEVM: (type: NEVMWallet) => void;
-  sendUtxoTransaction: (transaction: UTXOTransaction) => Promise<{ tx: string; error?: any }>
+  sendUtxoTransaction: (
+    transaction: UTXOTransaction
+  ) => Promise<{ tx: string; error?: any }>;
+  availableWallets: {
+    paliWallet: boolean;
+    metamask: boolean;
+  };
 }
 
 export const ConnectedWalletContext = createContext(
@@ -63,7 +69,11 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
         },
         connectNEVM,
         connectUTXO,
-        sendUtxoTransaction
+        sendUtxoTransaction,
+        availableWallets: {
+          paliWallet: paliWallet.isInstalled,
+          metamask: metamask.isEnabled,
+        },
       }}
     >
       {children}

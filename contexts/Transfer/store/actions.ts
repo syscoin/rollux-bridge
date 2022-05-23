@@ -1,4 +1,4 @@
-import { TransferType } from "../types";
+import { TransferStatus, TransferType } from "../types";
 
 export const setType = (
   transferType: TransferType
@@ -20,6 +20,31 @@ export const setAmount = (
   payload: amount,
 });
 
+export const addLog = (
+  nextStatus: TransferStatus,
+  message: string,
+  data: any
+): {
+  type: "add-log";
+  payload: { nextStatus: TransferStatus; message: string; data: any };
+} => ({
+  type: "add-log",
+  payload: {
+    nextStatus,
+    message,
+    data,
+  },
+});
+
+export const setStatus = (
+  status: TransferStatus
+): { type: "set-status"; payload: TransferStatus } => ({
+  type: "set-status",
+  payload: status,
+});
+
 export type TransferActions =
   | ReturnType<typeof setType>
-  | ReturnType<typeof setAmount>;
+  | ReturnType<typeof setAmount>
+  | ReturnType<typeof addLog>
+  | ReturnType<typeof setStatus>;

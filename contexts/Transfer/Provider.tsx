@@ -1,12 +1,13 @@
-import { createContext, useMemo, useReducer } from "react";
+import { createContext, useEffect, useMemo, useReducer } from "react";
 import reducer from "./store/reducer";
-import { ITransfer, TransferType } from "./types";
+import { ITransfer, ITransferLog, TransferType } from "./types";
 
 import { syscoin, utils as syscoinUtils } from "syscoinjs-lib";
-import satoshibitcoin from "satoshi-bitcoin";
-import BN from "bn.js";
 import { BlockbookAPIURL, SYSX_ASSET_GUID } from "./constants";
 import { useConnectedWallet } from "../ConnectedWallet/useConnectedWallet";
+import { addLog, setStatus } from "./store/actions";
+import burnSysx from "./functions/burnSysx";
+import burnSysToSysx from "./functions/burnSysToSysx";
 
 interface ITransferContext {
   transfer: ITransfer;
@@ -25,7 +26,7 @@ const initialState: ITransfer = {
   amount: "0",
   id: "",
   type: "sys-to-nevm",
-  status: "pending",
+  status: "initialize",
   logs: [],
 };
 
@@ -38,44 +39,11 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
       new syscoin(null, BlockbookAPIURL, syscoinUtils.syscoinNetworks.mainnet),
     []
   );
-  const { utxo, sendUtxoTransaction } = useConnectedWallet();
+  const { utxo, nevm, sendUtxoTransaction } = useConnectedWallet();
   const [transfer, dispatch] = useReducer<typeof reducer>(reducer, {
     ...initialState,
     id,
   });
-
-  const sysToSysx = async (
-    amount: string,
-    xpub: string,
-    sysAddress: string
-  ) => {
-    const feeRate = new BN(10);
-    const txOpts = { rbf: true };
-    const assetGuid = SYSX_ASSET_GUID;
-    const assetChangeAddress = sysAddress;
-    const assetMap = new Map([
-      [
-        assetGuid,
-        {
-          changeAddress: assetChangeAddress,
-          outputs: [
-            {
-              value: new BN(satoshibitcoin.toSatoshi(amount)),
-              address: assetChangeAddress,
-            },
-          ],
-        },
-      ],
-    ]);
-    const res = await syscoinInstance.syscoinBurnToAssetAllocation(
-      txOpts,
-      assetMap,
-      assetChangeAddress,
-      feeRate,
-      xpub
-    );
-    return syscoinUtils.exportPsbtToJson(res.psbt, res.assets);
-  };
 
   const startTransfer = (transferType: TransferType) => {
     if (transferType === "sys-to-nevm") {
@@ -88,20 +56,97 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
   };
 
   const startSysToNevmTransfer = () => {
+    if (utxo.account && nevm.account) {
+      dispatch(setStatus("initialize"));
+      dispatch(
+        addLog("initialize", "Starting Sys to NEVM transfer", {
+          amount: transfer.amount,
+          type: transfer.type,
+          utxoAddress: utxo.account,
+          nevmAddress: nevm.account,
+        })
+      );
+      dispatch(setStatus("burn-sys"));
+    }
+  };
+
+  useEffect(() => {
+    const latestLog = transfer.logs.slice(-1)[0];
+    console.log({ latestLog });
     const run = async () => {
-      const data = await sysToSysx(transfer.amount, utxo.xpub!, utxo.account!);
-      console.log({ serialized: data });
-      const tx = await sendUtxoTransaction(data);
-      console.log({ tx });
+      switch (transfer.status) {
+        case "burn-sys": {
+          const burnSysTransaction = await burnSysToSysx(
+            syscoinInstance,
+            transfer.amount,
+            utxo.xpub!,
+            utxo.account!
+          );
+          const burnSysTransactionReceipt = await sendUtxoTransaction(
+            burnSysTransaction
+          );
+          dispatch(
+            addLog("burn-sys", "Burning SYS to SYSX", burnSysTransactionReceipt)
+          );
+          dispatch(setStatus("burn-sysx"));
+          break;
+        }
+        case "burn-sysx": {
+          const burnSysxTransaction = await burnSysx(
+            syscoinInstance,
+            transfer.amount,
+            SYSX_ASSET_GUID,
+            utxo.account!,
+            utxo.xpub!,
+            nevm.account!
+          );
+          const burnSysxTransactionReceipt = await sendUtxoTransaction(
+            burnSysxTransaction
+          );
+          dispatch(
+            addLog(
+              "burn-sysx",
+              "Burning SYSX to NEVM",
+              burnSysxTransactionReceipt
+            )
+          );
+          dispatch(setStatus("generate-proofs"));
+          break;
+        }
+
+        case "generate-proofs": {
+          const { tx } = transfer.logs.find((log) => log.status === "burn-sysx")
+            ?.payload.data;
+          const proof = await syscoinUtils.fetchBackendSPVProof(
+            BlockbookAPIURL,
+            tx
+          );
+          dispatch(addLog("generate-proofs", "Submitting proofs", { proof }));
+          dispatch(setStatus("submit-proofs"));
+        }
+        default:
+          return;
+      }
     };
     run()
       .then(() => {
+        localStorage.setItem(
+          `transfer-${transfer.id}`,
+          JSON.stringify(transfer)
+        );
         console.log("success");
       })
       .catch((err) => {
         console.log({ err });
       });
-  };
+  }, [
+    transfer,
+    transfer.status,
+    sendUtxoTransaction,
+    utxo,
+    nevm,
+    syscoinInstance,
+  ]);
 
   const updateAmount = (amount: string) => {
     dispatch({

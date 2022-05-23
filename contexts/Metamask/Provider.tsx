@@ -23,7 +23,9 @@ const MetamaskContext = createContext({} as MetamaskContext);
 
 export const useMetamask = () => useContext(MetamaskContext);
 
-const MetamaskProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [account, setAccount] = useState<string | undefined>();
 
@@ -46,10 +48,41 @@ const MetamaskProvider: React.FC<{children: React.ReactNode}> = ({ children }) =
     if (typeof window.ethereum !== "undefined" && window.ethereum.isMetaMask) {
       setIsEnabled(true);
     }
+  }, []);
+
+  useEffect(() => {
+    if (!isEnabled) {
+      return;
+    }
     if (window.ethereum.selectedAddress) {
       setAccount(window.ethereum.selectedAddress);
     }
-  }, []);
+    window.ethereum
+      .request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0x39" }],
+      })
+      .catch(({ code }) => {
+        if (code === 4902) {
+          window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainId: "0x39",
+                chainName: "Syscoin NEVM",
+                nativeCurrency: {
+                  name: "Syscoin",
+                  symbol: "SYS",
+                  decimals: 18,
+                },
+                rpcUrls: ["https://rpc.syscoin.org"],
+                blockExplorerUrls: ["https://explorer.syscoin.org/"],
+              },
+            ],
+          });
+        }
+      });
+  }, [isEnabled]);
 
   return (
     <MetamaskContext.Provider

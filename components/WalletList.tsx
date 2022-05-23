@@ -3,7 +3,8 @@ import Image from "next/image";
 import { useConnectedWallet } from "../contexts/ConnectedWallet/useConnectedWallet";
 
 const WalletList: React.FC = () => {
-  const { nevm, utxo, connectNEVM, connectUTXO } = useConnectedWallet();
+  const { nevm, utxo, connectNEVM, connectUTXO, availableWallets } =
+    useConnectedWallet();
   return (
     <Box>
       <Typography variant="body2">Connect Wallet:</Typography>
@@ -34,8 +35,9 @@ const WalletList: React.FC = () => {
               sx={{ ml: "auto" }}
               variant="contained"
               onClick={() => connectUTXO("pali-wallet")}
+              disabled={!availableWallets.paliWallet}
             >
-              Connect
+              {availableWallets.metamask ? "Connect" : "Not installed"}
             </Button>
           </>
         )}
@@ -68,8 +70,9 @@ const WalletList: React.FC = () => {
               sx={{ ml: "auto" }}
               variant="contained"
               onClick={() => connectNEVM("metamask")}
+              disabled={!availableWallets.metamask}
             >
-              Connect
+              {availableWallets.metamask ? "Connect" : "Not installed"}
             </Button>
           </>
         )}

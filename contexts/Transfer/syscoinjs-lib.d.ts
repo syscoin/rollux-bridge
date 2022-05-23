@@ -39,6 +39,10 @@ declare module "syscoinjs-lib" {
   declare module utils {
     export function exportPsbtToJson(psbt: Psbt, assets): UTXOTransaction;
     export function importPsbtFromJson(jsonData, network): UTXOTransaction;
+    export function fetchBackendSPVProof(
+      blockbookAPIURL: string,
+      txId: string
+    ): Promise<any>;
 
     export const syscoinNetworks: {
       mainnet: Network;

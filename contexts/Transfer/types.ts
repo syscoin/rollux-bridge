@@ -1,10 +1,22 @@
 export type TransferType = "sys-to-nevm" | "nevm-to-sys";
 
-export type TransferStatus = "pending" | "success" | "failed";
+export type SysToEthTransferStatus =
+  | "initialize"
+  | "burn-sys"
+  | "burn-sysx"
+  | "generate-proofs"
+  | "submit-proofs"
+  | "completed"
+  | "error";
 
-export interface ITransferLog {
-  type: string;
-  payload: any;
+export type TransferStatus = SysToEthTransferStatus;
+
+export interface ITransferLog<T = any> {
+  status: TransferStatus;
+  payload: {
+    message: string;
+    data: T;
+  };
 }
 
 export interface ITransfer {
