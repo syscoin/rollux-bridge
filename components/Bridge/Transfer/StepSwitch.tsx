@@ -22,11 +22,7 @@ const BridgeTransferStepSwitch: React.FC = () => {
     return <BridgeSysToSysxForm />;
   }
 
-  if (
-    status === "burn-sys" ||
-    status === "burn-sysx" ||
-    status === "generate-proofs"
-  ) {
+  if (status === "burn-sys" || status === "burn-sysx") {
     return (
       <Alert
         severity="warning"
@@ -41,6 +37,18 @@ const BridgeTransferStepSwitch: React.FC = () => {
     );
   }
 
+  if (status === "generate-proofs") {
+    <Alert
+      severity="warning"
+      action={
+        <Button color="inherit" size="small" onClick={() => retry()}>
+          Retry
+        </Button>
+      }
+    >
+      Check Pali Wallet for transaction confirmations
+    </Alert>;
+  }
   if (status === "submit-proofs") {
     return (
       <Alert
