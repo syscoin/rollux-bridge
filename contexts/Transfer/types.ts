@@ -25,4 +25,6 @@ export interface ITransfer {
   status: TransferStatus;
   amount: string;
   logs: ITransferLog[];
+  createdAt: number;
+  updatedAt?: number;
 }

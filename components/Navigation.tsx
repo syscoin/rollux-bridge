@@ -14,7 +14,7 @@ const NavigationItem: React.FC<INavigationItem> = ({ label, path }) => {
       <Link href={path}>
         <ListItemButton
           sx={
-            pathname === path
+            pathname.startsWith(path)
               ? {
                   backgroundColor: "primary.dark",
                   color: "white",
@@ -31,10 +31,6 @@ const NavigationItem: React.FC<INavigationItem> = ({ label, path }) => {
 
 const Navigation: React.FC = () => {
   const routes: INavigationItem[] = [
-    {
-      label: "Bridge",
-      path: "/bridge",
-    },
     {
       label: "My Transfers",
       path: "/transfers",

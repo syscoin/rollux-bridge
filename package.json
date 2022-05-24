@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.8.0",
     "@mui/material": "^5.7.0",
+    "@mui/x-data-grid": "^5.11.1",
     "@web3-react/core": "^6.1.9",
     "@web3-react/metamask": "^8.0.0-beta.0",
     "bitcoin-proof": "^2.0.0",

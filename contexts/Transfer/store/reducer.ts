@@ -5,10 +5,10 @@ import { TransferActions } from "./actions";
 export const reducer: Reducer<ITransfer, TransferActions> = (state, action) => {
   switch (action.type) {
     case "set-type":
-      return { ...state, type: action.payload };
+      return { ...state, type: action.payload, updatedAt: Date.now() };
 
     case "set-amount":
-      return { ...state, amount: action.payload };
+      return { ...state, amount: action.payload, updatedAt: Date.now() };
 
     case "add-log":
       const { data, message, nextStatus } = action.payload;
@@ -24,10 +24,11 @@ export const reducer: Reducer<ITransfer, TransferActions> = (state, action) => {
             },
           },
         ],
+        updatedAt: Date.now(),
       };
 
     case "set-status":
-      return { ...state, status: action.payload };
+      return { ...state, status: action.payload, updatedAt: Date.now() };
 
     case "initialize": {
       return action.payload;

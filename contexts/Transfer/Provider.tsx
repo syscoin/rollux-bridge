@@ -34,14 +34,6 @@ type TransferProviderProps = {
   children: React.ReactNode;
 };
 
-const initialState: ITransfer = {
-  amount: "0",
-  id: "",
-  type: "sys-to-nevm",
-  status: "initialize",
-  logs: [],
-};
-
 const TransferProvider: React.FC<TransferProviderProps> = ({
   id,
   children,
@@ -61,6 +53,17 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     );
   }, [web3]);
   const { utxo, nevm, sendUtxoTransaction } = useConnectedWallet();
+  const initialState: ITransfer = useMemo(
+    () => ({
+      amount: "0",
+      id,
+      type: "sys-to-nevm",
+      status: "initialize",
+      logs: [],
+      createdAt: Date.now(),
+    }),
+    [id]
+  );
   const [transfer, dispatch] = useReducer<typeof reducer>(reducer, {
     ...initialState,
     id,
@@ -264,7 +267,7 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     }
     dispatch(initialize(defaultState));
     setIsInitialized(true);
-  }, [id]);
+  }, [id, initialState]);
 
   const updateAmount = (amount: string) => {
     dispatch({
