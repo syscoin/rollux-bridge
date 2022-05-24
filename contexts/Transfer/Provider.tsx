@@ -1,6 +1,13 @@
-import { createContext, useEffect, useMemo, useReducer, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from "react";
 import reducer from "./store/reducer";
-import { ITransfer, ITransferLog, TransferType } from "./types";
+import { ITransfer, ITransferLog, TransferStatus, TransferType } from "./types";
 
 import { SPVProof, syscoin, utils as syscoinUtils } from "syscoinjs-lib";
 import { BlockbookAPIURL, SYSX_ASSET_GUID } from "./constants";
@@ -16,6 +23,8 @@ interface ITransferContext {
   transfer: ITransfer;
   startTransfer: (type: TransferType) => void;
   updateAmount: (amount: string) => void;
+  retry: () => void;
+  error?: any;
 }
 
 export const TransferContext = createContext({} as ITransferContext);
@@ -56,7 +65,10 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     ...initialState,
     id,
   });
+
   const [initialized, setIsInitialized] = useState(false);
+  const [previousStatus, setPreviousStatus] = useState<TransferStatus>();
+  const [error, setError] = useState();
 
   const startTransfer = (transferType: TransferType) => {
     if (transferType === "sys-to-nevm") {
@@ -83,148 +95,125 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     }
   };
 
-  useEffect(() => {
-    const latestLog = transfer.logs.slice(-1)[0];
-    console.log({ latestLog });
-    const run = async () => {
-      switch (transfer.status) {
-        case "burn-sys": {
-          const burnSysTransaction = await burnSysToSysx(
-            syscoinInstance,
-            transfer.amount,
-            utxo.xpub!,
-            utxo.account!
-          );
-          const burnSysTransactionReceipt = await sendUtxoTransaction(
-            burnSysTransaction
-          );
-          dispatch(
-            addLog("burn-sys", "Burning SYS to SYSX", burnSysTransactionReceipt)
-          );
-          dispatch(setStatus("burn-sysx"));
-          break;
-        }
-        case "burn-sysx": {
-          const burnSysxTransaction = await burnSysx(
-            syscoinInstance,
-            transfer.amount,
-            SYSX_ASSET_GUID,
-            utxo.account!,
-            utxo.xpub!,
-            nevm.account!
-          );
-          console.log("Burn SYSX sign requested");
-          const burnSysxTransactionReceipt = await sendUtxoTransaction(
-            burnSysxTransaction
-          );
-          console.log("Burn SYSX sign sent!!!");
-          dispatch(
-            addLog(
-              "burn-sysx",
-              "Burning SYSX to NEVM",
-              burnSysxTransactionReceipt
-            )
-          );
-          dispatch(setStatus("generate-proofs"));
-          break;
-        }
+  const runSideEffects = useCallback(async () => {
+    switch (transfer.status) {
+      case "burn-sys": {
+        const burnSysTransaction = await burnSysToSysx(
+          syscoinInstance,
+          transfer.amount,
+          utxo.xpub!,
+          utxo.account!
+        );
+        const burnSysTransactionReceipt = await sendUtxoTransaction(
+          burnSysTransaction
+        );
+        dispatch(
+          addLog("burn-sys", "Burning SYS to SYSX", burnSysTransactionReceipt)
+        );
+        setTimeout(() => dispatch(setStatus("burn-sysx")), 3000);
+        break;
+      }
+      case "burn-sysx": {
+        const burnSysxTransaction = await burnSysx(
+          syscoinInstance,
+          transfer.amount,
+          SYSX_ASSET_GUID,
+          utxo.account!,
+          utxo.xpub!,
+          nevm.account!
+        );
+        const burnSysxTransactionReceipt = await sendUtxoTransaction(
+          burnSysxTransaction
+        );
+        dispatch(
+          addLog(
+            "burn-sysx",
+            "Burning SYSX to NEVM",
+            burnSysxTransactionReceipt
+          )
+        );
+        dispatch(setStatus("generate-proofs"));
+        break;
+      }
 
-        case "generate-proofs": {
-          const { tx } = transfer.logs.find((log) => log.status === "burn-sysx")
-            ?.payload.data;
-          const proof = await syscoinUtils.fetchBackendSPVProof(
-            BlockbookAPIURL,
-            tx
-          );
-          const results = JSON.parse(proof.result) as SPVProof;
-          dispatch(addLog("generate-proofs", "Submitting proofs", { results }));
-          dispatch(setStatus("submit-proofs"));
-          break;
+      case "generate-proofs": {
+        const { tx } = transfer.logs.find((log) => log.status === "burn-sysx")
+          ?.payload.data;
+        const proof = await syscoinUtils.fetchBackendSPVProof(
+          BlockbookAPIURL,
+          tx
+        );
+        if (proof.result === "") {
+          throw new Error("Proof not yet available");
         }
-        case "submit-proofs": {
-          const proof = transfer.logs.find(
-            (log) => log.status === "generate-proofs"
-          )?.payload.data.results as SPVProof;
-          const nevmBlock = await web3.eth.getBlock(
-            `0x${proof.nevm_blockhash}`
-          );
-          const txBytes = `0x${proof.transaction}`;
-          const txIndex = proof.index;
-          const merkleProof = getProof(proof.siblings, txIndex);
-          merkleProof.sibling = merkleProof.sibling.map(
-            (sibling) => `0x${sibling}`
-          );
-          const syscoinBlockheader = `0x${proof.header}`;
-          relayContract.methods
-            .relayTx(
-              nevmBlock.number,
-              txBytes,
-              txIndex,
-              merkleProof.sibling,
-              syscoinBlockheader
-            )
-            .send({
-              from: nevm.account!,
-              gas: 400000,
-            })
-            .once("transactionHash", (hash: string) => {
-              console.log("Relay tx hash", hash);
+        const results = JSON.parse(proof.result) as SPVProof;
+        dispatch(addLog("generate-proofs", "Submitting proofs", { results }));
+        dispatch(setStatus("submit-proofs"));
+        break;
+      }
+      case "submit-proofs": {
+        const proof = transfer.logs.find(
+          (log) => log.status === "generate-proofs"
+        )?.payload.data.results as SPVProof;
+        const nevmBlock = await web3.eth.getBlock(`0x${proof.nevm_blockhash}`);
+        const txBytes = `0x${proof.transaction}`;
+        const txIndex = proof.index;
+        const merkleProof = getProof(proof.siblings, txIndex);
+        merkleProof.sibling = merkleProof.sibling.map(
+          (sibling) => `0x${sibling}`
+        );
+        const syscoinBlockheader = `0x${proof.header}`;
+        relayContract.methods
+          .relayTx(
+            nevmBlock.number,
+            txBytes,
+            txIndex,
+            merkleProof.sibling,
+            syscoinBlockheader
+          )
+          .send({
+            from: nevm.account!,
+            gas: 400000,
+          })
+          .once("transactionHash", (hash: string) => {
+            console.log("Relay tx hash", hash);
+            dispatch(
+              addLog("submit-proofs", "Transaction hash", {
+                hash,
+              })
+            );
+          })
+          .once("confirmation", (confirmationNumber: number, receipt: any) => {
+            console.log("Relay tx confirmation", confirmationNumber, receipt);
+
+            dispatch(
+              addLog("completed", "Proof confirmed", {
+                confirmationNumber,
+                receipt,
+              })
+            );
+            dispatch(setStatus("completed"));
+          })
+          .on("error", (error: { message: string }) => {
+            console.log(error);
+            if (/might still be mined/.test(error.message)) {
+              dispatch(setStatus("completed"));
+            } else {
               dispatch(
-                addLog("submit-proofs", "Transaction hash", {
-                  hash,
+                addLog("error", "Proof error", {
+                  error,
                 })
               );
-            })
-            .once(
-              "confirmation",
-              (confirmationNumber: number, receipt: any) => {
-                console.log(
-                  "Relay tx confirmation",
-                  confirmationNumber,
-                  receipt
-                );
-
-                dispatch(
-                  addLog("submit-proofs", "Proof confirmed", {
-                    confirmationNumber,
-                    receipt,
-                  })
-                );
-                dispatch(setStatus("completed"));
-              }
-            )
-            .on("error", (error: { message: string }) => {
-              console.log(error);
-              if (/might still be mined/.test(error.message)) {
-                dispatch(setStatus("completed"));
-              } else {
-                dispatch(
-                  addLog("submit-proofs", "Proof error", {
-                    error,
-                  })
-                );
-              }
-            });
-          break;
-        }
-        default:
-          return;
+              dispatch(setStatus("error"));
+            }
+          });
+        break;
       }
-    };
-    run()
-      .then(() => {
-        localStorage.setItem(
-          `transfer-${transfer.id}`,
-          JSON.stringify(transfer)
-        );
-        console.log("success");
-      })
-      .catch((err) => {
-        console.log({ err });
-      });
+      default:
+        return;
+    }
   }, [
     transfer,
-    transfer.status,
     sendUtxoTransaction,
     utxo,
     nevm,
@@ -234,7 +223,31 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
   ]);
 
   useEffect(() => {
-    if (!initialized) {
+    if (previousStatus === transfer.status) {
+      return;
+    }
+    setError(undefined);
+    runSideEffects().catch((err) => {
+      console.log({ err });
+      setError(error);
+    });
+    setPreviousStatus(transfer.status);
+  }, [
+    transfer,
+    transfer.status,
+    sendUtxoTransaction,
+    utxo,
+    nevm,
+    syscoinInstance,
+    relayContract,
+    web3,
+    previousStatus,
+    runSideEffects,
+    error,
+  ]);
+
+  useEffect(() => {
+    if (!initialized || !transfer.id) {
       return;
     }
     localStorage.setItem(`transfer-${transfer.id}`, JSON.stringify(transfer));
@@ -242,7 +255,14 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
 
   useEffect(() => {
     const item = localStorage.getItem(`transfer-${id}`);
-    dispatch(initialize(item ? JSON.parse(item) : initialState));
+    let defaultState = {
+      ...initialState,
+      id,
+    };
+    if (item) {
+      defaultState = JSON.parse(item);
+    }
+    dispatch(initialize(defaultState));
     setIsInitialized(true);
   }, [id]);
 
@@ -254,7 +274,18 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
   };
 
   return (
-    <TransferContext.Provider value={{ transfer, startTransfer, updateAmount }}>
+    <TransferContext.Provider
+      value={{
+        transfer,
+        startTransfer,
+        updateAmount,
+        retry: () =>
+          runSideEffects().catch((err) => {
+            console.log({ err });
+          }),
+        error,
+      }}
+    >
       {children}
     </TransferContext.Provider>
   );

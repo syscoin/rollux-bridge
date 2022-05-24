@@ -1,30 +1,29 @@
 import {
-  Box,
-  Button,
-  Card,
-  CardContent,
+  CircularProgress,
   Container,
   Grid,
   IconButton,
-  InputAdornment,
-  Step,
-  StepLabel,
-  Stepper,
-  TextField,
   Typography,
 } from "@mui/material";
 import { NextPage } from "next";
 import BridgeWalletInfo from "../../components/Bridge/WalletInfo";
-import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import DrawerPage from "../../components/DrawerPage";
-import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import TransferProvider from "../../contexts/Transfer/Provider";
-import { useTransfer } from "../../contexts/Transfer/useTransfer";
-import BridgeSysToSysxForm from "../../components/Bridge/SysToSysxForm";
+import BridgeTransferStepSwitch from "components/Bridge/Transfer/StepSwitch";
+import BridgeTransferStepper from "components/Bridge/Stepper";
+import { useRouter } from "next/router";
+import ArrowForward from "@mui/icons-material/ArrowForward";
 
 const Bridge: NextPage = () => {
+  const router = useRouter();
+  const { id } = router.query;
+
+  if (!id) {
+    return <CircularProgress />;
+  }
+
   return (
-    <TransferProvider id="test">
+    <TransferProvider id={id as string}>
       <DrawerPage>
         <Container sx={{ mt: 10 }}>
           <Typography variant="h5" fontWeight="bold">
@@ -51,8 +50,9 @@ const Bridge: NextPage = () => {
               />
             </Grid>
             <Grid item xs={2} display="flex">
-              <IconButton sx={{ m: "auto" }} color="secondary">
-                <CompareArrowsIcon />
+              <IconButton sx={{ m: "auto" }} color="secondary" disabled>
+                {/* <CompareArrowsIcon /> */}
+                <ArrowForward />
               </IconButton>
             </Grid>
             <Grid item xs={5}>
@@ -67,20 +67,10 @@ const Bridge: NextPage = () => {
               />
             </Grid>
           </Grid>
-          <Stepper activeStep={0} alternativeLabel sx={{ mb: 2 }}>
-            <Step>
-              <StepLabel>Transfer</StepLabel>
-            </Step>
-            <Step>
-              <StepLabel>Prove</StepLabel>
-            </Step>
-            <Step>
-              <StepLabel>Mint</StepLabel>
-            </Step>
-          </Stepper>
+          <BridgeTransferStepper />
           <Grid container>
             <Grid item xs="auto" sx={{ mx: "auto" }}>
-              <BridgeSysToSysxForm />
+              <BridgeTransferStepSwitch />
             </Grid>
           </Grid>
         </Container>

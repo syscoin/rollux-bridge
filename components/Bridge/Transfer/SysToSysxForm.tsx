@@ -7,7 +7,8 @@ import {
   Typography,
 } from "@mui/material";
 import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
-import { useTransfer } from "../../contexts/Transfer/useTransfer";
+import { useTransfer } from "contexts/Transfer/useTransfer";
+
 
 const BridgeSysToSysxForm: React.FC = () => {
   const { updateAmount, transfer, startTransfer } = useTransfer();
