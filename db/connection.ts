@@ -1,6 +1,15 @@
 import mongoose from "mongoose";
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 
+export const nextPageConnectDb = async () => {
+  if (mongoose.connections[0].readyState) {
+    return;
+  }
+  const mongoUrl =
+    process.env.MONGODB_URI ?? "mongodb://localhost/syscoin-bridge";
+  await mongoose.connect(mongoUrl);
+};
+
 const connectDB =
   (handler: NextApiHandler) =>
   async (req: NextApiRequest, res: NextApiResponse) => {

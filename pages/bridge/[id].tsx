@@ -5,7 +5,7 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import { NextPage } from "next";
+import { NextPage, NextPageContext } from "next";
 import BridgeWalletInfo from "../../components/Bridge/WalletInfo";
 import DrawerPage from "../../components/DrawerPage";
 import TransferProvider from "../../contexts/Transfer/Provider";
@@ -13,8 +13,16 @@ import BridgeTransferStepSwitch from "components/Bridge/Transfer/StepSwitch";
 import BridgeTransferStepper from "components/Bridge/Stepper";
 import { useRouter } from "next/router";
 import ArrowForward from "@mui/icons-material/ArrowForward";
+import { nextPageConnectDb } from "db/connection";
+import Transfer from "db/models/transfer";
+import { ITransfer } from "contexts/Transfer/types";
+import { Document } from "mongoose";
 
-const Bridge: NextPage = () => {
+interface Props {
+  transfer: ITransfer;
+}
+
+const Bridge: NextPage<Props> = ({ transfer }) => {
   const router = useRouter();
   const { id } = router.query;
 

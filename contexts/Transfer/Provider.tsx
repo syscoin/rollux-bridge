@@ -61,8 +61,10 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
       status: "initialize",
       logs: [],
       createdAt: Date.now(),
+      nevmAddress: nevm.account!,
+      utxoAddress: utxo.account!,
     }),
-    [id]
+    [id, utxo, nevm]
   );
   const [transfer, dispatch] = useReducer<typeof reducer>(reducer, {
     ...initialState,
@@ -225,6 +227,13 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     web3,
   ]);
 
+  const updateAmount = (amount: string) => {
+    dispatch({
+      type: "set-amount",
+      payload: amount,
+    });
+  };
+
   useEffect(() => {
     if (previousStatus === transfer.status) {
       return;
@@ -237,7 +246,6 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     setPreviousStatus(transfer.status);
   }, [
     transfer,
-    transfer.status,
     sendUtxoTransaction,
     utxo,
     nevm,
@@ -253,10 +261,27 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     if (!initialized || !transfer.id) {
       return;
     }
-    localStorage.setItem(`transfer-${transfer.id}`, JSON.stringify(transfer));
+    if (transfer.status !== "initialize") {
+      localStorage.setItem(`transfer-${transfer.id}`, JSON.stringify(transfer));
+      fetch(`/api/transfer/${transfer.id}`, {
+        body: JSON.stringify(transfer),
+        method: "PATCH",
+      }).then(() => {
+        console.log("Saved in DB");
+      });
+    }
   }, [transfer, initialized]);
 
   useEffect(() => {
+    fetch(`/api/transfer/${id}`)
+      .then((transfer) => {
+        return transfer.status === 200 ? transfer.json() : undefined;
+      })
+      .then((state) => {
+        if (state) {
+          dispatch(initialize(state));
+        }
+      });
     const item = localStorage.getItem(`transfer-${id}`);
     let defaultState = {
       ...initialState,
@@ -268,13 +293,6 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     dispatch(initialize(defaultState));
     setIsInitialized(true);
   }, [id, initialState]);
-
-  const updateAmount = (amount: string) => {
-    dispatch({
-      type: "set-amount",
-      payload: amount,
-    });
-  };
 
   return (
     <TransferContext.Provider

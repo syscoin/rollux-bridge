@@ -38,16 +38,18 @@ const BridgeTransferStepSwitch: React.FC = () => {
   }
 
   if (status === "generate-proofs") {
-    <Alert
-      severity="warning"
-      action={
-        <Button color="inherit" size="small" onClick={() => retry()}>
-          Retry
-        </Button>
-      }
-    >
-      Check Pali Wallet for transaction confirmations
-    </Alert>;
+    return (
+      <Alert
+        severity="warning"
+        action={
+          <Button color="inherit" size="small" onClick={() => retry()}>
+            Retry
+          </Button>
+        }
+      >
+        Check Pali Wallet for transaction confirmations
+      </Alert>
+    );
   }
   if (status === "submit-proofs") {
     return (

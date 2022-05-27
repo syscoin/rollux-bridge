@@ -27,4 +27,6 @@ export interface ITransfer {
   logs: ITransferLog[];
   createdAt: number;
   updatedAt?: number;
+  utxoAddress: string;
+  nevmAddress: string;
 }
