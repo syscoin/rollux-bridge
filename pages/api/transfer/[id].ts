@@ -17,16 +17,18 @@ const getRequest = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const patchRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
-  const transferBody = req.body;
+  const transferBody = JSON.parse(req.body);
 
   let transfer = await Transfer.findOne({
     id,
   });
 
   if (!transfer) {
-    transfer = await Transfer.create({ ...transfer, ...transferBody });
+    console.log("CREATE", transferBody);
+    transfer = await Transfer.create(transferBody);
+    transfer = transfer.save();
   } else {
-    transfer = await Transfer.findOneAndUpdate({ id }, transferBody);
+    transfer = await Transfer.findOneAndUpdate({ id }, { $set: transferBody });
   }
 
   res.status(200).json(transfer);
