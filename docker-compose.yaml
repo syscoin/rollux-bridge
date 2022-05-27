@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  my-mongoDB:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+    - db-data:/data/db
+    - mongo-config:/data/configdb
+ 
+volumes:
+  db-data:
+  mongo-config:
