@@ -105,7 +105,7 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
       case "burn-sys": {
         const burnSysTransaction = await burnSysToSysx(
           syscoinInstance,
-          transfer.amount,
+          parseFloat(transfer.amount).toFixed(6),
           utxo.xpub!,
           utxo.account!
         );

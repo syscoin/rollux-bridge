@@ -1,9 +1,12 @@
 import { Box, Button, Container, Link, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import DrawerPage from "components/DrawerPage";
+import WalletList from "components/WalletList";
+import { useConnectedWallet } from "contexts/ConnectedWallet/useConnectedWallet";
 import { ITransfer } from "contexts/Transfer/types";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 
 const DateField: React.FC<{ value: number }> = ({ value }) => {
   if (!value) {
@@ -20,6 +23,20 @@ const DateField: React.FC<{ value: number }> = ({ value }) => {
 
 const TransfersPage: NextPage = () => {
   const [items, setItems] = useState<ITransfer[]>([]);
+  const { utxo, nevm } = useConnectedWallet();
+
+  const { data, isFetched } = useQuery(
+    "transfers",
+    () => {
+      const searchParams = new URLSearchParams();
+      searchParams.set("utxo", utxo.account!);
+      searchParams.set("nevm", nevm.account!);
+      return fetch(`/api/transfer?${searchParams.toString()}`).then((resp) =>
+        resp.json()
+      );
+    },
+    { enabled: Boolean(utxo?.account || nevm?.account) }
+  );
 
   useEffect(() => {
     if (!localStorage) {
@@ -53,7 +70,7 @@ const TransfersPage: NextPage = () => {
             {
               field: "id",
               headerName: "Id",
-              width: 150,
+              width: 130,
             },
             {
               field: "type",
@@ -62,16 +79,31 @@ const TransfersPage: NextPage = () => {
             {
               field: "amount",
               headerName: "Amount",
+              renderCell: ({ value }) => `${value} SYS`,
+            },
+            {
+              field: "utxoAddress",
+              headerName: "UTXO",
+              width: 320,
+            },
+            {
+              field: "nevmAddress",
+              headerName: "NEVM",
+              width: 300,
             },
             {
               field: "status",
               headerName: "Status",
               renderCell: ({ value }) => {
+                let color = "inherit";
+                if (value === "completed") {
+                  color = "green";
+                }
+                if (value === "error") {
+                  color = "error";
+                }
                 return (
-                  <Typography
-                    variant="body1"
-                    color={value === "completed" ? "green" : "inherit"}
-                  >
+                  <Typography variant="body1" color={color}>
                     {value}
                   </Typography>
                 );
@@ -80,13 +112,13 @@ const TransfersPage: NextPage = () => {
             {
               field: "createdAt",
               headerName: "Created At",
-              flex: 1,
+              width: 200,
               renderCell: ({ value }) => <DateField value={value} />,
             },
             {
               field: "updatedAt",
               headerName: "Updated At",
-              flex: 1,
+              width: 200,
               renderCell: ({ value }) => <DateField value={value} />,
             },
             {
@@ -97,10 +129,11 @@ const TransfersPage: NextPage = () => {
               },
             },
           ]}
-          rows={items ?? []}
-          sx={{ background: "white" }}
+          rows={isFetched ? data ?? items : []}
+          sx={{ background: "white", mb: 2 }}
           autoHeight
         />
+        <WalletList />
       </Container>
     </DrawerPage>
   );

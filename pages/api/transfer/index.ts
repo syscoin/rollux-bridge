@@ -13,7 +13,7 @@ const getAll: NextApiHandler = async (req, res) => {
         utxoAddress: utxo,
       },
     ],
-  });
+  }).sort({ createdAt: -1 });
   return res.status(200).json(transfers);
 };
 
