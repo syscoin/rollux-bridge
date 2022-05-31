@@ -1,6 +1,7 @@
-import { Button, Box, Typography } from "@mui/material";
+import { Button, Box, Typography, Link } from "@mui/material";
 import Image from "next/image";
 import { useConnectedWallet } from "../contexts/ConnectedWallet/useConnectedWallet";
+import { Launch } from "@mui/icons-material";
 
 const WalletList: React.FC = () => {
   const { nevm, utxo, connectNEVM, connectUTXO, availableWallets } =
@@ -31,13 +32,19 @@ const WalletList: React.FC = () => {
         ) : (
           <>
             <Typography variant="body1">PaliWallet</Typography>
+            <Link
+              href="https://chrome.google.com/webstore/detail/pali-wallet/mgffkfbidihjpoaomajlbgchddlicgpn"
+              title="Download Pali Wallet"
+            >
+              <Launch />
+            </Link>
             <Button
               sx={{ ml: "auto" }}
               variant="contained"
               onClick={() => connectUTXO("pali-wallet")}
               disabled={!availableWallets.paliWallet}
             >
-              {availableWallets.metamask ? "Connect" : "Not installed"}
+              {availableWallets.paliWallet ? "Connect" : "Not installed"}
             </Button>
           </>
         )}
@@ -66,6 +73,12 @@ const WalletList: React.FC = () => {
         ) : (
           <>
             <Typography variant="body1">Metamask</Typography>
+            <Link
+              href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn"
+              title="Download Metamask"
+            >
+              <Launch />
+            </Link>
             <Button
               sx={{ ml: "auto" }}
               variant="contained"

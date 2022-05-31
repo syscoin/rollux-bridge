@@ -1,5 +1,14 @@
 import { ThemeProvider } from "@emotion/react";
-import { Box, Button, Container, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  Grid,
+  styled,
+  Typography,
+} from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -8,6 +17,18 @@ import Link from "next/link";
 
 import WalletList from "../components/WalletList";
 import { useConnectedWallet } from "../contexts/ConnectedWallet/useConnectedWallet";
+import HomeHowItWorks from "components/Home/HowItWorks";
+import ContactUs from "components/Home/ContactUs";
+import FAQ from "components/Home/FAQ";
+import Footer from "components/Footer";
+
+const SectionContainer = styled(Box)({
+  padding: "4rem",
+});
+
+const ColoredContainer = styled(SectionContainer)({
+  backgroundColor: "#b7c9ff",
+});
 
 const Home: NextPage = () => {
   const { nevm, utxo } = useConnectedWallet();
@@ -55,7 +76,13 @@ const Home: NextPage = () => {
             )}
           </Grid>
         </Grid>
+        <Container>
+          <HomeHowItWorks />
+        </Container>
+        <Box component={FAQ} mb={3} />
+        <Box component={ContactUs} mb={3} />
       </Box>
+      <Footer />
     </Box>
   );
 };

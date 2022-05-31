@@ -37,7 +37,7 @@ const Navigation: React.FC = () => {
     },
     {
       label: "FAQ",
-      path: "/faq",
+      path: "/#faq",
     },
   ];
 
