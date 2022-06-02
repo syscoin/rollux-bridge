@@ -302,7 +302,7 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
         updateAmount,
         retry: () =>
           runSideEffects().catch((err) => {
-            console.log({ err });
+            setError(err);
           }),
         error,
       }}

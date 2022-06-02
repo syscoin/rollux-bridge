@@ -8,9 +8,11 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: syscoin-bridge
     volumes:
     - db-data:/data/db
     - mongo-config:/data/configdb
+    - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
  
 volumes:
   db-data:

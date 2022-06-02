@@ -15,8 +15,10 @@ import BridgeSysToSysxForm from "./SysToSysxForm";
 const BridgeTransferStepSwitch: React.FC = () => {
   const {
     transfer: { status },
+    error,
     retry,
   } = useTransfer();
+  console.log({ error });
 
   if (status === "initialize") {
     return <BridgeSysToSysxForm />;
@@ -25,14 +27,14 @@ const BridgeTransferStepSwitch: React.FC = () => {
   if (status === "burn-sys" || status === "burn-sysx") {
     return (
       <Alert
-        severity="warning"
+        severity={error ? "error" : "warning"}
         action={
           <Button color="inherit" size="small" onClick={() => retry()}>
             Retry
           </Button>
         }
       >
-        Check Pali Wallet for signing
+        {error ?? "Check Pali Wallet for signing"}
       </Alert>
     );
   }
