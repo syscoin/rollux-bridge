@@ -8,12 +8,22 @@ import {
 } from "@mui/material";
 import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import { useTransfer } from "contexts/Transfer/useTransfer";
-
+import { FieldValues, useForm } from "react-hook-form";
 
 const BridgeSysToSysxForm: React.FC = () => {
-  const { updateAmount, transfer, startTransfer } = useTransfer();
+  const { startTransfer } = useTransfer();
+  const {
+    register,
+    formState: { errors, isValid, isDirty },
+    handleSubmit,
+  } = useForm({ mode: "all" });
+
+  const onSubmit = (data: FieldValues) => {
+    startTransfer(data.amount, "sys-to-nevm");
+  };
+
   return (
-    <Card component="form">
+    <Card component="form" onSubmit={handleSubmit(onSubmit)}>
       <CardContent sx={{ display: "flex", flexDirection: "column" }}>
         <TextField
           label="Amount"
@@ -23,15 +33,29 @@ const BridgeSysToSysxForm: React.FC = () => {
           InputProps={{
             endAdornment: <InputAdornment position="end">SYS</InputAdornment>,
           }}
-          value={transfer.amount}
-          onChange={(e) => updateAmount(e.target.value)}
+          {...register("amount", {
+            valueAsNumber: true,
+            min: {
+              value: 1,
+              message: "Amount must be greater than 0",
+            },
+            required: {
+              message: "Amount is required",
+              value: true,
+            },
+            validate: (value) =>
+              isNaN(value) ? "Must be a number" : undefined,
+          })}
+          error={!!errors.amount}
+          helperText={errors.amount && errors.amount.message}
         />
         <Typography variant="caption" sx={{ mt: 2 }}>
           # This will convert SYS into SYSX (SPT version of SYS)
         </Typography>
         <Button
           variant="contained"
-          onClick={() => startTransfer("sys-to-nevm")}
+          type="submit"
+          disabled={!isDirty || !isValid}
         >
           Burn
           <LocalFireDepartmentIcon />

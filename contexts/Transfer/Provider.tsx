@@ -21,8 +21,7 @@ import { getProof } from "bitcoin-proof";
 
 interface ITransferContext {
   transfer: ITransfer;
-  startTransfer: (type: TransferType) => void;
-  updateAmount: (amount: string) => void;
+  startTransfer: (amount: number, type: TransferType) => void;
   retry: () => void;
   error?: any;
 }
@@ -75,7 +74,8 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
   const [previousStatus, setPreviousStatus] = useState<TransferStatus>();
   const [error, setError] = useState();
 
-  const startTransfer = (transferType: TransferType) => {
+  const startTransfer = (amount: number, transferType: TransferType) => {
+    updateAmount(`${amount}`);
     if (transferType === "sys-to-nevm") {
       dispatch({
         type: "set-type",
@@ -181,7 +181,6 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
             gas: 400000,
           })
           .once("transactionHash", (hash: string) => {
-            console.log("Relay tx hash", hash);
             dispatch(
               addLog("submit-proofs", "Transaction hash", {
                 hash,
@@ -189,8 +188,6 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
             );
           })
           .once("confirmation", (confirmationNumber: number, receipt: any) => {
-            console.log("Relay tx confirmation", confirmationNumber, receipt);
-
             dispatch(
               addLog("completed", "Proof confirmed", {
                 confirmationNumber,
@@ -200,7 +197,6 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
             dispatch(setStatus("completed"));
           })
           .on("error", (error: { message: string }) => {
-            console.log(error);
             if (/might still be mined/.test(error.message)) {
               dispatch(setStatus("completed"));
             } else {
@@ -240,7 +236,6 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     }
     setError(undefined);
     runSideEffects().catch((err) => {
-      console.log({ err });
       setError(error);
     });
     setPreviousStatus(transfer.status);
@@ -266,8 +261,8 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
       fetch(`/api/transfer/${transfer.id}`, {
         body: JSON.stringify(transfer),
         method: "PATCH",
-      }).then(() => {
-        console.log("Saved in DB");
+      }).catch((e) => {
+        console.error("Saved in DB Error", e);
       });
     }
   }, [transfer, initialized]);
@@ -299,7 +294,6 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
       value={{
         transfer,
         startTransfer,
-        updateAmount,
         retry: () =>
           runSideEffects().catch((err) => {
             setError(err);

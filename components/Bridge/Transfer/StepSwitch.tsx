@@ -18,7 +18,6 @@ const BridgeTransferStepSwitch: React.FC = () => {
     error,
     retry,
   } = useTransfer();
-  console.log({ error });
 
   if (status === "initialize") {
     return <BridgeSysToSysxForm />;

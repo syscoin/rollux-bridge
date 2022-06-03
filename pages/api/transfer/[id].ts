@@ -24,7 +24,6 @@ const patchRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (!transfer) {
-    console.log("CREATE", transferBody);
     transfer = await Transfer.create(transferBody);
     transfer = transfer.save();
   } else {
