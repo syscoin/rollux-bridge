@@ -16,7 +16,8 @@
     "incremental": true,
     "baseUrl": "./",
     "paths": {
-      "@contexts/*": ["./src/contexts/*"]
+      "@contexts/*": ["./contexts/*"],
+      "@firebase": ["./firebase"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

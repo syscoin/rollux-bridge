@@ -1,20 +1,27 @@
-import connectDB from "db/connection";
-import Transfer from "db/models/transfer";
 import { NextApiHandler } from "next";
+import firebase from "firebase-setup";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 const getAll: NextApiHandler = async (req, res) => {
   const { nevm, utxo } = req.query;
-  const transfers = await Transfer.find({
-    $or: [
-      {
-        nevmAddress: nevm,
-      },
-      {
-        utxoAddress: utxo,
-      },
-    ],
-  }).sort({ createdAt: -1 });
-  return res.status(200).json(transfers);
+
+  const nevmQuery = query(
+    collection(firebase.firestore, "transfers"),
+    where("nevmAddress", "==", nevm)
+  );
+  const utxoQuery = query(
+    collection(firebase.firestore, "transfers"),
+    where("utxoAddress", "==", utxo)
+  );
+
+  const { docs: nevmDocs } = await getDocs(nevmQuery);
+  const { docs: utxoDocs } = await getDocs(utxoQuery);
+  return res
+    .status(200)
+    .json([
+      ...nevmDocs.map((doc) => doc.data()),
+      ...utxoDocs.map((doc) => doc.data()),
+    ]);
 };
 
 const handler: NextApiHandler = (req, res) => {
@@ -23,4 +30,4 @@ const handler: NextApiHandler = (req, res) => {
   }
 };
 
-export default connectDB(handler);
+export default handler;
