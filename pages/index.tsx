@@ -26,10 +26,6 @@ const SectionContainer = styled(Box)({
   padding: "4rem",
 });
 
-const ColoredContainer = styled(SectionContainer)({
-  backgroundColor: "#b7c9ff",
-});
-
 const Home: NextPage = () => {
   const { nevm, utxo } = useConnectedWallet();
 

@@ -261,6 +261,9 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
       fetch(`/api/transfer/${transfer.id}`, {
         body: JSON.stringify(transfer),
         method: "PATCH",
+        headers: {
+          "content-type": "application/json",
+        },
       }).catch((e) => {
         console.error("Saved in DB Error", e);
       });

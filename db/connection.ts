@@ -20,7 +20,6 @@ const connectDB =
     // Use new db connection
     const mongoUrl =
       process.env.MONGODB_URI ?? "mongodb://localhost/syscoin-bridge";
-    console.log("Connecting to", mongoUrl);
     await mongoose.connect(mongoUrl);
     return handler(req, res);
   };

@@ -29,15 +29,15 @@ const BridgeSysToSysxForm: React.FC = () => {
           label="Amount"
           placeholder="0.01"
           margin="dense"
-          inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+          inputProps={{ inputMode: "numeric", pattern: "[0-9]+.[0-9]*" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">SYS</InputAdornment>,
           }}
           {...register("amount", {
             valueAsNumber: true,
             min: {
-              value: 1,
-              message: "Amount must be greater than 0",
+              value: 0.1,
+              message: "Amount must be atleast 0.1",
             },
             required: {
               message: "Amount is required",

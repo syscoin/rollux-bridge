@@ -1,36 +1,37 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import connectDB from "db/connection";
-import Transfer from "db/models/transfer";
+import firebase from "firebase-setup";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 
 const getRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
-  const transfer = await Transfer.findOne({
-    id,
-  });
-  transfer;
-  if (!transfer) {
+  const document = await getDoc(
+    doc(firebase.firestore, "transfers", id as string)
+  );
+  if (!document.exists()) {
     return res.status(404).json({ message: "Transfer not found" });
   }
-  res.status(200).json(transfer);
+  res.status(200).json(document.data());
 };
 
 const patchRequest = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { id } = req.query;
-  const transferBody = JSON.parse(req.body);
+  const id = req.query.id as string;
 
-  let transfer = await Transfer.findOne({
-    id,
-  });
-
-  if (!transfer) {
-    transfer = await Transfer.create(transferBody);
-    transfer = transfer.save();
-  } else {
-    transfer = await Transfer.findOneAndUpdate({ id }, { $set: transferBody });
+  if (!id) {
+    return res.status(400).json({ message: "Missing id" });
   }
+  const document = doc(firebase.firestore, "transfers", id as string);
 
-  res.status(200).json(transfer);
+  const transferBody = req.body;
+
+  const results = await getDoc(document);
+
+  if (results.exists()) {
+    await updateDoc(document, transferBody);
+  } else {
+    await setDoc(document, transferBody);
+  }
+  const updated = await getDoc(document);
+  res.status(200).json(updated.data());
 };
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -45,4 +46,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   res.status(405).json({ message: "Invalid method" });
 }
 
-export default connectDB(handler);
+export default handler;
