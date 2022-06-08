@@ -22,6 +22,7 @@ import { getProof } from "bitcoin-proof";
 interface ITransferContext {
   transfer: ITransfer;
   startTransfer: (amount: number, type: TransferType) => void;
+  setTransferType: (type: TransferType) => void;
   retry: () => void;
   error?: any;
 }
@@ -230,6 +231,13 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     });
   };
 
+  const setTransferType = (type: TransferType) => {
+    dispatch({
+      type: "set-type",
+      payload: type,
+    });
+  };
+
   useEffect(() => {
     if (previousStatus === transfer.status) {
       return;
@@ -297,6 +305,7 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
       value={{
         transfer,
         startTransfer,
+        setTransferType,
         retry: () =>
           runSideEffects().catch((err) => {
             setError(err);

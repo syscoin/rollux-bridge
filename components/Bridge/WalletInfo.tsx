@@ -15,9 +15,11 @@ const NetworkContainer = styled(Card)({
   margin: "0.5rem 0",
 });
 
+type WalletType = "utxo" | "nevm" | string;
+
 interface IProps {
   label: string;
-  walletType: "utxo" | "nevm";
+  walletType: WalletType;
   account: string | undefined;
   network: {
     name: string;

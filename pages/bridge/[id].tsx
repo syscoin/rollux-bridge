@@ -5,18 +5,16 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import { NextPage, NextPageContext } from "next";
+import { NextPage } from "next";
 import BridgeWalletInfo from "../../components/Bridge/WalletInfo";
 import DrawerPage from "../../components/DrawerPage";
 import TransferProvider from "../../contexts/Transfer/Provider";
 import BridgeTransferStepSwitch from "components/Bridge/Transfer/StepSwitch";
 import BridgeTransferStepper from "components/Bridge/Stepper";
 import { useRouter } from "next/router";
-import ArrowForward from "@mui/icons-material/ArrowForward";
-import { nextPageConnectDb } from "db/connection";
-import Transfer from "db/models/transfer";
+import { ArrowForward, CompareArrows } from "@mui/icons-material";
 import { ITransfer } from "contexts/Transfer/types";
-import { Document } from "mongoose";
+import BridgeWalletSwitch from "components/Bridge/WalletSwitch";
 
 interface Props {
   transfer: ITransfer;
@@ -45,36 +43,7 @@ const Bridge: NextPage<Props> = ({ transfer }) => {
           <Typography variant="body1" sx={{ my: 3 }}>
             New Transfer
           </Typography>
-          <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid item xs={5}>
-              <BridgeWalletInfo
-                label="From"
-                walletType="utxo"
-                account="0x0"
-                network={{
-                  name: "Syscoin Network",
-                  symbol: "SYS",
-                }}
-              />
-            </Grid>
-            <Grid item xs={2} display="flex">
-              <IconButton sx={{ m: "auto" }} color="secondary" disabled>
-                {/* <CompareArrowsIcon /> */}
-                <ArrowForward />
-              </IconButton>
-            </Grid>
-            <Grid item xs={5}>
-              <BridgeWalletInfo
-                label="To"
-                walletType="nevm"
-                account="0x0"
-                network={{
-                  name: "NEVM Network",
-                  symbol: "NEVM",
-                }}
-              />
-            </Grid>
-          </Grid>
+          <BridgeWalletSwitch />
           <BridgeTransferStepper />
           <Grid container>
             <Grid item xs="auto" sx={{ mx: "auto" }}>
