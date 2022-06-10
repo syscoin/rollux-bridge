@@ -16,10 +16,11 @@ import { addLog, initialize, setStatus } from "./store/actions";
 import relayAbi from "./relay-abi";
 import Web3 from "web3";
 import runWithSysToNevmStateMachine from "./functions/sysToNevm";
+import runWithNevmToSysStateMachine from "./functions/nevmToSys";
 
 interface ITransferContext {
   transfer: ITransfer;
-  startTransfer: (amount: number, type: TransferType) => void;
+  startTransfer: (amount: number) => void;
   setTransferType: (type: TransferType) => void;
   retry: () => void;
   error?: any;
@@ -73,29 +74,22 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
   const [previousStatus, setPreviousStatus] = useState<TransferStatus>();
   const [error, setError] = useState();
 
-  const startTransfer = (amount: number, transferType: TransferType) => {
+  const startTransfer = (amount: number) => {
     updateAmount(`${amount}`);
-    if (transferType === "sys-to-nevm") {
-      dispatch({
-        type: "set-type",
-        payload: transferType,
-      });
-      startSysToNevmTransfer();
-    }
-  };
+    dispatch(setStatus("initialize"));
+    dispatch(
+      addLog("initialize", "Starting Sys to NEVM transfer", {
+        amount: transfer.amount,
+        type: transfer.type,
+        utxoAddress: utxo.account,
+        nevmAddress: nevm.account,
+      })
+    );
 
-  const startSysToNevmTransfer = () => {
-    if (utxo.account && nevm.account) {
-      dispatch(setStatus("initialize"));
-      dispatch(
-        addLog("initialize", "Starting Sys to NEVM transfer", {
-          amount: transfer.amount,
-          type: transfer.type,
-          utxoAddress: utxo.account,
-          nevmAddress: nevm.account,
-        })
-      );
+    if (transfer.type === "sys-to-nevm") {
       dispatch(setStatus("burn-sys"));
+    } else if (transfer.type === "nevm-to-sys") {
+      dispatch(setStatus("freeze-burn-sys"));
     }
   };
 
@@ -127,6 +121,19 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
       ).catch((err) => {
         setError(error);
       });
+    } else if (transfer.type === "nevm-to-sys") {
+      runWithNevmToSysStateMachine(
+        transfer,
+        web3,
+        syscoinInstance,
+        utxo,
+        sendUtxoTransaction,
+        dispatch
+      ).catch((err) => {
+        setError(error);
+      });
+    } else {
+      throw new Error("Unknown transfer type");
     }
   }, [
     transfer,

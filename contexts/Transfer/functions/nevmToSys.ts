@@ -11,15 +11,17 @@ import BN from "bn.js";
 import { UTXOInfo } from "@contexts/ConnectedWallet/types";
 import { SendUtxoTransaction } from "@contexts/ConnectedWallet/Provider";
 import burnSysx from "./burnSysx";
+import { toWei } from "web3-utils";
 
 const freezeAndBurn = (
   contract: Contract,
   transfer: ITransfer,
   dispatch: Dispatch<TransferActions>
 ) => {
+  const amount = toWei(transfer.amount.toString(), "ether");
   contract.methods
-    .freezeBurnERC20(transfer.amount, SYSX_ASSET_GUID, transfer.utxoAddress)
-    .send({ from: transfer.nevmAddress, gas: 400000, value: transfer.amount })
+    .freezeBurnERC20(amount, SYSX_ASSET_GUID, transfer.utxoAddress)
+    .send({ from: transfer.nevmAddress, gas: 400000, value: amount })
     .once("transactionHash", (transactionHash: string) => {
       dispatch(
         addLog("freeze-burn-sys", "Freeze and Burn SYS", transactionHash)
@@ -140,25 +142,6 @@ const burnSysxToSys = async (
   setTimeout(() => dispatch(setStatus("completed")), 3000);
 };
 
-const complete = async (
-  transfer: ITransfer,
-  dispatch: Dispatch<TransferActions>
-) => {
-  const nevmBurnSys = transfer.logs.find(
-    (log) => log.status === "confirm-freeze-burn-sys"
-  );
-  const mintSysx = transfer.logs.find((log) => log.status === "mint-sysx");
-  const burnSysx = transfer.logs.find((log) => log.status === "burn-sysx");
-  dispatch(
-    addLog("completed", "Burn Sysx", {
-      nevmFreezeBurn: (nevmBurnSys?.payload.data as TransactionReceipt)
-        .transactionHash,
-      mintSysx: mintSysx?.payload.data.txId,
-      burnSysx: burnSysx?.payload.data.txId,
-    })
-  );
-};
-
 const runWithNevmToSysStateMachine = async (
   transfer: ITransfer,
   web3: Web3,
@@ -196,9 +179,7 @@ const runWithNevmToSysStateMachine = async (
         sendUtxoTransaction
       );
     }
-    case "completed": {
-      return complete(transfer, dispatch);
-    }
+
     default:
       return;
   }

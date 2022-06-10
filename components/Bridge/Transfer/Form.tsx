@@ -6,11 +6,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
+import { RocketLaunch } from "@mui/icons-material";
 import { useTransfer } from "contexts/Transfer/useTransfer";
 import { FieldValues, useForm } from "react-hook-form";
 
-const BridgeSysToSysxForm: React.FC = () => {
+const BridgeTransferForm: React.FC = () => {
   const { startTransfer } = useTransfer();
   const {
     register,
@@ -19,7 +19,7 @@ const BridgeSysToSysxForm: React.FC = () => {
   } = useForm({ mode: "all" });
 
   const onSubmit = (data: FieldValues) => {
-    startTransfer(data.amount, "sys-to-nevm");
+    startTransfer(data.amount);
   };
 
   return (
@@ -36,7 +36,7 @@ const BridgeSysToSysxForm: React.FC = () => {
           {...register("amount", {
             valueAsNumber: true,
             min: {
-              value: 0.1,
+              value: 0.001,
               message: "Amount must be atleast 0.1",
             },
             required: {
@@ -49,20 +49,16 @@ const BridgeSysToSysxForm: React.FC = () => {
           error={!!errors.amount}
           helperText={errors.amount && errors.amount.message}
         />
-        <Typography variant="caption" sx={{ mt: 2 }}>
-          # This will convert SYS into SYSX (SPT version of SYS)
-        </Typography>
         <Button
           variant="contained"
           type="submit"
           disabled={!isDirty || !isValid}
         >
-          Burn
-          <LocalFireDepartmentIcon />
+          Start Transfer <RocketLaunch />
         </Button>
       </CardContent>
     </Card>
   );
 };
 
-export default BridgeSysToSysxForm;
+export default BridgeTransferForm;

@@ -15,7 +15,8 @@ export type EthToSysTransferStatus =
   | "confirm-freeze-burn-sys"
   | "mint-sysx"
   | "burn-sysx"
-  | "error";
+  | "error"
+  | "completed";
 
 export type TransferStatus = SysToEthTransferStatus | EthToSysTransferStatus;
 

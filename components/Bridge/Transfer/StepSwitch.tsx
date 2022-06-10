@@ -1,16 +1,8 @@
-import { PriorityHigh, Refresh, RefreshOutlined } from "@mui/icons-material";
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Typography,
-} from "@mui/material";
+import { PriorityHigh } from "@mui/icons-material";
+import { Alert, Button, Card, CardContent, Typography } from "@mui/material";
 import { useTransfer } from "contexts/Transfer/useTransfer";
 import BridgeTransferComplete from "./Complete";
-import BridgeSysToSysxForm from "./SysToSysxForm";
+import BridgeTransferForm from "./Form";
 
 const BridgeTransferStepSwitch: React.FC = () => {
   const {
@@ -20,10 +12,10 @@ const BridgeTransferStepSwitch: React.FC = () => {
   } = useTransfer();
 
   if (status === "initialize") {
-    return <BridgeSysToSysxForm />;
+    return <BridgeTransferForm />;
   }
 
-  if (status === "burn-sys" || status === "burn-sysx") {
+  if (["burn-sys", "burn-sysx", "mint-sysx"].includes(status)) {
     return (
       <Alert
         severity={error ? "error" : "warning"}
@@ -52,7 +44,7 @@ const BridgeTransferStepSwitch: React.FC = () => {
       </Alert>
     );
   }
-  if (status === "submit-proofs") {
+  if (["submit-proofs", "freeze-burn-sys"].includes(status)) {
     return (
       <Alert
         severity="warning"
@@ -63,6 +55,20 @@ const BridgeTransferStepSwitch: React.FC = () => {
         }
       >
         Check Metmask Wallet for signing
+      </Alert>
+    );
+  }
+  if (status === "confirm-freeze-burn-sys") {
+    return (
+      <Alert
+        severity="warning"
+        action={
+          <Button color="inherit" size="small" onClick={() => retry()}>
+            Retry
+          </Button>
+        }
+      >
+        Check Metamask for transaction confirmations
       </Alert>
     );
   }

@@ -1,5 +1,7 @@
+import { useTransfer } from "@contexts/Transfer/useTransfer";
 import {
   Box,
+  Button,
   Card,
   CardActionArea,
   CardContent,
@@ -9,11 +11,6 @@ import {
 import Image from "next/image";
 import { useConnectedWallet } from "../../contexts/ConnectedWallet/useConnectedWallet";
 import SyscoinLogo from "../Icons/syscoin";
-
-const NetworkContainer = styled(Card)({
-  padding: "0.5rem",
-  margin: "0.5rem 0",
-});
 
 type WalletType = "utxo" | "nevm" | string;
 
@@ -28,7 +25,9 @@ interface IProps {
 }
 
 const BridgeWalletInfo: React.FC<IProps> = ({ label, network, walletType }) => {
-  const { nevm, utxo } = useConnectedWallet();
+  const { nevm, utxo, connectUTXO, connectNEVM } = useConnectedWallet();
+  const { transfer } = useTransfer();
+
   return (
     <Box>
       <Typography variant="caption" color="gray">
@@ -55,7 +54,17 @@ const BridgeWalletInfo: React.FC<IProps> = ({ label, network, walletType }) => {
             width="32px"
             alt="PaliWallet logo"
           />
-          <Typography variant="body2">{utxo.account}</Typography>
+          {transfer.status === "initialize" ? (
+            utxo.account ? (
+              <Typography variant="body2">{utxo.account}</Typography>
+            ) : (
+              <Button onClick={() => connectUTXO("pali-wallet")}>
+                Connect
+              </Button>
+            )
+          ) : (
+            <Typography variant="body2">{transfer.utxoAddress}</Typography>
+          )}
         </Box>
       )}
       {walletType === "nevm" && nevm.type === "metamask" && (
@@ -64,9 +73,17 @@ const BridgeWalletInfo: React.FC<IProps> = ({ label, network, walletType }) => {
             src="/metamask-logo.svg"
             height="32px"
             width="32px"
-            alt="PaliWallet logo"
+            alt="Metamask logo"
           />
-          <Typography variant="body2">{nevm.account}</Typography>
+          {transfer.status === "initialize" ? (
+            nevm.account ? (
+              <Typography variant="body2">{nevm.account}</Typography>
+            ) : (
+              <Button onClick={() => connectNEVM("metamask")}>Connect</Button>
+            )
+          ) : (
+            <Typography variant="body2">{transfer.nevmAddress}</Typography>
+          )}
         </Box>
       )}
     </Box>
