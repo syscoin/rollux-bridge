@@ -4,14 +4,16 @@ import { useMetamask } from "../Metamask/Provider";
 import { usePaliWallet } from "../PaliWallet/usePaliWallet";
 import { UTXOInfo, NEVMInfo, UTXOWallet, NEVMWallet } from "./types";
 
+export type SendUtxoTransaction = (
+  transaction: UTXOTransaction
+) => Promise<{ tx: string; error?: any }>;
+
 interface IConnectedWalletContext {
   utxo: Partial<UTXOInfo>;
   nevm: Partial<NEVMInfo>;
   connectUTXO: (type: UTXOWallet) => void;
   connectNEVM: (type: NEVMWallet) => void;
-  sendUtxoTransaction: (
-    transaction: UTXOTransaction
-  ) => Promise<{ tx: string; error?: any }>;
+  sendUtxoTransaction: SendUtxoTransaction;
   availableWallets: {
     paliWallet: boolean;
     metamask: boolean;
@@ -48,7 +50,9 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
     setNevmWalletType(type);
   };
 
-  const sendUtxoTransaction = (transaction: UTXOTransaction) => {
+  const sendUtxoTransaction: SendUtxoTransaction = (
+    transaction: UTXOTransaction
+  ) => {
     if (utxoWalletType === "pali-wallet") {
       return paliWallet.sendTransaction(transaction);
     }

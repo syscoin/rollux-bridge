@@ -16,12 +16,14 @@ const getAll: NextApiHandler = async (req, res) => {
 
   const { docs: nevmDocs } = await getDocs(nevmQuery);
   const { docs: utxoDocs } = await getDocs(utxoQuery);
-  return res
-    .status(200)
-    .json([
-      ...nevmDocs.map((doc) => doc.data()),
-      ...utxoDocs.map((doc) => doc.data()),
-    ]);
+  const transactionMap = [
+    ...nevmDocs.map((doc) => doc.data()),
+    ...utxoDocs.map((doc) => doc.data()),
+  ].reduce((acc, curr) => {
+    acc[curr.id] = curr;
+    return acc;
+  }, {});
+  return res.status(200).json(Object.values(transactionMap));
 };
 
 const handler: NextApiHandler = (req, res) => {

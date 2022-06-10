@@ -63,12 +63,19 @@ const Home: NextPage = () => {
             </Typography>
             <WalletList />
             {isReady && (
-              <Link href={`/bridge/${Date.now()}`}>
-                <Button variant="contained">
-                  Continue
-                  <ArrowForwardIcon />
-                </Button>
-              </Link>
+              <Box display="flex" justifyContent="space-between">
+                <Link href={`/bridge/${Date.now()}`}>
+                  <Button variant="contained">
+                    Continue
+                    <ArrowForwardIcon />
+                  </Button>
+                </Link>
+                <Link href={`/transfers`}>
+                  <Button variant="text" color="secondary">
+                    View My Transfers
+                  </Button>
+                </Link>
+              </Box>
             )}
           </Grid>
         </Grid>

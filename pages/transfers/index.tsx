@@ -71,6 +71,9 @@ const TransfersPage: NextPage = () => {
               field: "id",
               headerName: "Id",
               width: 130,
+              renderCell: ({ value }) => (
+                <Link href={`/bridge/${value}`}>{value}</Link>
+              ),
             },
             {
               field: "type",
@@ -120,13 +123,6 @@ const TransfersPage: NextPage = () => {
               headerName: "Updated At",
               width: 200,
               renderCell: ({ value }) => <DateField value={value} />,
-            },
-            {
-              field: "actions",
-              headerName: "Actions",
-              renderCell: ({ id }) => {
-                return <Link href={`/bridge/${id}`}>View</Link>;
-              },
             },
           ]}
           rows={isFetched ? data ?? items : []}
