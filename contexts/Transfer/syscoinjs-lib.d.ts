@@ -44,6 +44,16 @@ declare module "syscoinjs-lib" {
       utxos,
       redeemOrWitnessScript?
     ): Promise<{ psbt; assets }>;
+    assetAllocationMint(
+      assetOpts,
+      txOpts,
+      assetMap,
+      sysChangeAddress,
+      feeRate,
+      sysFromXpubOrAddress,
+      utxos = undefined,
+      redeemOrWitnessScript = undefined
+    ): Promise<{ psbt; assets }>;
   }
   declare module utils {
     export function exportPsbtToJson(psbt: Psbt, assets): UTXOTransaction;

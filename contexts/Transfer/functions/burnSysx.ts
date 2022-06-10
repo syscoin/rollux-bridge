@@ -39,7 +39,9 @@ export const burnSysx = async (
     xpubAddress
   );
   if (!res) {
-    throw new Error("Could not create transaction, not enough funds?");
+    throw new Error("Could not create transaction, not enough funds?", {
+      cause: res,
+    });
   }
   return syscoinUtils.exportPsbtToJson(res.psbt, res.assets);
 };
