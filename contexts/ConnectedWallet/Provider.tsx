@@ -65,11 +65,13 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
         nevm: {
           type: nevmWalletType,
           account: nevmAccount,
+          balance: metamask.balance,
         },
         utxo: {
           type: utxoWalletType,
           account: utxoAccount,
           xpub: paliWallet.xpubAddress,
+          balance: paliWallet.balance,
         },
         connectNEVM,
         connectUTXO,

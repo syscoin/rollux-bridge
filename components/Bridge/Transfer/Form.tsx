@@ -11,7 +11,7 @@ import { useTransfer } from "contexts/Transfer/useTransfer";
 import { FieldValues, useForm } from "react-hook-form";
 
 const BridgeTransferForm: React.FC = () => {
-  const { startTransfer } = useTransfer();
+  const { startTransfer, maxAmount } = useTransfer();
   const {
     register,
     formState: { errors, isValid, isDirty },
@@ -22,9 +22,14 @@ const BridgeTransferForm: React.FC = () => {
     startTransfer(data.amount);
   };
 
+  const maxAmountFixed = parseFloat(`${maxAmount ?? "0"}`).toFixed(4);
+
   return (
     <Card component="form" onSubmit={handleSubmit(onSubmit)}>
       <CardContent sx={{ display: "flex", flexDirection: "column" }}>
+        <Typography variant="body2" color="secondary">
+          Balance: {maxAmount === undefined ? "--" : maxAmountFixed}
+        </Typography>
         <TextField
           label="Amount"
           placeholder="0.01"
@@ -35,6 +40,10 @@ const BridgeTransferForm: React.FC = () => {
           }}
           {...register("amount", {
             valueAsNumber: true,
+            max: {
+              value: maxAmountFixed,
+              message: `You can transfer up to ${maxAmountFixed} SYS`,
+            },
             min: {
               value: 0.001,
               message: "Amount must be atleast 0.1",
@@ -46,6 +55,7 @@ const BridgeTransferForm: React.FC = () => {
             validate: (value) =>
               isNaN(value) ? "Must be a number" : undefined,
           })}
+          disabled={maxAmount === undefined}
           error={!!errors.amount}
           helperText={errors.amount && errors.amount.message}
         />

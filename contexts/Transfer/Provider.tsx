@@ -20,6 +20,7 @@ import runWithNevmToSysStateMachine from "./functions/nevmToSys";
 
 interface ITransferContext {
   transfer: ITransfer;
+  maxAmount: number | string | undefined;
   startTransfer: (amount: number) => void;
   setTransferType: (type: TransferType) => void;
   retry: () => void;
@@ -52,23 +53,23 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     );
   }, [web3]);
   const { utxo, nevm, sendUtxoTransaction } = useConnectedWallet();
-  const initialState: ITransfer = useMemo(
-    () => ({
+  const baseTransfer: Partial<ITransfer> = useMemo(() => {
+    return {
       amount: "0",
       id,
       type: "sys-to-nevm",
       status: "initialize",
       logs: [],
       createdAt: Date.now(),
-      nevmAddress: nevm.account!,
-      utxoAddress: utxo.account!,
-    }),
-    [id, utxo, nevm]
-  );
+    };
+  }, [id]);
+
   const [transfer, dispatch] = useReducer<typeof reducer>(reducer, {
-    ...initialState,
+    ...baseTransfer,
+    nevmAddress: nevm.account!,
+    utxoAddress: utxo.account!,
     id,
-  });
+  } as ITransfer);
 
   const [initialized, setIsInitialized] = useState(false);
   const [previousStatus, setPreviousStatus] = useState<TransferStatus>();
@@ -167,6 +168,14 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     runSideEffects,
   ]);
 
+  let maxAmount = undefined;
+
+  if (transfer.type === "sys-to-nevm") {
+    maxAmount = utxo.balance;
+  } else if (transfer.type === "nevm-to-sys") {
+    maxAmount = nevm.balance;
+  }
+
   useEffect(() => {
     if (!initialized || !transfer.id) {
       return;
@@ -196,16 +205,15 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
         }
       });
     const item = localStorage.getItem(`transfer-${id}`);
-    let defaultState = {
-      ...initialState,
+    const defaultState = {
+      ...baseTransfer,
+      nevmAddress: nevm.account!,
+      utxoAddress: utxo.account!,
       id,
-    };
-    if (item) {
-      defaultState = JSON.parse(item);
-    }
-    dispatch(initialize(defaultState));
+    } as ITransfer;
+    dispatch(initialize(item ? JSON.parse(item) : defaultState));
     setIsInitialized(true);
-  }, [id, initialState]);
+  }, [id, baseTransfer, nevm, utxo]);
 
   return (
     <TransferContext.Provider
@@ -215,6 +223,7 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
         setTransferType,
         retry: () => runSideEffects(),
         error,
+        maxAmount,
       }}
     >
       {children}

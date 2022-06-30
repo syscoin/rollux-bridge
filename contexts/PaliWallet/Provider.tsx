@@ -1,26 +1,17 @@
 import React, { createContext, useEffect, useState } from "react";
 import { UTXOTransaction } from "syscoinjs-lib";
 import { utils as syscoinUtils } from "syscoinjs-lib";
-
-interface IAccount {
-  address: { main: string };
-  balance: number;
-  assets: [];
-  id: number;
-  isTrezorWallet: boolean;
-  label: string;
-  transactions: [];
-  xpub: string;
-}
+import { PaliWallet } from "./types";
 
 interface ConnectionsController {
   connectWallet: () => Promise<void>;
   disconnectWallet: () => Promise<void>;
-  getConnectedAccount: () => Promise<IAccount>;
+  getConnectedAccount: () => Promise<PaliWallet.Account>;
   onWalletUpdate: (fn: () => Promise<any>) => Promise<any>;
   getConnectedAccountXpub: () => Promise<string>;
   signAndSend: (psbt: UTXOTransaction) => Promise<UTXOTransaction>;
   signPSBT: (psbt: UTXOTransaction) => Promise<UTXOTransaction>;
+  getWalletState: () => Promise<PaliWallet.WalletState>;
 }
 
 declare global {
@@ -35,6 +26,7 @@ interface IPaliWalletContext {
   connectedAccount?: string;
   xpubAddress?: string;
   connectWallet: () => void;
+  balance: number | undefined;
   sendTransaction: (
     transaction: UTXOTransaction
   ) => Promise<{ tx: string; error?: any }>;
@@ -49,6 +41,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isInstalled, setIsInstalled] = useState(false);
   const [connectedAccount, setConnectedAccount] = useState<string>();
   const [xpubAddress, setXpubAddress] = useState<string>();
+  const [walletState, setWalletState] = useState<PaliWallet.WalletState>();
 
   useEffect(() => {
     if (window === undefined) {
@@ -73,8 +66,10 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     controller.onWalletUpdate(async () => {
       const xpubAddress = await controller.getConnectedAccountXpub();
       const account = await controller.getConnectedAccount();
+      const walletState = await controller.getWalletState();
       setConnectedAccount(account ? account.address.main : undefined);
       setXpubAddress(xpubAddress);
+      setWalletState(walletState);
     });
   }, [controller]);
 
@@ -82,12 +77,15 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!controller) {
       return;
     }
-    controller.connectWallet();
+    return controller.connectWallet();
   };
 
   const sendTransaction = async (transaction: UTXOTransaction) => {
     if (!controller) {
       return Promise.reject("No controller");
+    }
+    if (connectedAccount === undefined) {
+      await connectWallet();
     }
     const signedTransaction = await controller.signAndSend(transaction);
     const unserializedResp = syscoinUtils.importPsbtFromJson(
@@ -108,6 +106,9 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
         connectWallet,
         xpubAddress,
         sendTransaction,
+        balance: walletState?.accounts.find(
+          (account) => account.address.main === connectedAccount
+        )?.balance,
       }}
     >
       {children}

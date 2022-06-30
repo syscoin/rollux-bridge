@@ -1,5 +1,7 @@
+import { NEVMNetwork } from "@contexts/Transfer/constants";
 import { createContext, useContext, useEffect, useState } from "react";
-import { TransactionConfig } from "web3-core";
+import { TransactionConfig, provider } from "web3-core";
+import Web3 from "web3";
 
 declare global {
   interface Window {
@@ -8,13 +10,14 @@ declare global {
       request: (params: { method: string; params?: any }) => Promise<string>;
       isConnected: boolean;
       selectedAddress: string;
-    };
+    } & provider;
   }
 }
 
 interface MetamaskContext {
   isEnabled: boolean;
   account?: string;
+  balance?: string;
   requestAccounts: () => void;
   sendTransaction: (transactionConfig: TransactionConfig) => Promise<string>;
 }
@@ -28,6 +31,8 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [account, setAccount] = useState<string | undefined>();
+  const [web3, setWeb3] = useState<Web3>();
+  const [balance, setBalance] = useState<string>();
 
   const requestAccounts = () => {
     window.ethereum
@@ -47,6 +52,7 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (typeof window.ethereum !== "undefined" && window.ethereum.isMetaMask) {
       setIsEnabled(true);
+      setWeb3(new Web3(window.ethereum));
     }
   }, []);
 
@@ -66,27 +72,24 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
         if (code === 4902) {
           window.ethereum.request({
             method: "wallet_addEthereumChain",
-            params: [
-              {
-                chainId: "0x39",
-                chainName: "Syscoin NEVM",
-                nativeCurrency: {
-                  name: "Syscoin",
-                  symbol: "SYS",
-                  decimals: 18,
-                },
-                rpcUrls: ["https://rpc.syscoin.org"],
-                blockExplorerUrls: ["https://explorer.syscoin.org/"],
-              },
-            ],
+            params: [NEVMNetwork],
           });
         }
       });
   }, [isEnabled]);
 
+  useEffect(() => {
+    if (!web3 || !account) {
+      return;
+    }
+    web3.eth.getBalance(account).then((balance) => {
+      setBalance(web3.utils.fromWei(balance));
+    });
+  }, [web3, account, setBalance]);
+
   return (
     <MetamaskContext.Provider
-      value={{ isEnabled, account, requestAccounts, sendTransaction }}
+      value={{ isEnabled, account, requestAccounts, sendTransaction, balance }}
     >
       {children}
     </MetamaskContext.Provider>

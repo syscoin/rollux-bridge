@@ -1,3 +1,4 @@
+import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
 import { PriorityHigh } from "@mui/icons-material";
 import { Alert, Button, Card, CardContent, Typography } from "@mui/material";
 import { useTransfer } from "contexts/Transfer/useTransfer";
@@ -6,16 +7,36 @@ import BridgeTransferForm from "./Form";
 
 const BridgeTransferStepSwitch: React.FC = () => {
   const {
-    transfer: { status },
+    transfer: { status, utxoAddress },
     error,
     retry,
   } = useTransfer();
+
+  const { utxo, connectUTXO } = useConnectedWallet();
 
   if (status === "initialize") {
     return <BridgeTransferForm />;
   }
 
   if (["burn-sys", "burn-sysx", "mint-sysx"].includes(status)) {
+    if (!utxo.account || utxoAddress !== utxo.account) {
+      return (
+        <Alert
+          severity="error"
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => connectUTXO("pali-wallet")}
+            >
+              Reconnect
+            </Button>
+          }
+        >
+          {!utxo.account ? "Reconnect Pali wallet" : `Change to ${utxoAddress}`}
+        </Alert>
+      );
+    }
     return (
       <Alert
         severity={error ? "error" : "warning"}

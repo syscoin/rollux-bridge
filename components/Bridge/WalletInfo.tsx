@@ -62,8 +62,18 @@ const BridgeWalletInfo: React.FC<IProps> = ({ label, network, walletType }) => {
                 Connect
               </Button>
             )
+          ) : utxo.account ? (
+            utxo.account === transfer.utxoAddress ? (
+              <Typography variant="body2">{transfer.utxoAddress}</Typography>
+            ) : (
+              <Typography variant="body2">
+                Change to {transfer.utxoAddress}
+              </Typography>
+            )
           ) : (
-            <Typography variant="body2">{transfer.utxoAddress}</Typography>
+            <Button onClick={() => connectUTXO("pali-wallet")}>
+              Reconnect
+            </Button>
           )}
         </Box>
       )}
