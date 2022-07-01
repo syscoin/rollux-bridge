@@ -1,6 +1,7 @@
 import firebase from "firebase-setup";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const getRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
@@ -18,6 +19,13 @@ const patchRequest = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (!id) {
     return res.status(400).json({ message: "Missing id" });
+  }
+  if (process.env.NODE_ENV !== "development") {
+    await signInWithEmailAndPassword(
+      firebase.auth,
+      process.env.FIREBASE_AUTH_EMAIL!,
+      process.env.FIREBASE_AUTH_PASSWORD!
+    );
   }
   const document = doc(firebase.firestore, "transfers", id as string);
 

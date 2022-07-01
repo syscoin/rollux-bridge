@@ -1,5 +1,6 @@
 import { initializeApp, getApp, FirebaseOptions } from "firebase/app";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 export const firebaseConfig: FirebaseOptions = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -21,10 +22,12 @@ try {
 }
 
 const firestore = getFirestore(app);
+const auth = getAuth(app);
 
 const firebase = {
   app,
   firestore,
+  auth,
 };
 
 if (process.env.NODE_ENV === "development" && !intialized) {
