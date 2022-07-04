@@ -22,7 +22,7 @@ declare global {
 }
 
 interface IPaliWalletContext {
-  isInstalled: boolean;
+  isInstalled?: boolean;
   connectedAccount?: string;
   xpubAddress?: string;
   connectWallet: () => void;
@@ -38,7 +38,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [controller, setController] = useState<ConnectionsController>();
-  const [isInstalled, setIsInstalled] = useState(false);
+  const [isInstalled, setIsInstalled] = useState<boolean>();
   const [connectedAccount, setConnectedAccount] = useState<string>();
   const [xpubAddress, setXpubAddress] = useState<string>();
   const [walletState, setWalletState] = useState<PaliWallet.WalletState>();
@@ -47,9 +47,26 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     if (window === undefined) {
       return;
     }
-    if (window.ConnectionsController) {
-      setIsInstalled(true);
-      setController(window.ConnectionsController);
+
+    const check = (intervalId?: NodeJS.Timeout) => {
+      if (window && window.ConnectionsController && !isInstalled) {
+        setIsInstalled(true);
+        setController(window.ConnectionsController);
+        clearInterval(intervalId);
+      }
+    };
+
+    check();
+
+    if (!isInstalled) {
+      setTimeout(() => {
+        if (isInstalled === undefined) {
+          setIsInstalled(false);
+        }
+      }, 10000);
+      const checkInterval = setInterval(() => {
+        check(checkInterval);
+      }, 100);
     }
 
     return () => {
@@ -57,7 +74,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
         controller.disconnectWallet();
       }
     };
-  }, [controller]);
+  }, [controller, isInstalled]);
 
   useEffect(() => {
     if (!controller) {

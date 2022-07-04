@@ -44,7 +44,11 @@ const WalletList: React.FC = () => {
               onClick={() => connectUTXO("pali-wallet")}
               disabled={!availableWallets.paliWallet}
             >
-              {availableWallets.paliWallet ? "Connect" : "Not installed"}
+              {availableWallets.paliWallet
+                ? "Connect"
+                : availableWallets.paliWallet === undefined
+                ? "Checking Pali Wallet"
+                : "Not installed"}
             </Button>
           </>
         )}

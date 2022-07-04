@@ -15,7 +15,7 @@ interface IConnectedWalletContext {
   connectNEVM: (type: NEVMWallet) => void;
   sendUtxoTransaction: SendUtxoTransaction;
   availableWallets: {
-    paliWallet: boolean;
+    paliWallet?: boolean;
     metamask: boolean;
   };
 }
