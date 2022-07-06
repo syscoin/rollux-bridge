@@ -7,8 +7,9 @@ import {
   Typography,
 } from "@mui/material";
 import { RocketLaunch } from "@mui/icons-material";
-import { useTransfer } from "contexts/Transfer/useTransfer";
+
 import { FieldValues, useForm } from "react-hook-form";
+import { useTransfer } from "../../../contexts/Transfer/useTransfer";
 
 const BridgeTransferForm: React.FC = () => {
   const { startTransfer, maxAmount } = useTransfer();
@@ -34,7 +35,7 @@ const BridgeTransferForm: React.FC = () => {
           label="Amount"
           placeholder="0.01"
           margin="dense"
-          inputProps={{ inputMode: "numeric", pattern: "[0-9]+.[0-9]*" }}
+          inputProps={{ inputMode: "numeric", pattern: "[0-9]+(.[0-9])*" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">SYS</InputAdornment>,
           }}
@@ -57,7 +58,7 @@ const BridgeTransferForm: React.FC = () => {
           })}
           disabled={maxAmount === undefined}
           error={!!errors.amount}
-          helperText={errors.amount && errors.amount.message}
+          helperText={<>{errors.amount && errors.amount.message}</>}
         />
         <Button
           variant="contained"

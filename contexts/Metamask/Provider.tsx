@@ -1,7 +1,7 @@
-import { NEVMNetwork } from "@contexts/Transfer/constants";
 import { createContext, useContext, useEffect, useState } from "react";
 import { TransactionConfig, provider } from "web3-core";
 import Web3 from "web3";
+import { NEVMNetwork } from "../Transfer/constants";
 
 declare global {
   interface Window {
@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-interface MetamaskContext {
+interface IMetamaskContext {
   isEnabled: boolean;
   account?: string;
   balance?: string;
@@ -22,7 +22,7 @@ interface MetamaskContext {
   sendTransaction: (transactionConfig: TransactionConfig) => Promise<string>;
 }
 
-const MetamaskContext = createContext({} as MetamaskContext);
+const MetamaskContext = createContext({} as IMetamaskContext);
 
 export const useMetamask = () => useContext(MetamaskContext);
 

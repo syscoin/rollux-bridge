@@ -168,7 +168,7 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     runSideEffects,
   ]);
 
-  let maxAmount = undefined;
+  let maxAmount: number | string | undefined = undefined;
 
   if (transfer.type === "sys-to-nevm") {
     maxAmount = utxo.balance;
@@ -195,6 +195,20 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
   }, [transfer, initialized]);
 
   useEffect(() => {
+    if (initialized) {
+      return;
+    }
+    setIsInitialized(true);
+    const loadDefault = () => {
+      const item = localStorage.getItem(`transfer-${id}`);
+      const defaultState = {
+        ...baseTransfer,
+        nevmAddress: nevm.account!,
+        utxoAddress: utxo.account!,
+        id,
+      } as ITransfer;
+      dispatch(initialize(item ? JSON.parse(item) : defaultState));
+    };
     fetch(`/api/transfer/${id}`)
       .then((transfer) => {
         return transfer.status === 200 ? transfer.json() : undefined;
@@ -202,18 +216,12 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
       .then((state) => {
         if (state) {
           dispatch(initialize(state));
+        } else {
+          loadDefault();
         }
-      });
-    const item = localStorage.getItem(`transfer-${id}`);
-    const defaultState = {
-      ...baseTransfer,
-      nevmAddress: nevm.account!,
-      utxoAddress: utxo.account!,
-      id,
-    } as ITransfer;
-    dispatch(initialize(item ? JSON.parse(item) : defaultState));
-    setIsInitialized(true);
-  }, [id, baseTransfer, nevm, utxo]);
+      })
+      .catch(() => loadDefault());
+  }, [id, baseTransfer, nevm, utxo, initialized]);
 
   return (
     <TransferContext.Provider
