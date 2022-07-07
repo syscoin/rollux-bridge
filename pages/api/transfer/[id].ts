@@ -20,7 +20,7 @@ const patchRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!id) {
     return res.status(400).json({ message: "Missing id" });
   }
-  if (process.env.NODE_ENV !== "development") {
+  if (process.env.NODE_ENV !== "development" && firebase.auth) {
     await signInWithEmailAndPassword(
       firebase.auth,
       process.env.FIREBASE_AUTH_EMAIL!,
