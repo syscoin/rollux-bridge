@@ -223,6 +223,10 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
       .catch(() => loadDefault());
   }, [id, baseTransfer, nevm, utxo, initialized]);
 
+  useEffect(() => {
+    setIsInitialized(false);
+  }, [id]);
+
   return (
     <TransferContext.Provider
       value={{
