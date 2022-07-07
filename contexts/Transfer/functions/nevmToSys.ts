@@ -128,7 +128,7 @@ const burnSysxToSys = async (
       syscoinInstance,
       transfer.amount,
       SYSX_ASSET_GUID,
-      transfer.utxoAddress,
+      transfer.utxoAddress!,
       utxo.xpub!,
       ""
     );
