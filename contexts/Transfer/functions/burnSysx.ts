@@ -29,7 +29,13 @@ export const burnSysx = async (
       },
     ],
   ]);
-
+  console.log("burnSysx", {
+    feeRate,
+    txOpts,
+    assetOpts,
+    assetChangeAddress,
+    assetMap,
+  });
   const res = await syscoinInstance.assetAllocationBurn(
     assetOpts,
     txOpts,

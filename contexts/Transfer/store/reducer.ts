@@ -33,6 +33,12 @@ export const reducer: Reducer<ITransfer, TransferActions> = (state, action) => {
     case "initialize": {
       return action.payload;
     }
+    case "setUtxoAddress": {
+      return { ...state, utxoAddress: action.payload, updatedAt: Date.now() };
+    }
+    case "setNevmAddress": {
+      return { ...state, nevmAddress: action.payload, updatedAt: Date.now() };
+    }
     default:
       return state;
   }

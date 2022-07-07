@@ -12,7 +12,13 @@ import { ITransfer, TransferStatus, TransferType } from "./types";
 import { syscoin, utils as syscoinUtils } from "syscoinjs-lib";
 import { BlockbookAPIURL } from "./constants";
 import { useConnectedWallet } from "../ConnectedWallet/useConnectedWallet";
-import { addLog, initialize, setStatus } from "./store/actions";
+import {
+  addLog,
+  initialize,
+  setNevmAddress,
+  setStatus,
+  setUtxoAddress,
+} from "./store/actions";
 import relayAbi from "./relay-abi";
 import Web3 from "web3";
 import runWithSysToNevmStateMachine from "./functions/sysToNevm";
@@ -66,8 +72,6 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
 
   const [transfer, dispatch] = useReducer<typeof reducer>(reducer, {
     ...baseTransfer,
-    nevmAddress: nevm.account!,
-    utxoAddress: utxo.account!,
     id,
   } as ITransfer);
 
@@ -76,7 +80,16 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
   const [error, setError] = useState();
 
   const startTransfer = (amount: number) => {
+    if (!utxo.account || !nevm.account) {
+      console.log("Some accounts are not connected", {
+        nevm: nevm.account,
+        utxo: utxo.account,
+      });
+      return;
+    }
     updateAmount(`${amount}`);
+    dispatch(setUtxoAddress(utxo.account));
+    dispatch(setNevmAddress(nevm.account));
     dispatch(setStatus("initialize"));
     dispatch(
       addLog("initialize", "Starting Sys to NEVM transfer", {
@@ -120,7 +133,7 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
         nevm,
         relayContract
       ).catch((err) => {
-        setError(error);
+        setError(err);
       });
     } else if (transfer.type === "nevm-to-sys") {
       runWithNevmToSysStateMachine(
@@ -131,7 +144,7 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
         sendUtxoTransaction,
         dispatch
       ).catch((err) => {
-        setError(error);
+        setError(err);
       });
     } else {
       throw new Error("Unknown transfer type");
@@ -145,28 +158,20 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     sendUtxoTransaction,
     nevm,
     relayContract,
-    error,
   ]);
 
   useEffect(() => {
-    if (previousStatus === transfer.status) {
+    if (
+      !initialized ||
+      transfer.status === "initialize" ||
+      previousStatus === transfer.status
+    ) {
       return;
     }
     setError(undefined);
     runSideEffects();
     setPreviousStatus(transfer.status);
-  }, [
-    transfer,
-    sendUtxoTransaction,
-    utxo,
-    nevm,
-    syscoinInstance,
-    relayContract,
-    web3,
-    previousStatus,
-    error,
-    runSideEffects,
-  ]);
+  }, [initialized, previousStatus, runSideEffects, transfer.status]);
 
   let maxAmount: number | string | undefined = undefined;
 

@@ -52,7 +52,9 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     if (account === null) {
       await connectWallet();
     }
+    console.log("Sending transaction", transaction, new Date());
     const signedTransaction = await windowController.signAndSend(transaction);
+    console.log("Confirmed transaction", signedTransaction, new Date());
     const unserializedResp = syscoinUtils.importPsbtFromJson(
       signedTransaction,
       syscoinUtils.syscoinNetworks.mainnet

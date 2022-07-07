@@ -27,6 +27,13 @@ export const burnSysToSysx = async (
       },
     ],
   ]);
+  console.log("burnSysToSysx", {
+    feeRate,
+    txOpts,
+    assetGuid,
+    assetChangeAddress,
+    assetMap,
+  });
   const res = await syscoinInstance.syscoinBurnToAssetAllocation(
     txOpts,
     assetMap,
@@ -37,6 +44,7 @@ export const burnSysToSysx = async (
   if (!res) {
     throw new Error("Could not create transaction, not enough funds?");
   }
+  console.log("burnSysToSysx", { res });
   return syscoinUtils.exportPsbtToJson(res.psbt, res.assets);
 };
 

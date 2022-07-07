@@ -50,9 +50,25 @@ export const initialize = (
   payload: transfer,
 });
 
+export const setUtxoAddress = (
+  address: string
+): { type: "setUtxoAddress"; payload: string } => ({
+  type: "setUtxoAddress",
+  payload: address,
+});
+
+export const setNevmAddress = (
+  address: string
+): { type: "setNevmAddress"; payload: string } => ({
+  type: "setNevmAddress",
+  payload: address,
+});
+
 export type TransferActions =
   | ReturnType<typeof setType>
   | ReturnType<typeof setAmount>
   | ReturnType<typeof addLog>
   | ReturnType<typeof setStatus>
-  | ReturnType<typeof initialize>;
+  | ReturnType<typeof initialize>
+  | ReturnType<typeof setUtxoAddress>
+  | ReturnType<typeof setNevmAddress>;

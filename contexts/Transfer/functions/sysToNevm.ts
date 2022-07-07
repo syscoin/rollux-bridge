@@ -27,7 +27,7 @@ const runWithSysToNevmStateMachine = async (
         syscoinInstance,
         parseFloat(transfer.amount).toFixed(6),
         utxo.xpub!,
-        utxo.account!
+        transfer.utxoAddress!
       );
       const burnSysTransactionReceipt = await sendUtxoTransaction(
         burnSysTransaction
@@ -38,6 +38,7 @@ const runWithSysToNevmStateMachine = async (
       setTimeout(() => dispatch(setStatus("burn-sysx")), 3000);
       break;
     }
+
     case "burn-sysx": {
       const burnSysxTransaction = await burnSysx(
         syscoinInstance,

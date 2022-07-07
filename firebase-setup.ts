@@ -22,7 +22,7 @@ try {
 }
 
 const firestore = getFirestore(app);
-const auth = getAuth(app);
+const auth = process.env.NODE_ENV !== "development" ? getAuth(app): null;
 
 const firebase = {
   app,
