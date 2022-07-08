@@ -58,7 +58,8 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
       "0xD822557aC2F2b77A1988617308e4A29A89Cb95A6"
     );
   }, [web3]);
-  const { utxo, nevm, sendUtxoTransaction } = useConnectedWallet();
+  const { utxo, nevm, sendUtxoTransaction, refershBalances } =
+    useConnectedWallet();
   const baseTransfer: Partial<ITransfer> = useMemo(() => {
     return {
       amount: "0",
@@ -160,6 +161,14 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     relayContract,
   ]);
 
+  let maxAmount: number | string | undefined = undefined;
+
+  if (transfer.type === "sys-to-nevm") {
+    maxAmount = utxo.balance;
+  } else if (transfer.type === "nevm-to-sys") {
+    maxAmount = nevm.balance;
+  }
+
   useEffect(() => {
     if (
       !initialized ||
@@ -172,14 +181,6 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     runSideEffects();
     setPreviousStatus(transfer.status);
   }, [initialized, previousStatus, runSideEffects, transfer.status]);
-
-  let maxAmount: number | string | undefined = undefined;
-
-  if (transfer.type === "sys-to-nevm") {
-    maxAmount = utxo.balance;
-  } else if (transfer.type === "nevm-to-sys") {
-    maxAmount = nevm.balance;
-  }
 
   useEffect(() => {
     if (!initialized || !transfer.id) {
@@ -231,6 +232,10 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
   useEffect(() => {
     setIsInitialized(false);
   }, [id]);
+
+  useEffect(() => {
+    refershBalances();
+  }, [transfer.type, refershBalances]);
 
   return (
     <TransferContext.Provider

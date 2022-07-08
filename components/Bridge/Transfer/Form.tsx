@@ -10,6 +10,7 @@ import { RocketLaunch } from "@mui/icons-material";
 
 import { FieldValues, useForm } from "react-hook-form";
 import { useTransfer } from "../../../contexts/Transfer/useTransfer";
+import { useEffect } from "react";
 
 const BridgeTransferForm: React.FC = () => {
   const { startTransfer, maxAmount } = useTransfer();

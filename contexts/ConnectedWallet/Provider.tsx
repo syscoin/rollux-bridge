@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useCallback, useState } from "react";
 import { UTXOTransaction } from "syscoinjs-lib";
 import { useMetamask } from "../Metamask/Provider";
 import { usePaliWallet } from "../PaliWallet/usePaliWallet";
@@ -18,6 +18,7 @@ interface IConnectedWalletContext {
     paliWallet?: boolean;
     metamask: boolean;
   };
+  refershBalances: () => void;
 }
 
 export const ConnectedWalletContext = createContext(
@@ -59,6 +60,10 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
     return Promise.reject(new Error("Wallet not connected"));
   };
 
+  const refershBalances = useCallback(() => {
+    metamask.fetchBalance();
+  }, [metamask]);
+
   return (
     <ConnectedWalletContext.Provider
       value={{
@@ -80,6 +85,7 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
           paliWallet: paliWallet.isInstalled,
           metamask: metamask.isEnabled,
         },
+        refershBalances,
       }}
     >
       {children}
