@@ -53,7 +53,12 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
       await connectWallet();
     }
     console.log("Sending transaction", transaction, new Date());
-    const signedTransaction = await windowController.signAndSend(transaction);
+    const signedTransaction = await windowController
+      .signAndSend(transaction)
+      .catch((sendTransactionError) => {
+        console.error("PaliWallet Sendtransaction", { sendTransactionError });
+        return Promise.reject(sendTransactionError);
+      });
     console.log("Confirmed transaction", signedTransaction, new Date());
     const unserializedResp = syscoinUtils.importPsbtFromJson(
       signedTransaction,
