@@ -7,7 +7,6 @@ import { SYSX_ASSET_GUID } from "../constants";
 import { addLog, setStatus, TransferActions } from "../store/actions";
 import { ITransfer } from "../types";
 import { syscoin, utils } from "syscoinjs-lib";
-import BN from "bn.js";
 import { UTXOInfo } from "@contexts/ConnectedWallet/types";
 import { SendUtxoTransaction } from "@contexts/ConnectedWallet/Provider";
 import burnSysx from "./burnSysx";
@@ -87,7 +86,7 @@ const mintSysx = async (
   }
   const receipt = freezeBurnConfirmationLog.payload.data as TransactionReceipt;
 
-  const feeRate = new BN(10);
+  const feeRate = new utils.BN(10);
   const txOpts = { rbf: true };
   // web3 URL + ID and nevm burn txid
   const assetOpts = {

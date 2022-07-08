@@ -1,10 +1,11 @@
-import { Box, Button, Container, Link, Typography } from "@mui/material";
+import { Box, Button, Container, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import DrawerPage from "components/DrawerPage";
 import WalletList from "components/WalletList";
 import { useConnectedWallet } from "contexts/ConnectedWallet/useConnectedWallet";
 import { ITransfer } from "contexts/Transfer/types";
 import { NextPage } from "next";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 
@@ -56,13 +57,9 @@ const TransfersPage: NextPage = () => {
           Transfers
         </Typography>
         <Box display="flex" mb={2}>
-          <Button
-            component={Link}
-            sx={{ ml: "auto" }}
-            href={`/bridge/${Date.now()}`}
-          >
-            New Transfer
-          </Button>
+          <Link href={`/bridge/${Date.now()}`}>
+            <Button sx={{ ml: "auto" }}>New Transfer</Button>
+          </Link>
         </Box>
 
         <DataGrid

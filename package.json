@@ -13,6 +13,7 @@
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.8.0",
+    "@mui/lab": "^5.0.0-alpha.89",
     "@mui/material": "^5.7.0",
     "@mui/x-data-grid": "^5.11.1",
     "@web3-react/core": "^6.1.9",

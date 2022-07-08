@@ -33,7 +33,11 @@ const BridgeTransferStepSwitch: React.FC = () => {
             </Button>
           }
         >
-          {!utxo.account ? "Reconnect Pali wallet" : `Change to ${utxoAddress}`}
+          <Typography>
+            {!utxo.account
+              ? "Reconnect Pali wallet"
+              : `Change to ${utxoAddress}`}
+          </Typography>
         </Alert>
       );
     }
@@ -46,7 +50,7 @@ const BridgeTransferStepSwitch: React.FC = () => {
           </Button>
         }
       >
-        {error ?? "Check Pali Wallet for signing"}
+        {typeof error === "string" ? error : "Check Pali Wallet for signing"}
       </Alert>
     );
   }

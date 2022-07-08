@@ -1,7 +1,6 @@
 import { syscoin, utils as syscoinUtils } from "syscoinjs-lib";
 import satoshibitcoin from "satoshi-bitcoin";
 import { SYSX_ASSET_GUID } from "../constants";
-import BN from "bn.js";
 
 export const burnSysx = async (
   syscoinInstance: syscoin,
@@ -11,7 +10,7 @@ export const burnSysx = async (
   xpubAddress: string,
   ethAddressStripped: string
 ) => {
-  const feeRate = new BN(10);
+  const feeRate = new syscoinUtils.BN(10);
   const txOpts = { rbf: true };
   const assetOpts = { ethaddress: Buffer.from(ethAddressStripped, "hex") };
   const assetChangeAddress = sysChangeAddress;
@@ -22,7 +21,7 @@ export const burnSysx = async (
         changeAddress: assetChangeAddress,
         outputs: [
           {
-            value: new BN(satoshibitcoin.toSatoshi(amount)),
+            value: new syscoinUtils.BN(satoshibitcoin.toSatoshi(amount)),
             address: sysChangeAddress,
           },
         ],

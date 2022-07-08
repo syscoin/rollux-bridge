@@ -9,8 +9,12 @@ import {
   Link,
   Typography,
 } from "@mui/material";
+
+import LoadingButton from "@mui/lab/LoadingButton";
+
 import { useTransfer } from "contexts/Transfer/useTransfer";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 const SYSCOIN_TX_BLOCKCHAIN_URL = "https://blockbook.elint.services/tx/";
 const NEVM_TX_BLOCKCHAIN_URL = "https://explorer.syscoin.org/tx/";
@@ -102,11 +106,13 @@ const NevmToSysComplete = () => {
 
 const BridgeTransferComplete: React.FC = () => {
   const { push } = useRouter();
+  const [reinitializing, setReinitializing] = useState(false);
   const {
     transfer: { type },
   } = useTransfer();
 
   const newTransfer = () => {
+    setReinitializing(true);
     push(`/bridge/${Date.now()}`);
   };
 
@@ -119,9 +125,14 @@ const BridgeTransferComplete: React.FC = () => {
           {type === "nevm-to-sys" && <NevmToSysComplete />}
         </CardContent>
         <CardActions>
-          <Button color="secondary" sx={{ ml: "auto" }} onClick={newTransfer}>
+          <LoadingButton
+            color="secondary"
+            sx={{ ml: "auto" }}
+            onClick={newTransfer}
+            loading={reinitializing}
+          >
             New Transfer <ArrowForward />
-          </Button>
+          </LoadingButton>
         </CardActions>
       </Card>
     </Box>

@@ -56,6 +56,7 @@ declare module "syscoinjs-lib" {
     ): Promise<{ psbt; assets }>;
   }
   declare module utils {
+    export const BN: any;
     export function exportPsbtToJson(psbt: Psbt, assets): UTXOTransaction;
     export function importPsbtFromJson(jsonData, network): UTXOTransaction;
     export function fetchBackendSPVProof(

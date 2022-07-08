@@ -46,7 +46,7 @@ const runWithSysToNevmStateMachine = async (
         SYSX_ASSET_GUID,
         utxo.account!,
         utxo.xpub!,
-        nevm.account!
+        nevm.account!.replace(/^0x/g, "")
       );
       const burnSysxTransactionReceipt = await sendUtxoTransaction(
         burnSysxTransaction
