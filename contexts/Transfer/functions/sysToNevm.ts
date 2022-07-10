@@ -29,13 +29,20 @@ const runWithSysToNevmStateMachine = async (
         utxo.xpub!,
         transfer.utxoAddress!
       );
-      const burnSysTransactionReceipt = await sendUtxoTransaction(
-        burnSysTransaction
-      );
-      dispatch(
-        addLog("burn-sys", "Burning SYS to SYSX", burnSysTransactionReceipt)
-      );
-      setTimeout(() => dispatch(setStatus("burn-sysx")), 3000);
+      await sendUtxoTransaction(burnSysTransaction)
+        .then((burnSysTransactionReceipt) => {
+          console.log("burn-sys", {
+            burnSysTransactionReceipt,
+          });
+          dispatch(
+            addLog("burn-sys", "Burning SYS to SYSX", burnSysTransactionReceipt)
+          );
+          setTimeout(() => dispatch(setStatus("burn-sysx")), 3000);
+        })
+        .catch((error) => {
+          console.error("burn-sys error", error);
+          return Promise.reject(error);
+        });
       break;
     }
 
@@ -48,13 +55,21 @@ const runWithSysToNevmStateMachine = async (
         utxo.xpub!,
         nevm.account!.replace(/^0x/g, "")
       );
-      const burnSysxTransactionReceipt = await sendUtxoTransaction(
-        burnSysxTransaction
-      );
-      dispatch(
-        addLog("burn-sysx", "Burning SYSX to NEVM", burnSysxTransactionReceipt)
-      );
-      dispatch(setStatus("generate-proofs"));
+      await sendUtxoTransaction(burnSysxTransaction)
+        .then((burnSysxTransactionReceipt) => {
+          dispatch(
+            addLog(
+              "burn-sysx",
+              "Burning SYSX to NEVM",
+              burnSysxTransactionReceipt
+            )
+          );
+          dispatch(setStatus("generate-proofs"));
+        })
+        .catch((error) => {
+          console.error("burn-sysx error", error);
+          return Promise.reject(error);
+        });
       break;
     }
 
