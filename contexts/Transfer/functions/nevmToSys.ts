@@ -43,7 +43,11 @@ const freezeAndBurn = (
 
 const confirmFreezeAndBurnSys = async (
   transfer: ITransfer,
-  web3: Web3,
+  confirmTransaction: (
+    chain: "nevm" | "utxo",
+    txid: string,
+    duration?: number
+  ) => Promise<utils.BlockbookTransactionBTC | TransactionReceipt>,
   dispatch: Dispatch<TransferActions>
 ) => {
   const freezeBurnLog = transfer.logs.find(
@@ -53,22 +57,23 @@ const confirmFreezeAndBurnSys = async (
     return;
   }
   const transactionHash = freezeBurnLog.payload.data as string;
-  const receipt = await web3.eth.getTransactionReceipt(transactionHash);
-  if (!receipt) {
-    return;
-  }
-  if (receipt.status === true) {
+  try {
+    const receipt = await confirmTransaction("nevm", transactionHash);
+    if (!receipt) {
+      return;
+    }
     dispatch(
       addLog("confirm-freeze-burn-sys", "Confirm Freeze and Burn SYS", receipt)
     );
     return dispatch(setStatus("mint-sysx"));
+  } catch (error) {
+    dispatch(
+      addLog("error", "Confirm Freeze and Burn error", {
+        error,
+      })
+    );
+    dispatch(setStatus("error"));
   }
-  dispatch(
-    addLog("error", "Confirm Freeze and Burn error", {
-      receipt,
-    })
-  );
-  dispatch(setStatus("error"));
 };
 
 const mintSysx = async (
@@ -147,7 +152,12 @@ const runWithNevmToSysStateMachine = async (
   syscoinInstance: syscoin,
   utxo: Partial<UTXOInfo>,
   sendUtxoTransaction: SendUtxoTransaction,
-  dispatch: Dispatch<TransferActions>
+  dispatch: Dispatch<TransferActions>,
+  confirmTransaction: (
+    chain: "nevm" | "utxo",
+    transactionHash: string,
+    duration?: number
+  ) => Promise<utils.BlockbookTransactionBTC | TransactionReceipt>
 ) => {
   const erc20Manager = new web3.eth.Contract(
     SyscoinERC20ManagerABI,
@@ -158,7 +168,7 @@ const runWithNevmToSysStateMachine = async (
       return freezeAndBurn(erc20Manager, transfer, dispatch);
     }
     case "confirm-freeze-burn-sys": {
-      return confirmFreezeAndBurnSys(transfer, web3, dispatch);
+      return confirmFreezeAndBurnSys(transfer, confirmTransaction, dispatch);
     }
     case "mint-sysx": {
       return mintSysx(

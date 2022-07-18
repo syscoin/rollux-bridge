@@ -25,6 +25,7 @@ export interface ITransferLog<T = any> {
   payload: {
     message: string;
     data: T;
+    previousStatus?: TransferStatus;
   };
 }
 

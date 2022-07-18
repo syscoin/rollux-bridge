@@ -59,10 +59,28 @@ declare module "syscoinjs-lib" {
     export const BN: any;
     export function exportPsbtToJson(psbt: Psbt, assets): UTXOTransaction;
     export function importPsbtFromJson(jsonData, network): UTXOTransaction;
+    export interface BlockbookTransactionBTC {
+      txid: string;
+      version: number;
+      vin: TxBTCVin[];
+      vout: TxBTCVout[];
+      blockHash: string;
+      blockHeight: number;
+      confirmations: number;
+      blockTime: number;
+      value: string;
+      valueIn: string;
+      fees: string;
+      hex: string;
+    }
     export function fetchBackendSPVProof(
       blockbookAPIURL: string,
       txId: string
     ): Promise<any>;
+    export function fetchBackendRawTx(
+      backendUrl: string,
+      txid: string
+    ): Promise<BlockbookTransactionBTC>;
 
     export const syscoinNetworks: {
       mainnet: Network;

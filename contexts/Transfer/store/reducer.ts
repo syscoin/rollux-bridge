@@ -21,6 +21,7 @@ export const reducer: Reducer<ITransfer, TransferActions> = (state, action) => {
             payload: {
               data,
               message,
+              previousStatus: state.status,
             },
           },
         ],

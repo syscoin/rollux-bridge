@@ -1,8 +1,18 @@
-import { createContext, ReactNode, useCallback, useState } from "react";
-import { UTXOTransaction } from "syscoinjs-lib";
+import { BlockbookAPIURL } from "@contexts/Transfer/constants";
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
+import { syscoin, utils as syscoinUtils, UTXOTransaction } from "syscoinjs-lib";
+
 import { useMetamask } from "../Metamask/Provider";
 import { usePaliWallet } from "../PaliWallet/usePaliWallet";
 import { UTXOInfo, NEVMInfo, UTXOWallet, NEVMWallet } from "./types";
+import Web3 from "web3";
+import { TransactionReceipt } from "web3-core";
 
 export type SendUtxoTransaction = (
   transaction: UTXOTransaction
@@ -18,7 +28,14 @@ interface IConnectedWalletContext {
     paliWallet?: boolean;
     metamask: boolean;
   };
-  refershBalances: () => void;
+  refreshBalances: () => void;
+  confirmTransaction: (
+    chain: "nevm" | "utxo",
+    transactionId: string,
+    duration?: number
+  ) => Promise<syscoinUtils.BlockbookTransactionBTC | TransactionReceipt>;
+  syscoinInstance: syscoin;
+  web3: Web3;
 }
 
 export const ConnectedWalletContext = createContext(
@@ -28,6 +45,12 @@ export const ConnectedWalletContext = createContext(
 const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const syscoinInstance = useMemo(
+    () =>
+      new syscoin(null, BlockbookAPIURL, syscoinUtils.syscoinNetworks.mainnet),
+    []
+  );
+  const web3 = useMemo(() => new Web3(Web3.givenProvider), []);
   const [utxoWalletType, setUtxoWalletType] =
     useState<UTXOWallet>("pali-wallet");
   const [nevmWalletType, setNevmWalletType] = useState<NEVMWallet>("metamask");
@@ -60,9 +83,67 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
     return Promise.reject(new Error("Wallet not connected"));
   };
 
-  const refershBalances = useCallback(() => {
+  const refreshBalances = useCallback(() => {
     metamask.fetchBalance();
   }, [metamask]);
+
+  const confirmTransaction = useCallback(
+    (
+      chain: "nevm" | "utxo",
+      transactionId: string,
+      durationInSeconds = 10 * 60 * 1000 // 10 minutes
+    ): Promise<syscoinUtils.BlockbookTransactionBTC | TransactionReceipt> => {
+      if (chain === "utxo") {
+        return new Promise((resolve, reject) => {
+          const expiry = Date.now() + durationInSeconds;
+          const interval = setInterval(async () => {
+            const transaction = await syscoinUtils
+              .fetchBackendRawTx(BlockbookAPIURL, transactionId)
+              .catch((error) => {
+                clearInterval(interval);
+                reject(
+                  new Error("Confirm transaction failed", { cause: error })
+                );
+              });
+            if (!transaction) {
+              return;
+            }
+            if (transaction.confirmations > 0) {
+              clearInterval(interval);
+              resolve(transaction);
+            }
+            if (Date.now() > expiry) {
+              clearInterval(interval);
+              reject(new Error("Confirm transaction timed out"));
+            }
+          }, 1000);
+        });
+      }
+      return new Promise((resolve, reject) => {
+        const expiry = Date.now() + durationInSeconds;
+        const interval = setInterval(async () => {
+          const receipt = await web3.eth
+            .getTransactionReceipt(transactionId)
+            .catch((error) => {
+              clearInterval(interval);
+              reject(new Error("Confirm transaction failed", { cause: error }));
+            });
+          if (!receipt) {
+            return;
+          }
+          if (receipt.status === true) {
+            clearInterval(interval);
+            resolve(receipt);
+          }
+          if (Date.now() > expiry) {
+            clearInterval(interval);
+            reject(new Error("Confirm transaction timed out"));
+          }
+        }, 1000);
+      });
+    },
+    [web3]
+  );
 
   return (
     <ConnectedWalletContext.Provider
@@ -85,7 +166,10 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
           paliWallet: paliWallet.isInstalled,
           metamask: metamask.isEnabled,
         },
-        refershBalances,
+        refreshBalances,
+        confirmTransaction,
+        syscoinInstance,
+        web3,
       }}
     >
       {children}

@@ -7,9 +7,10 @@ import BridgeTransferForm from "./Form";
 
 const BridgeTransferStepSwitch: React.FC = () => {
   const {
-    transfer: { status, utxoAddress },
+    transfer: { status, utxoAddress, logs },
     error,
     retry,
+    revertToPreviousStatus,
   } = useTransfer();
 
   const { utxo, connectUTXO } = useConnectedWallet();
@@ -101,15 +102,29 @@ const BridgeTransferStepSwitch: React.FC = () => {
     return <BridgeTransferComplete />;
   }
 
+  const lastLog = logs[logs.length - 1];
+  if (!lastLog) {
+    return null;
+  }
+  const { message } = lastLog.payload;
+
   return (
-    <Card variant="outlined">
-      <CardContent>
-        <Typography variant="body2">
-          <PriorityHigh color="warning" />
-          Check Pali Wallet for signing
-        </Typography>
-      </CardContent>
-    </Card>
+    <Alert
+      severity="error"
+      action={
+        <Button
+          color="inherit"
+          size="small"
+          onClick={() => revertToPreviousStatus()}
+        >
+          Retry
+        </Button>
+      }
+    >
+      <Typography variant="body2" color="error">
+        {message}
+      </Typography>
+    </Alert>
   );
 };
 

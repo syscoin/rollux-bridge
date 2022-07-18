@@ -10,17 +10,38 @@ import { ITransfer } from "../types";
 import Web3 from "web3";
 import { Contract } from "web3-eth-contract";
 import { getProof } from "bitcoin-proof";
+import { TransactionReceipt } from "web3-core";
+
+type SysToNevmStateMachineParams = {
+  transfer: ITransfer;
+  syscoinInstance: syscoin;
+  web3: Web3;
+  utxo: Partial<UTXOInfo>;
+  dispatch: Dispatch<TransferActions>;
+  sendUtxoTransaction: SendUtxoTransaction;
+  nevm: Partial<NEVMInfo>;
+  relayContract: Contract;
+  confirmTransaction: (
+    chain: "nevm" | "utxo",
+    transactionHash: string,
+    duration?: number
+  ) => Promise<syscoinUtils.BlockbookTransactionBTC | TransactionReceipt>;
+};
 
 const runWithSysToNevmStateMachine = async (
-  transfer: ITransfer,
-  syscoinInstance: syscoin,
-  web3: Web3,
-  utxo: Partial<UTXOInfo>,
-  dispatch: Dispatch<TransferActions>,
-  sendUtxoTransaction: SendUtxoTransaction,
-  nevm: Partial<NEVMInfo>,
-  relayContract: Contract
+  params: SysToNevmStateMachineParams
 ) => {
+  const {
+    transfer,
+    syscoinInstance,
+    web3,
+    dispatch,
+    nevm,
+    relayContract,
+    sendUtxoTransaction,
+    utxo,
+    confirmTransaction,
+  } = params;
   switch (transfer.status) {
     case "burn-sys": {
       const burnSysTransaction = await burnSysToSysx(
@@ -76,6 +97,11 @@ const runWithSysToNevmStateMachine = async (
     case "generate-proofs": {
       const { tx } = transfer.logs.find((log) => log.status === "burn-sysx")
         ?.payload.data;
+      const transactionRaw = await confirmTransaction("utxo", tx);
+      if (!transactionRaw) {
+        return;
+      }
+      console.log("Fetching backednd proof");
       const proof = await syscoinUtils.fetchBackendSPVProof(
         BlockbookAPIURL,
         tx
@@ -133,7 +159,7 @@ const runWithSysToNevmStateMachine = async (
             dispatch(setStatus("completed"));
           } else {
             dispatch(
-              addLog("error", "Proof error", {
+              addLog("error", error.message ?? "Proof error", {
                 error,
               })
             );

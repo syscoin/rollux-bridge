@@ -9,8 +9,6 @@ import {
 import reducer from "./store/reducer";
 import { ITransfer, TransferStatus, TransferType } from "./types";
 
-import { syscoin, utils as syscoinUtils } from "syscoinjs-lib";
-import { BlockbookAPIURL } from "./constants";
 import { useConnectedWallet } from "../ConnectedWallet/useConnectedWallet";
 import {
   addLog,
@@ -31,6 +29,7 @@ interface ITransferContext {
   setTransferType: (type: TransferType) => void;
   retry: () => void;
   error?: any;
+  revertToPreviousStatus: () => void;
 }
 
 export const TransferContext = createContext({} as ITransferContext);
@@ -44,13 +43,15 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
   id,
   children,
 }) => {
-  const syscoinInstance = useMemo(
-    () =>
-      new syscoin(null, BlockbookAPIURL, syscoinUtils.syscoinNetworks.mainnet),
-    []
-  );
-
-  const web3 = useMemo(() => new Web3(Web3.givenProvider), []);
+  const {
+    utxo,
+    nevm,
+    sendUtxoTransaction,
+    refreshBalances,
+    confirmTransaction,
+    syscoinInstance,
+    web3,
+  } = useConnectedWallet();
 
   const relayContract = useMemo(() => {
     return new web3.eth.Contract(
@@ -58,8 +59,7 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
       "0xD822557aC2F2b77A1988617308e4A29A89Cb95A6"
     );
   }, [web3]);
-  const { utxo, nevm, sendUtxoTransaction, refershBalances } =
-    useConnectedWallet();
+
   const baseTransfer: Partial<ITransfer> = useMemo(() => {
     return {
       amount: "0",
@@ -124,7 +124,7 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
 
   const runSideEffects = useCallback(() => {
     if (transfer.type === "sys-to-nevm") {
-      runWithSysToNevmStateMachine(
+      runWithSysToNevmStateMachine({
         transfer,
         syscoinInstance,
         web3,
@@ -132,8 +132,9 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
         dispatch,
         sendUtxoTransaction,
         nevm,
-        relayContract
-      ).catch((err) => {
+        relayContract,
+        confirmTransaction,
+      }).catch((err) => {
         setError(err);
       });
     } else if (transfer.type === "nevm-to-sys") {
@@ -143,7 +144,8 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
         syscoinInstance,
         utxo,
         sendUtxoTransaction,
-        dispatch
+        dispatch,
+        confirmTransaction
       ).catch((err) => {
         setError(err);
       });
@@ -159,7 +161,18 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
     sendUtxoTransaction,
     nevm,
     relayContract,
+    confirmTransaction,
   ]);
+
+  const revertToPreviousStatus = () => {
+    if (transfer.logs.length === 0) {
+      return;
+    }
+    const latestLog = transfer.logs[transfer.logs.length - 1];
+    if (latestLog.payload.previousStatus) {
+      dispatch(setStatus(latestLog.payload.previousStatus));
+    }
+  };
 
   let maxAmount: number | string | undefined = undefined;
 
@@ -234,8 +247,8 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
   }, [id]);
 
   useEffect(() => {
-    refershBalances();
-  }, [transfer.type, refershBalances]);
+    refreshBalances();
+  }, [transfer.type, refreshBalances]);
 
   return (
     <TransferContext.Provider
@@ -246,6 +259,7 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
         retry: () => runSideEffects(),
         error,
         maxAmount,
+        revertToPreviousStatus,
       }}
     >
       {children}

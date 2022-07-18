@@ -3,6 +3,8 @@ import { UTXOTransaction } from "syscoinjs-lib";
 import { utils as syscoinUtils } from "syscoinjs-lib";
 import { PaliWallet } from "./types";
 
+const tenMinutes = 10 * 60 * 1000;
+
 interface ConnectionsController {
   connectWallet: () => Promise<void>;
   disconnectWallet: () => Promise<void>;
@@ -30,6 +32,10 @@ interface IPaliWalletContext {
   sendTransaction: (
     transaction: UTXOTransaction
   ) => Promise<{ tx: string; error?: any }>;
+  confirmTransaction: (
+    transaction: { account: string; id: string },
+    duration?: number
+  ) => Promise<boolean>;
 }
 
 export const PaliWalletContext = createContext({} as IPaliWalletContext);
@@ -96,6 +102,62 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     return windowController.connectWallet();
   };
 
+  const confirmTransaction = (
+    transactionDetails: {
+      account: string;
+      id: string;
+    },
+    durationInSeconds = tenMinutes
+  ): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+      const expiry = Date.now() + durationInSeconds;
+      console.log("Confirming transaction", transactionDetails, expiry);
+      const interval = setInterval(async () => {
+        const controller = loadWindowController();
+        const walletState = await controller.getWalletState().catch((error) => {
+          reject(new Error("Error getting wallet state", { cause: error }));
+        });
+        if (!walletState) {
+          clearInterval(interval);
+          return;
+        }
+        const accountInWallet = walletState.accounts.find(
+          (account) => account.address.main === transactionDetails.account
+        );
+        if (!accountInWallet) {
+          clearInterval(interval);
+          reject(new Error("Account not found in wallet"));
+          return;
+        }
+        const foundWalletTransaction = accountInWallet.transactions.find(
+          (walletTransaction) =>
+            walletTransaction.txid === transactionDetails.id
+        );
+        if (!foundWalletTransaction) {
+          clearInterval(interval);
+          reject(new Error("Transaction not found in wallet"));
+          return;
+        }
+        console.log(
+          "Transaction Confirmation check",
+          transactionDetails,
+          new Date()
+        );
+        if (foundWalletTransaction.confirmations > 0) {
+          console.log("Transaction confirmed", foundWalletTransaction);
+          clearInterval(interval);
+          resolve(true);
+        }
+
+        if (Date.now() > expiry) {
+          clearInterval(interval);
+          console.log("Transaction not confirmed", foundWalletTransaction);
+          resolve(false);
+        }
+      }, 1000);
+    });
+  };
+
   useEffect(() => {
     if (controller) {
       return;
@@ -151,6 +213,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
         balance: walletState?.accounts.find(
           (account) => account.address.main === connectedAccount
         )?.balance,
+        confirmTransaction,
       }}
     >
       {children}
