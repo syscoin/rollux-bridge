@@ -33,11 +33,11 @@ const Bridge: NextPage<Props> = ({ transfer }) => {
       <DrawerPage>
         <Container sx={{ mt: 10 }}>
           <Typography variant="h5" fontWeight="bold">
-            Bridge Tokens
+            Bridge Your SYS
           </Typography>
           <Typography variant="caption" color="gray">
-            Transfer SYS back and forth between the Syscoin and NEVM
-            blockchains.
+            Trustlessly transfer SYS back and forth between the Syscoin Base and
+            Syscoin NEVM blockchains without middlemen!
           </Typography>
 
           <Typography variant="body1" sx={{ my: 3 }}>

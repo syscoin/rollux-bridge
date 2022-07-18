@@ -96,15 +96,26 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
       if (chain === "utxo") {
         return new Promise((resolve, reject) => {
           const expiry = Date.now() + durationInSeconds;
+          let isRequesting = false;
           const interval = setInterval(async () => {
+            if (Date.now() > expiry) {
+              clearInterval(interval);
+              reject(new Error("Confirm transaction timed out"));
+            }
+            if (isRequesting) {
+              return;
+            }
+            isRequesting = true;
             const transaction = await syscoinUtils
               .fetchBackendRawTx(BlockbookAPIURL, transactionId)
               .catch((error) => {
+                isRequesting = false;
                 clearInterval(interval);
                 reject(
                   new Error("Confirm transaction failed", { cause: error })
                 );
               });
+            isRequesting = false;
             if (!transaction) {
               return;
             }
@@ -112,22 +123,29 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
               clearInterval(interval);
               resolve(transaction);
             }
-            if (Date.now() > expiry) {
-              clearInterval(interval);
-              reject(new Error("Confirm transaction timed out"));
-            }
           }, 1000);
         });
       }
       return new Promise((resolve, reject) => {
         const expiry = Date.now() + durationInSeconds;
+        let isRequesting = false;
         const interval = setInterval(async () => {
+          if (Date.now() > expiry) {
+            clearInterval(interval);
+            reject(new Error("Confirm transaction timed out"));
+          }
+          if (isRequesting) {
+            return;
+          }
+          isRequesting = true;
           const receipt = await web3.eth
             .getTransactionReceipt(transactionId)
             .catch((error) => {
+              isRequesting = false;
               clearInterval(interval);
               reject(new Error("Confirm transaction failed", { cause: error }));
             });
+          isRequesting = false;
           if (!receipt) {
             return;
           }
