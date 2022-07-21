@@ -91,14 +91,14 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
     (
       chain: "nevm" | "utxo",
       transactionId: string,
-      durationInSeconds = 10 * 60 * 1000 // 10 minutes
+      durationInSeconds = 0
     ): Promise<syscoinUtils.BlockbookTransactionBTC | TransactionReceipt> => {
       if (chain === "utxo") {
         return new Promise((resolve, reject) => {
           const expiry = Date.now() + durationInSeconds;
           let isRequesting = false;
           const interval = setInterval(async () => {
-            if (Date.now() > expiry) {
+            if (durationInSeconds !== 0 && Date.now() > expiry) {
               clearInterval(interval);
               reject(new Error("Confirm transaction timed out"));
             }
@@ -130,7 +130,7 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
         const expiry = Date.now() + durationInSeconds;
         let isRequesting = false;
         const interval = setInterval(async () => {
-          if (Date.now() > expiry) {
+          if (durationInSeconds !== 0 && Date.now() > expiry) {
             clearInterval(interval);
             reject(new Error("Confirm transaction timed out"));
           }

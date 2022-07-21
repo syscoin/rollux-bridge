@@ -14,7 +14,9 @@ import LoadingButton from "@mui/lab/LoadingButton";
 
 import { useTransfer } from "contexts/Transfer/useTransfer";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
+import { TransactionReceipt } from "web3-core";
 
 const SYSCOIN_TX_BLOCKCHAIN_URL = "https://blockbook.elint.services/tx/";
 const NEVM_TX_BLOCKCHAIN_URL = "https://explorer.syscoin.org/tx/";
@@ -23,12 +25,38 @@ const SysToNevmComplete = () => {
   const {
     transfer: { logs },
   } = useTransfer();
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const { confirmTransaction } = useConnectedWallet();
 
   const burnSysTx = logs.find((log) => log.status === "burn-sys");
   const burnSysxTx = logs.find((log) => log.status === "burn-sysx");
   const submitProofsTx = logs.find((log) => log.status === "submit-proofs");
+
+  useEffect(() => {
+    const txHash = submitProofsTx?.payload.data.hash;
+    if (txHash) {
+      const interval = setInterval(() => {
+        confirmTransaction("nevm", txHash).then((receipt) => {
+          if ((receipt as TransactionReceipt).status) {
+            setIsConfirmed(true);
+            clearInterval(interval);
+          }
+        });
+      }, 1000);
+    }
+  }, [confirmTransaction, submitProofsTx?.payload.data.hash]);
+
   return (
-    <>
+    <CardContent>
+      {isConfirmed ? (
+        <Alert severity="success" sx={{ mb: 3 }}>
+          Transfer complete!
+        </Alert>
+      ) : (
+        <Alert severity="warning" sx={{ mb: 3 }}>
+          Confirming final transaction...
+        </Alert>
+      )}
       <Box sx={{ mb: 2 }}>
         <Typography variant="body2">Burn Sys tx:</Typography>
         <Link
@@ -56,7 +84,7 @@ const SysToNevmComplete = () => {
           {submitProofsTx?.payload.data.hash}
         </Link>
       </Box>
-    </>
+    </CardContent>
   );
 };
 
@@ -64,6 +92,8 @@ const NevmToSysComplete = () => {
   const {
     transfer: { logs },
   } = useTransfer();
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const { confirmTransaction } = useConnectedWallet();
 
   const nevmBurnSys = logs.find(
     (log) => log.status === "confirm-freeze-burn-sys"
@@ -71,9 +101,32 @@ const NevmToSysComplete = () => {
   const mintSysx = logs.find((log) => log.status === "mint-sysx");
   const burnSysx = logs.find((log) => log.status === "burn-sysx");
 
+  useEffect(() => {
+    const txid = burnSysx?.payload.data.tx;
+    if (txid) {
+      const interval = setInterval(() => {
+        confirmTransaction("utxo", txid).then((receipt) => {
+          if ((receipt as TransactionReceipt).status) {
+            setIsConfirmed(true);
+            clearInterval(interval);
+          }
+        });
+      }, 1000);
+    }
+  }, [confirmTransaction, burnSysx?.payload.data.tx]);
+
   return (
-    <>
+    <CardContent>
       <Box sx={{ mb: 2 }}>
+        {isConfirmed ? (
+          <Alert severity="success" sx={{ mb: 3 }}>
+            Transfer complete!
+          </Alert>
+        ) : (
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            Confirming final transaction...
+          </Alert>
+        )}
         <Typography variant="body2">Freeze Burn tx:</Typography>
         <Link
           href={`${NEVM_TX_BLOCKCHAIN_URL}${nevmBurnSys?.payload.data.transactionHash}`}
@@ -100,7 +153,7 @@ const NevmToSysComplete = () => {
           {burnSysx?.payload.data.tx}
         </Link>
       </Box>
-    </>
+    </CardContent>
   );
 };
 
@@ -118,12 +171,9 @@ const BridgeTransferComplete: React.FC = () => {
 
   return (
     <Box px={2}>
-      <Alert severity="success">Transfer complete!</Alert>
       <Card variant="outlined" sx={{ mt: 4 }}>
-        <CardContent>
-          {type === "sys-to-nevm" && <SysToNevmComplete />}
-          {type === "nevm-to-sys" && <NevmToSysComplete />}
-        </CardContent>
+        {type === "sys-to-nevm" && <SysToNevmComplete />}
+        {type === "nevm-to-sys" && <NevmToSysComplete />}
         <CardActions>
           <LoadingButton
             color="secondary"
