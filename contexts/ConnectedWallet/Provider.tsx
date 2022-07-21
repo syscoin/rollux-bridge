@@ -3,6 +3,7 @@ import {
   createContext,
   ReactNode,
   useCallback,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -13,6 +14,7 @@ import { usePaliWallet } from "../PaliWallet/usePaliWallet";
 import { UTXOInfo, NEVMInfo, UTXOWallet, NEVMWallet } from "./types";
 import Web3 from "web3";
 import { TransactionReceipt } from "web3-core";
+import { useRouter } from "next/router";
 
 export type SendUtxoTransaction = (
   transaction: UTXOTransaction
@@ -45,6 +47,9 @@ export const ConnectedWalletContext = createContext(
 const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const { route } = useRouter();
+  const [oldRoute, setOldRoute] = useState<string>();
+  const [createdIntervals, setCreatedIntervals] = useState<NodeJS.Timer[]>([]);
   const syscoinInstance = useMemo(
     () =>
       new syscoin(null, BlockbookAPIURL, syscoinUtils.syscoinNetworks.mainnet),
@@ -124,6 +129,7 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
               resolve(transaction);
             }
           }, 1000);
+          setCreatedIntervals(createdIntervals.concat(interval));
         });
       }
       return new Promise((resolve, reject) => {
@@ -158,10 +164,20 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
             reject(new Error("Confirm transaction timed out"));
           }
         }, 1000);
+        setCreatedIntervals(createdIntervals.concat(interval));
       });
     },
-    [web3]
+    [createdIntervals, web3.eth]
   );
+
+  useEffect(() => {
+    if (oldRoute === route) {
+      return;
+    }
+    createdIntervals.forEach((interval) => clearInterval(interval));
+    setOldRoute(route);
+    setCreatedIntervals([]);
+  }, [createdIntervals, route, oldRoute]);
 
   return (
     <ConnectedWalletContext.Provider

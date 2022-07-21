@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
 import { TransactionReceipt } from "web3-core";
+import { utils } from "syscoinjs-lib";
 
 const SYSCOIN_TX_BLOCKCHAIN_URL = "https://blockbook.elint.services/tx/";
 const NEVM_TX_BLOCKCHAIN_URL = "https://explorer.syscoin.org/tx/";
@@ -106,7 +107,7 @@ const NevmToSysComplete = () => {
     if (txid) {
       const interval = setInterval(() => {
         confirmTransaction("utxo", txid).then((receipt) => {
-          if ((receipt as TransactionReceipt).status) {
+          if ((receipt as utils.BlockbookTransactionBTC).confirmations > 0) {
             setIsConfirmed(true);
             clearInterval(interval);
           }
