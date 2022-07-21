@@ -100,6 +100,14 @@ const mintSysx = async (
   };
   // will be auto filled based on ethtxid eth-proof
   const assetMap = null;
+  console.log("assetAllocationMint", {
+    assetOpts,
+    txOpts,
+    assetMap,
+    utxoAddress: transfer.utxoAddress,
+    feeRate,
+    xpub: uxto.xpub,
+  });
   const res = await syscoinInstance.assetAllocationMint(
     assetOpts,
     txOpts,
@@ -112,6 +120,9 @@ const mintSysx = async (
     dispatch(addLog("mint-sysx", "Mint SYS error: Not enough funds", res));
     return dispatch(setStatus("error"));
   }
+  console.log("assetAllocationMint received", {
+    res,
+  });
   const transaction = utils.exportPsbtToJson(res.psbt, res.assets);
   const mintSysxTransactionReceipt = await sendUtxoTransaction(transaction);
   dispatch(addLog("mint-sysx", "Mint Sysx", mintSysxTransactionReceipt));

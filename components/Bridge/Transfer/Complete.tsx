@@ -36,16 +36,13 @@ const SysToNevmComplete = () => {
   useEffect(() => {
     const txHash = submitProofsTx?.payload.data.hash;
     if (txHash) {
-      const interval = setInterval(() => {
-        confirmTransaction("nevm", txHash).then((receipt) => {
-          if ((receipt as TransactionReceipt).status) {
-            setIsConfirmed(true);
-            clearInterval(interval);
-          }
-        });
-      }, 1000);
+      confirmTransaction("nevm", txHash).then((receipt) => {
+        if ((receipt as TransactionReceipt).status) {
+          setIsConfirmed(true);
+        }
+      });
     }
-  }, [confirmTransaction, submitProofsTx?.payload.data.hash]);
+  }, []);
 
   return (
     <CardContent>
@@ -105,16 +102,13 @@ const NevmToSysComplete = () => {
   useEffect(() => {
     const txid = burnSysx?.payload.data.tx;
     if (txid) {
-      const interval = setInterval(() => {
-        confirmTransaction("utxo", txid).then((receipt) => {
-          if ((receipt as utils.BlockbookTransactionBTC).confirmations > 0) {
-            setIsConfirmed(true);
-            clearInterval(interval);
-          }
-        });
-      }, 1000);
+      confirmTransaction("utxo", txid).then((receipt) => {
+        if ((receipt as utils.BlockbookTransactionBTC).confirmations > 0) {
+          setIsConfirmed(true);
+        }
+      });
     }
-  }, [confirmTransaction, burnSysx?.payload.data.tx]);
+  }, []);
 
   return (
     <CardContent>

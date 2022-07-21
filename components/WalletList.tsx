@@ -58,7 +58,7 @@ const WalletList: React.FC = () => {
           src="/metamask-logo.svg"
           height="32px"
           width="32px"
-          alt="PaliWallet logo"
+          alt="Metamask logo"
         />
 
         {nevm.type === "metamask" && nevm.account ? (

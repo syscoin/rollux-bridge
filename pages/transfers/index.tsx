@@ -1,5 +1,6 @@
-import { Box, Button, Container, Typography } from "@mui/material";
+import { Alert, Box, Button, Container, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import axios from "axios";
 import DrawerPage from "components/DrawerPage";
 import WalletList from "components/WalletList";
 import { useConnectedWallet } from "contexts/ConnectedWallet/useConnectedWallet";
@@ -25,18 +26,20 @@ const DateField: React.FC<{ value: number }> = ({ value }) => {
 const TransfersPage: NextPage = () => {
   const [items, setItems] = useState<ITransfer[]>([]);
   const { utxo, nevm } = useConnectedWallet();
-
-  const { data, isFetched } = useQuery(
+  const isFullyConnected = Boolean(utxo.account && nevm.account);
+  const { data, isFetched, isLoading, error } = useQuery(
     "transfers",
     () => {
       const searchParams = new URLSearchParams();
-      searchParams.set("utxo", utxo.account!);
-      searchParams.set("nevm", nevm.account!);
-      return fetch(`/api/transfer?${searchParams.toString()}`).then((resp) =>
-        resp.json()
-      );
+      if (utxo.account) {
+        searchParams.set("utxo", utxo.account);
+      }
+      if (nevm.account) {
+        searchParams.set("nevm", nevm.account);
+      }
+      return axios(`/api/transfer?${searchParams.toString()}`);
     },
-    { enabled: Boolean(utxo?.account || nevm?.account) }
+    { enabled: isFullyConnected }
   );
 
   useEffect(() => {
@@ -61,8 +64,8 @@ const TransfersPage: NextPage = () => {
             <Button sx={{ ml: "auto" }}>New Transfer</Button>
           </Link>
         </Box>
-
         <DataGrid
+          loading={isLoading}
           columns={[
             {
               field: "id",
@@ -122,10 +125,16 @@ const TransfersPage: NextPage = () => {
               renderCell: ({ value }) => <DateField value={value} />,
             },
           ]}
-          rows={isFetched ? data ?? items : []}
+          rows={isFetched ? data?.data ?? items : []}
           sx={{ background: "white", mb: 2 }}
           autoHeight
+          error={error}
         />
+        {!isFullyConnected && (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            <Typography variant="body1">Connect both wallets</Typography>
+          </Alert>
+        )}
         <WalletList />
       </Container>
     </DrawerPage>

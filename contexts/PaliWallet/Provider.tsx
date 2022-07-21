@@ -56,6 +56,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     const account = await windowController.getConnectedAccount();
     if (account === null) {
+      console.log("Wallet not found");
       await connectWallet();
     }
     console.log("Sending transaction", transaction, new Date());

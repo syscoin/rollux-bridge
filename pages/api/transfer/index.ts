@@ -1,29 +1,23 @@
 import { NextApiHandler } from "next";
 import firebase from "firebase-setup";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 
 const getAll: NextApiHandler = async (req, res) => {
   const { nevm, utxo } = req.query;
+  if (!nevm || !utxo) {
+    return res.status(400).json({ message: "Some parameters are missing" });
+  }
 
-  const nevmQuery = query(
+  const transferQuery = query(
     collection(firebase.firestore, "transfers"),
-    where("nevmAddress", "==", nevm)
-  );
-  const utxoQuery = query(
-    collection(firebase.firestore, "transfers"),
-    where("utxoAddress", "==", utxo)
+    where("nevmAddress", "==", nevm),
+    where("utxoAddress", "==", utxo),
+    orderBy("createdAt", "desc")
   );
 
-  const { docs: nevmDocs } = await getDocs(nevmQuery);
-  const { docs: utxoDocs } = await getDocs(utxoQuery);
-  const transactionMap = [
-    ...nevmDocs.map((doc) => doc.data()),
-    ...utxoDocs.map((doc) => doc.data()),
-  ].reduce((acc, curr) => {
-    acc[curr.id] = curr;
-    return acc;
-  }, {});
-  return res.status(200).json(Object.values(transactionMap));
+  const { docs } = await getDocs(transferQuery);
+
+  return res.status(200).json(Object.values(docs.map((doc) => doc.data())));
 };
 
 const handler: NextApiHandler = (req, res) => {
