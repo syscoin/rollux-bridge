@@ -42,7 +42,7 @@ const SysToNevmComplete = () => {
         }
       });
     }
-  }, []);
+  }, [confirmTransaction, submitProofsTx?.payload.data.hash]);
 
   return (
     <CardContent>
@@ -108,7 +108,7 @@ const NevmToSysComplete = () => {
         }
       });
     }
-  }, []);
+  }, [burnSysx?.payload.data.tx, confirmTransaction]);
 
   return (
     <CardContent>
