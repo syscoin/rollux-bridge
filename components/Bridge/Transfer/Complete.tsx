@@ -42,7 +42,8 @@ const SysToNevmComplete = () => {
         }
       });
     }
-  }, [confirmTransaction, submitProofsTx?.payload.data.hash]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <CardContent>
@@ -108,7 +109,8 @@ const NevmToSysComplete = () => {
         }
       });
     }
-  }, [burnSysx?.payload.data.tx, confirmTransaction]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <CardContent>
