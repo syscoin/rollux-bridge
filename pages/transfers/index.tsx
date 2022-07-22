@@ -74,7 +74,7 @@ const TransfersPage: NextPage = () => {
               renderCell: ({ value }) => (
                 <NextLink href={`/bridge/${value}`}>
                   <Typography
-                    variant="body1"
+                    variant="body2"
                     color="primary"
                     sx={{ cursor: "pointer" }}
                   >
