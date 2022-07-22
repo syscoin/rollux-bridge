@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Container, Typography } from "@mui/material";
+import { Alert, Box, Button, Container, Typography, Link } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import DrawerPage from "components/DrawerPage";
@@ -6,7 +6,7 @@ import WalletList from "components/WalletList";
 import { useConnectedWallet } from "contexts/ConnectedWallet/useConnectedWallet";
 import { ITransfer } from "contexts/Transfer/types";
 import { NextPage } from "next";
-import Link from "next/link";
+import NextLink from "next/link";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 
@@ -60,9 +60,9 @@ const TransfersPage: NextPage = () => {
           Transfers
         </Typography>
         <Box display="flex" mb={2}>
-          <Link href={`/bridge/${Date.now()}`}>
+          <NextLink href={`/bridge/${Date.now()}`}>
             <Button sx={{ ml: "auto" }}>New Transfer</Button>
-          </Link>
+          </NextLink>
         </Box>
         <DataGrid
           loading={isLoading}
@@ -72,7 +72,15 @@ const TransfersPage: NextPage = () => {
               headerName: "Id",
               width: 130,
               renderCell: ({ value }) => (
-                <Link href={`/bridge/${value}`}>{value}</Link>
+                <NextLink href={`/bridge/${value}`}>
+                  <Typography
+                    variant="body1"
+                    color="primary"
+                    sx={{ cursor: "pointer" }}
+                  >
+                    {value}
+                  </Typography>
+                </NextLink>
               ),
             },
             {
