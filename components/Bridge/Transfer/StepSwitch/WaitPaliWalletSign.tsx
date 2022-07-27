@@ -14,11 +14,7 @@ const WaitForPaliWalletSign = () => {
   let message = "Check Pali Wallet for signing";
   let alertAction = "Retry";
 
-  const handleAlertAction = () => {
-    if (severity === "error") {
-      connectUTXO("pali-wallet");
-      return;
-    }
+  let handleAlertAction = () => {
     retry();
   };
 
@@ -26,10 +22,12 @@ const WaitForPaliWalletSign = () => {
     severity = "error";
     alertAction = "Reconnect";
     message = "Reconnect Pali wallet";
+    handleAlertAction = () => connectUTXO("pali-wallet");
   } else if (utxoAddress !== utxo.account) {
     severity = "error";
     alertAction = "Reconnect";
     message = `Change to ${utxoAddress}`;
+    handleAlertAction = () => connectUTXO("pali-wallet");
   } else if (error) {
     severity = "error";
     if (typeof error === "string") {
