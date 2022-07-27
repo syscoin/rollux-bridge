@@ -15,6 +15,23 @@ import { useRouter } from "next/router";
 import { ArrowForward, CompareArrows } from "@mui/icons-material";
 import { ITransfer } from "contexts/Transfer/types";
 import BridgeWalletSwitch from "components/Bridge/WalletSwitch";
+import { useTransfer } from "@contexts/Transfer/useTransfer";
+
+const TransferTitle = () => {
+  const { transfer } = useTransfer();
+  if (transfer.status === "initialize") {
+    return (
+      <Typography variant="body1" sx={{ my: 3 }}>
+        New Transfer
+      </Typography>
+    );
+  }
+  return (
+    <Typography variant="body1" sx={{ my: 3 }}>
+      Transfer #{transfer.id}
+    </Typography>
+  );
+};
 
 interface Props {
   transfer: ITransfer;
@@ -39,10 +56,7 @@ const Bridge: NextPage<Props> = ({ transfer }) => {
             Trustlessly transfer SYS back and forth between the Syscoin Base and
             Syscoin NEVM blockchains without middlemen!
           </Typography>
-
-          <Typography variant="body1" sx={{ my: 3 }}>
-            New Transfer
-          </Typography>
+          <TransferTitle />
           <BridgeWalletSwitch />
           <BridgeTransferStepper />
           <Grid container>
