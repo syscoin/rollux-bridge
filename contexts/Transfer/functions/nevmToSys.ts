@@ -126,7 +126,7 @@ const mintSysx = async (
   const transaction = utils.exportPsbtToJson(res.psbt, res.assets);
   const mintSysxTransactionReceipt = await sendUtxoTransaction(transaction);
   dispatch(addLog("mint-sysx", "Mint Sysx", mintSysxTransactionReceipt));
-  setTimeout(() => dispatch(setStatus("burn-sysx")), 3000);
+  setTimeout(() => dispatch(setStatus("burn-sysx")), 5000);
 };
 
 const burnSysxToSys = async (
@@ -154,7 +154,7 @@ const burnSysxToSys = async (
 
   const burnSysxTransactionReceipt = await sendUtxoTransaction(transaction);
   dispatch(addLog("burn-sysx", "Burn Sysx", burnSysxTransactionReceipt));
-  setTimeout(() => dispatch(setStatus("completed")), 3000);
+  setTimeout(() => dispatch(setStatus("completed")), 5000);
 };
 
 const runWithNevmToSysStateMachine = async (

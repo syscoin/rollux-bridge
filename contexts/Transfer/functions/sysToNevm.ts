@@ -52,13 +52,14 @@ const runWithSysToNevmStateMachine = async (
       );
       await sendUtxoTransaction(burnSysTransaction)
         .then((burnSysTransactionReceipt) => {
-          console.log("burn-sys", {
-            burnSysTransactionReceipt,
-          });
+          console.log("burn-sys", burnSysTransactionReceipt, new Date());
           dispatch(
             addLog("burn-sys", "Burning SYS to SYSX", burnSysTransactionReceipt)
           );
-          setTimeout(() => dispatch(setStatus("burn-sysx")), 3000);
+          setTimeout(() => {
+            console.log("burn-sys", "Burning SYSX", new Date());
+            dispatch(setStatus("burn-sysx"));
+          }, 5000);
         })
         .catch((error) => {
           console.error("burn-sys error", error);
