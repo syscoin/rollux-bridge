@@ -144,6 +144,7 @@ const runWithSysToNevmStateMachine = async (
               hash,
             })
           );
+          dispatch(setStatus("completed"));
         })
         .once("confirmation", (confirmationNumber: number, receipt: any) => {
           dispatch(
@@ -152,7 +153,6 @@ const runWithSysToNevmStateMachine = async (
               receipt,
             })
           );
-          dispatch(setStatus("completed"));
         })
         .on("error", (error: { message: string }) => {
           if (/might still be mined/.test(error.message)) {
