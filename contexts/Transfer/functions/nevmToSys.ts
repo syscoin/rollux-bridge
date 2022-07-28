@@ -3,7 +3,7 @@ import Web3 from "web3";
 import { Contract } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-core";
 import SyscoinERC20ManagerABI from "../abi/SyscoinERC20Manager";
-import { SYSX_ASSET_GUID } from "../constants";
+import { PALIWALLET_INTERTRANSACTION_TIMEOUT, SYSX_ASSET_GUID } from "../constants";
 import { addLog, setStatus, TransferActions } from "../store/actions";
 import { ITransfer } from "../types";
 import { syscoin, utils } from "syscoinjs-lib";
@@ -126,7 +126,7 @@ const mintSysx = async (
   const transaction = utils.exportPsbtToJson(res.psbt, res.assets);
   const mintSysxTransactionReceipt = await sendUtxoTransaction(transaction);
   dispatch(addLog("mint-sysx", "Mint Sysx", mintSysxTransactionReceipt));
-  setTimeout(() => dispatch(setStatus("burn-sysx")), 5000);
+  setTimeout(() => dispatch(setStatus("burn-sysx")), PALIWALLET_INTERTRANSACTION_TIMEOUT);
 };
 
 const burnSysxToSys = async (
@@ -154,7 +154,7 @@ const burnSysxToSys = async (
 
   const burnSysxTransactionReceipt = await sendUtxoTransaction(transaction);
   dispatch(addLog("burn-sysx", "Burn Sysx", burnSysxTransactionReceipt));
-  setTimeout(() => dispatch(setStatus("completed")), 5000);
+  setTimeout(() => dispatch(setStatus("completed")), PALIWALLET_INTERTRANSACTION_TIMEOUT);
 };
 
 const runWithNevmToSysStateMachine = async (

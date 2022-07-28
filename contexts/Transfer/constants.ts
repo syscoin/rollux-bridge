@@ -12,3 +12,5 @@ export const NEVMNetwork = {
   rpcUrls: ["https://rpc.syscoin.org"],
   blockExplorerUrls: ["https://explorer.syscoin.org/"],
 };
+
+export const PALIWALLET_INTERTRANSACTION_TIMEOUT = 10000; // 5 seconds

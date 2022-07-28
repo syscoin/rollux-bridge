@@ -2,7 +2,11 @@ import { SendUtxoTransaction } from "@contexts/ConnectedWallet/Provider";
 import { NEVMInfo, UTXOInfo } from "@contexts/ConnectedWallet/types";
 import { Dispatch } from "react";
 import { SPVProof, syscoin, utils as syscoinUtils } from "syscoinjs-lib";
-import { BlockbookAPIURL, SYSX_ASSET_GUID } from "../constants";
+import {
+  BlockbookAPIURL,
+  PALIWALLET_INTERTRANSACTION_TIMEOUT,
+  SYSX_ASSET_GUID,
+} from "../constants";
 import burnSysToSysx from "./burnSysToSysx";
 import burnSysx from "./burnSysx";
 import { addLog, setStatus, TransferActions } from "../store/actions";
@@ -59,7 +63,7 @@ const runWithSysToNevmStateMachine = async (
           setTimeout(() => {
             console.log("burn-sys", "Burning SYSX", new Date());
             dispatch(setStatus("burn-sysx"));
-          }, 5000);
+          }, PALIWALLET_INTERTRANSACTION_TIMEOUT);
         })
         .catch((error) => {
           console.error("burn-sys error", error);
