@@ -6,6 +6,7 @@ export type SysToEthTransferStatus =
   | "burn-sysx"
   | "generate-proofs"
   | "submit-proofs"
+  | "finalizing"
   | "completed"
   | "error";
 
@@ -15,8 +16,9 @@ export type EthToSysTransferStatus =
   | "confirm-freeze-burn-sys"
   | "mint-sysx"
   | "burn-sysx"
-  | "error"
-  | "completed";
+  | "finalizing"
+  | "completed"
+  | "error";
 
 export type TransferStatus = SysToEthTransferStatus | EthToSysTransferStatus;
 

@@ -31,8 +31,8 @@ const BridgeTransferStepSwitch: React.FC = () => {
   if (status === "confirm-freeze-burn-sys") {
     return <WaitMetamaskTransactionConfirmation />;
   }
-  if (status === "completed") {
-    return <BridgeTransferComplete />;
+  if (["completed", 'finalizing'].includes(status)) {
+    return <BridgeTransferComplete isComplete={status === 'completed'}  />;
   }
 
   const lastLog = logs[logs.length - 1];

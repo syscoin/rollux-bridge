@@ -149,15 +149,7 @@ const runWithSysToNevmStateMachine = async (
               hash,
             })
           );
-          dispatch(setStatus("completed"));
-        })
-        .once("confirmation", (confirmationNumber: number, receipt: any) => {
-          dispatch(
-            addLog("completed", "Proof confirmed", {
-              confirmationNumber,
-              receipt,
-            })
-          );
+          dispatch(setStatus("finalizing"));
         })
         .on("error", (error: { message: string }) => {
           if (/might still be mined/.test(error.message)) {
@@ -173,6 +165,25 @@ const runWithSysToNevmStateMachine = async (
         });
       break;
     }
+    case "finalizing":
+      {
+        const submitProofLog = transfer.logs.find(
+          (log) => log.status === "submit-proofs"
+        );
+        const submitProofsHash = submitProofLog?.payload.data.hash;
+        if (!submitProofsHash) {
+          console.error("submit-proofs hash not found");
+          return;
+        }
+        const receipt = await confirmTransaction("nevm", submitProofsHash);
+        dispatch(
+          addLog("finalizing", "Transaction Receipt", {
+            receipt,
+          })
+        );
+        dispatch(setStatus("completed"));
+      }
+      break;
     default:
       return;
   }

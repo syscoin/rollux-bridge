@@ -24,6 +24,10 @@ const sysToNevmSteps: Step[] = [
     id: "submit-proofs",
     label: "Submit Proofs",
   },
+  {
+    id: "finalizing",
+    label: "Finalizing",
+  },
 ];
 
 const nevmToSysSteps: Step[] = [
@@ -42,6 +46,10 @@ const nevmToSysSteps: Step[] = [
   {
     id: "burn-sysx",
     label: "Burn SYSX to SYS",
+  },
+  {
+    id: "finalizing",
+    label: "Finalizing",
   },
 ];
 

@@ -22,32 +22,24 @@ import { utils } from "syscoinjs-lib";
 const SYSCOIN_TX_BLOCKCHAIN_URL = "https://blockbook.elint.services/tx/";
 const NEVM_TX_BLOCKCHAIN_URL = "https://explorer.syscoin.org/tx/";
 
-const SysToNevmComplete = () => {
+type BridgeTransferCompleteProps = {
+  isComplete: boolean;
+};
+
+const SysToNevmComplete: React.FC<BridgeTransferCompleteProps> = ({
+  isComplete,
+}) => {
   const {
     transfer: { logs },
   } = useTransfer();
-  const [isConfirmed, setIsConfirmed] = useState(false);
-  const { confirmTransaction } = useConnectedWallet();
 
   const burnSysTx = logs.find((log) => log.status === "burn-sys");
   const burnSysxTx = logs.find((log) => log.status === "burn-sysx");
   const submitProofsTx = logs.find((log) => log.status === "submit-proofs");
 
-  useEffect(() => {
-    const txHash = submitProofsTx?.payload.data.hash;
-    if (txHash) {
-      confirmTransaction("nevm", txHash).then((receipt) => {
-        if ((receipt as TransactionReceipt).status) {
-          setIsConfirmed(true);
-        }
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <CardContent>
-      {isConfirmed ? (
+      {isComplete ? (
         <Alert severity="success" sx={{ mb: 3 }}>
           Transfer complete!
         </Alert>
@@ -87,35 +79,22 @@ const SysToNevmComplete = () => {
   );
 };
 
-const NevmToSysComplete = () => {
+const NevmToSysComplete: React.FC<BridgeTransferCompleteProps> = ({
+  isComplete,
+}) => {
   const {
     transfer: { logs },
   } = useTransfer();
-  const [isConfirmed, setIsConfirmed] = useState(false);
-  const { confirmTransaction } = useConnectedWallet();
-
   const nevmBurnSys = logs.find(
     (log) => log.status === "confirm-freeze-burn-sys"
   );
   const mintSysx = logs.find((log) => log.status === "mint-sysx");
   const burnSysx = logs.find((log) => log.status === "burn-sysx");
 
-  useEffect(() => {
-    const txid = burnSysx?.payload.data.tx;
-    if (txid) {
-      confirmTransaction("utxo", txid).then((receipt) => {
-        if ((receipt as utils.BlockbookTransactionBTC).confirmations > 0) {
-          setIsConfirmed(true);
-        }
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <CardContent>
       <Box sx={{ mb: 2 }}>
-        {isConfirmed ? (
+        {isComplete ? (
           <Alert severity="success" sx={{ mb: 3 }}>
             Transfer complete!
           </Alert>
@@ -154,7 +133,9 @@ const NevmToSysComplete = () => {
   );
 };
 
-const BridgeTransferComplete: React.FC = () => {
+const BridgeTransferComplete: React.FC<BridgeTransferCompleteProps> = ({
+  isComplete,
+}) => {
   const { push } = useRouter();
   const [reinitializing, setReinitializing] = useState(false);
   const {
@@ -169,18 +150,20 @@ const BridgeTransferComplete: React.FC = () => {
   return (
     <Box px={2}>
       <Card variant="outlined" sx={{ mt: 4 }}>
-        {type === "sys-to-nevm" && <SysToNevmComplete />}
-        {type === "nevm-to-sys" && <NevmToSysComplete />}
-        <CardActions>
-          <LoadingButton
-            color="secondary"
-            sx={{ ml: "auto" }}
-            onClick={newTransfer}
-            loading={reinitializing}
-          >
-            New Transfer <ArrowForward />
-          </LoadingButton>
-        </CardActions>
+        {type === "sys-to-nevm" && <SysToNevmComplete isComplete={isComplete} />}
+        {type === "nevm-to-sys" && <NevmToSysComplete isComplete={isComplete} />}
+        {isComplete && (
+          <CardActions>
+            <LoadingButton
+              color="secondary"
+              sx={{ ml: "auto" }}
+              onClick={newTransfer}
+              loading={reinitializing}
+            >
+              New Transfer <ArrowForward />
+            </LoadingButton>
+          </CardActions>
+        )}
       </Card>
     </Box>
   );
