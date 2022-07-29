@@ -36,6 +36,7 @@ interface IPaliWalletContext {
     transaction: { account: string; id: string },
     duration?: number
   ) => Promise<boolean>;
+  isTestnet: boolean
 }
 
 export const PaliWalletContext = createContext({} as IPaliWalletContext);
@@ -215,6 +216,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
           (account) => account.address.main === connectedAccount
         )?.balance,
         confirmTransaction,
+        isTestnet: walletState?.activeNetwork !== 'main'
       }}
     >
       {children}

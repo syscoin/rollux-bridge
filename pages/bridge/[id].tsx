@@ -1,4 +1,6 @@
 import {
+  Alert,
+  Button,
   CircularProgress,
   Container,
   Grid,
@@ -16,6 +18,8 @@ import { ArrowForward, CompareArrows } from "@mui/icons-material";
 import { ITransfer } from "contexts/Transfer/types";
 import BridgeWalletSwitch from "components/Bridge/WalletSwitch";
 import { useTransfer } from "@contexts/Transfer/useTransfer";
+import { usePaliWallet } from "@contexts/PaliWallet/usePaliWallet";
+import { useMetamask } from "@contexts/Metamask/Provider";
 
 const TransferTitle = () => {
   const { transfer } = useTransfer();
@@ -39,6 +43,8 @@ interface Props {
 
 const Bridge: NextPage<Props> = ({ transfer }) => {
   const router = useRouter();
+  const paliWallet = usePaliWallet();
+  const metamask = useMetamask();
   const { id } = router.query;
 
   if (!id) {
@@ -49,6 +55,24 @@ const Bridge: NextPage<Props> = ({ transfer }) => {
     <TransferProvider id={id as string}>
       <DrawerPage>
         <Container sx={{ mt: 10 }}>
+          {paliWallet.isTestnet && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              Your Pali Wallet is not set to SYS Main Network.
+            </Alert>
+          )}
+          {metamask.isTestnet && (
+            <Alert
+              severity="error"
+              action={
+                <Button onClick={() => metamask.switchToMainnet()}>
+                  Switch
+                </Button>
+              }
+              sx={{ mb: 2 }}
+            >
+              Your Metamask is not set to NEVM Main Network.
+            </Alert>
+          )}
           <Typography variant="h5" fontWeight="bold">
             Bridge Your SYS
           </Typography>

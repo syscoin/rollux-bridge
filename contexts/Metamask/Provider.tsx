@@ -17,6 +17,7 @@ declare global {
       isConnected: boolean;
       selectedAddress: string;
       on: (event: string, callback: (...args: any[]) => void) => void;
+      networkVersion: string;
     } & provider;
   }
 }
@@ -28,6 +29,8 @@ interface IMetamaskContext {
   requestAccounts: () => void;
   sendTransaction: (transactionConfig: TransactionConfig) => Promise<string>;
   fetchBalance: () => void;
+  isTestnet: boolean;
+  switchToMainnet: () => void;
 }
 
 const MetamaskContext = createContext({} as IMetamaskContext);
@@ -41,6 +44,7 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
   const [account, setAccount] = useState<string | undefined>();
   const [web3, setWeb3] = useState<Web3>();
   const [balance, setBalance] = useState<string>();
+  const [isTestnet, setIsTestnet] = useState(false);
 
   const handleAccounstChange = (accounts: string[]) => {
     if (accounts.length > 0) {
@@ -73,6 +77,22 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
+  const switchToMainnet = () => {
+    window.ethereum
+      .request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0x39" }],
+      })
+      .catch(({ code }) => {
+        if (code === 4902) {
+          window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [NEVMNetwork],
+          });
+        }
+      });
+  };
+
   useEffect(() => {
     if (typeof window.ethereum !== "undefined" && window.ethereum.isMetaMask) {
       setIsEnabled(true);
@@ -87,23 +107,17 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
     if (window.ethereum.selectedAddress) {
       setAccount(window.ethereum.selectedAddress);
     }
-    window.ethereum
-      .request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0x39" }],
-      })
-      .catch(({ code }) => {
-        if (code === 4902) {
-          window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [NEVMNetwork],
-          });
-        }
-      });
   }, [isEnabled]);
 
   useEffect(() => {
     fetchBalance();
+    window.ethereum.on("chainChanged", (chainId) => {
+      setIsTestnet(chainId !== NEVMNetwork.chainId);
+    });
+    setIsTestnet(
+      window.ethereum.networkVersion !==
+        parseInt(NEVMNetwork.chainId, 16).toString()
+    );
   }, [account, fetchBalance]);
 
   return (
@@ -115,6 +129,8 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
         sendTransaction,
         balance,
         fetchBalance,
+        isTestnet,
+        switchToMainnet,
       }}
     >
       {children}
