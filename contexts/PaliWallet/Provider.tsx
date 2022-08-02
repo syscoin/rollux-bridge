@@ -36,7 +36,7 @@ interface IPaliWalletContext {
     transaction: { account: string; id: string },
     duration?: number
   ) => Promise<boolean>;
-  isTestnet: boolean
+  isTestnet: boolean;
 }
 
 export const PaliWalletContext = createContext({} as IPaliWalletContext);
@@ -55,10 +55,12 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!windowController) {
       return Promise.reject("No controller");
     }
-    const account = await windowController.getConnectedAccount();
-    if (account === null) {
-      console.log("Wallet not found");
-      await connectWallet();
+    if (!connectedAccount) {
+      const account = await windowController.getConnectedAccount();
+      if (account === null) {
+        console.log("Wallet not found");
+        await connectWallet();
+      }
     }
     console.log("Sending transaction", transaction, new Date());
     const signedTransaction = await windowController
@@ -216,7 +218,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
           (account) => account.address.main === connectedAccount
         )?.balance,
         confirmTransaction,
-        isTestnet: walletState?.activeNetwork !== 'main'
+        isTestnet: walletState?.activeNetwork !== "main",
       }}
     >
       {children}
