@@ -256,7 +256,10 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
         transfer,
         startTransfer,
         setTransferType,
-        retry: () => runSideEffects(),
+        retry: () => {
+          runSideEffects();
+          setError(undefined);
+        },
         error,
         maxAmount,
         revertToPreviousStatus,

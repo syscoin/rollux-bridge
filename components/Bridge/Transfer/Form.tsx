@@ -34,7 +34,7 @@ const BridgeTransferForm: React.FC = () => {
         </Typography>
         <TextField
           label="Amount"
-          placeholder="0.01"
+          placeholder="0.1"
           margin="dense"
           inputProps={{ inputMode: "numeric", pattern: "[0-9]+(.[0-9])*" }}
           InputProps={{
@@ -47,7 +47,7 @@ const BridgeTransferForm: React.FC = () => {
               message: `You can transfer up to ${maxAmountFixed} SYS`,
             },
             min: {
-              value: 0.001,
+              value: 0.1,
               message: "Amount must be atleast 0.1",
             },
             required: {
