@@ -14,6 +14,7 @@ interface ConnectionsController {
   signAndSend: (psbt: UTXOTransaction) => Promise<UTXOTransaction>;
   signPSBT: (psbt: UTXOTransaction) => Promise<UTXOTransaction>;
   getWalletState: () => Promise<PaliWallet.WalletState>;
+  isLocked: () => Promise<boolean>;
 }
 
 declare global {
@@ -54,6 +55,10 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     const windowController = loadWindowController();
     if (!windowController) {
       return Promise.reject("No controller");
+    }
+    const isLocked = await windowController.isLocked();
+    if (isLocked) {
+      await connectWallet();
     }
     if (!connectedAccount) {
       const account = await windowController.getConnectedAccount();
