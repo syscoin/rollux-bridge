@@ -28,7 +28,8 @@ type SysToNevmStateMachineParams = {
   confirmTransaction: (
     chain: "nevm" | "utxo",
     transactionHash: string,
-    duration?: number
+    duration?: number,
+    confirmations?: number
   ) => Promise<syscoinUtils.BlockbookTransactionBTC | TransactionReceipt>;
 };
 
@@ -63,15 +64,23 @@ const runWithSysToNevmStateMachine = async (
           dispatch(
             addLog("burn-sys", "Burning SYS to SYSX", burnSysTransactionReceipt)
           );
-          setTimeout(() => {
-            console.log("burn-sys", "Burning SYSX", new Date());
-            dispatch(setStatus("burn-sysx"));
-          }, PALIWALLET_INTERTRANSACTION_TIMEOUT);
+          dispatch(setStatus("confirm-burn-sys"));
         })
         .catch((error) => {
           console.error("burn-sys error", error);
           return Promise.reject(error);
         });
+      break;
+    }
+
+    case "confirm-burn-sys": {
+      const { tx } = transfer.logs.find((log) => log.status === "burn-sys")
+        ?.payload.data;
+      const transactionRaw = await confirmTransaction("utxo", tx, 0, 0);
+      if (!transactionRaw) {
+        return;
+      }
+      dispatch(setStatus("burn-sysx"));
       break;
     }
 
@@ -93,7 +102,7 @@ const runWithSysToNevmStateMachine = async (
               burnSysxTransactionReceipt
             )
           );
-          dispatch(setStatus("generate-proofs"));
+          dispatch(setStatus("confirm-burn-sysx"));
         })
         .catch((error) => {
           console.error("burn-sysx error", error);
@@ -102,14 +111,21 @@ const runWithSysToNevmStateMachine = async (
       break;
     }
 
-    case "generate-proofs": {
+    case "confirm-burn-sysx": {
       const { tx } = transfer.logs.find((log) => log.status === "burn-sysx")
         ?.payload.data;
       const transactionRaw = await confirmTransaction("utxo", tx);
       if (!transactionRaw) {
         return;
       }
+      dispatch(setStatus("generate-proofs"));
+      break;
+    }
+
+    case "generate-proofs": {
       console.log("Fetching backednd proof");
+      const { tx } = transfer.logs.find((log) => log.status === "burn-sysx")
+        ?.payload.data;
       const proof = await syscoinUtils.fetchBackendSPVProof(
         BlockbookAPIURL,
         tx
@@ -122,6 +138,7 @@ const runWithSysToNevmStateMachine = async (
       dispatch(setStatus("submit-proofs"));
       break;
     }
+
     case "submit-proofs": {
       const proof = transfer.logs.find(
         (log) => log.status === "generate-proofs"

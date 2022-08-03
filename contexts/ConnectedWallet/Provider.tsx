@@ -34,7 +34,8 @@ interface IConnectedWalletContext {
   confirmTransaction: (
     chain: "nevm" | "utxo",
     transactionId: string,
-    duration?: number
+    duration?: number,
+    confirmations?: number
   ) => Promise<syscoinUtils.BlockbookTransactionBTC | TransactionReceipt>;
   syscoinInstance: syscoin;
   web3: Web3;
@@ -96,7 +97,8 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
     (
       chain: "nevm" | "utxo",
       transactionId: string,
-      durationInSeconds = 0
+      durationInSeconds = 0,
+      confirmationsNeeded = 1
     ): Promise<syscoinUtils.BlockbookTransactionBTC | TransactionReceipt> => {
       if (chain === "utxo") {
         return new Promise((resolve, reject) => {
@@ -124,7 +126,7 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
             if (!transaction) {
               return;
             }
-            if (transaction.confirmations > 0) {
+            if (transaction.confirmations >= confirmationsNeeded) {
               clearInterval(interval);
               resolve(transaction);
             }

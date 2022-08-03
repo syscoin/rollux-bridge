@@ -13,8 +13,16 @@ const sysToNevmSteps: Step[] = [
     label: "Burn SYS",
   },
   {
+    id: "confirm-burn-sys",
+    label: "Confirm Burn SYS",
+  },
+  {
     id: "burn-sysx",
     label: "Burn SYSX",
+  },
+  {
+    id: "confirm-burn-sysx",
+    label: "Confirm Burn SYSX",
   },
   {
     id: "generate-proofs",
@@ -42,6 +50,10 @@ const nevmToSysSteps: Step[] = [
   {
     id: "mint-sysx",
     label: "Mint SYSX",
+  },
+  {
+    id: "confirm-mint-sysx",
+    label: "Confirm Mint SYSX",
   },
   {
     id: "burn-sysx",

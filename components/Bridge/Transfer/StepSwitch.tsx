@@ -22,7 +22,14 @@ const BridgeTransferStepSwitch: React.FC = () => {
     return <WaitForPaliWalletSign />;
   }
 
-  if (status === "generate-proofs") {
+  if (
+    [
+      "confirm-burn-sys",
+      "confirm-burn-sysx",
+      "confirm-mint-sysx",
+      "generate-proofs",
+    ].includes(status)
+  ) {
     return <WaitPaliWalletTransactionConfirmation />;
   }
   if (["submit-proofs", "freeze-burn-sys"].includes(status)) {
@@ -31,8 +38,8 @@ const BridgeTransferStepSwitch: React.FC = () => {
   if (status === "confirm-freeze-burn-sys") {
     return <WaitMetamaskTransactionConfirmation />;
   }
-  if (["completed", 'finalizing'].includes(status)) {
-    return <BridgeTransferComplete isComplete={status === 'completed'}  />;
+  if (["completed", "finalizing"].includes(status)) {
+    return <BridgeTransferComplete isComplete={status === "completed"} />;
   }
 
   const lastLog = logs[logs.length - 1];

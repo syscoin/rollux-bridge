@@ -3,7 +3,9 @@ export type TransferType = "sys-to-nevm" | "nevm-to-sys";
 export type SysToEthTransferStatus =
   | "initialize"
   | "burn-sys"
+  | "confirm-burn-sys"
   | "burn-sysx"
+  | "confirm-burn-sysx"
   | "generate-proofs"
   | "submit-proofs"
   | "finalizing"
@@ -15,6 +17,7 @@ export type EthToSysTransferStatus =
   | "freeze-burn-sys"
   | "confirm-freeze-burn-sys"
   | "mint-sysx"
+  | "confirm-mint-sysx"
   | "burn-sysx"
   | "finalizing"
   | "completed"

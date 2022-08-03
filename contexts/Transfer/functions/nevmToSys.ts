@@ -129,10 +129,7 @@ const mintSysx = async (
   const transaction = utils.exportPsbtToJson(res.psbt, res.assets);
   const mintSysxTransactionReceipt = await sendUtxoTransaction(transaction);
   dispatch(addLog("mint-sysx", "Mint Sysx", mintSysxTransactionReceipt));
-  setTimeout(
-    () => dispatch(setStatus("burn-sysx")),
-    PALIWALLET_INTERTRANSACTION_TIMEOUT
-  );
+  dispatch(setStatus("confirm-mint-sysx"));
 };
 
 const burnSysxToSys = async (
@@ -176,7 +173,8 @@ const runWithNevmToSysStateMachine = async (
   confirmTransaction: (
     chain: "nevm" | "utxo",
     transactionHash: string,
-    duration?: number
+    duration?: number,
+    confirmations?: number
   ) => Promise<utils.BlockbookTransactionBTC | TransactionReceipt>
 ) => {
   const erc20Manager = new web3.eth.Contract(
@@ -199,6 +197,18 @@ const runWithNevmToSysStateMachine = async (
         sendUtxoTransaction
       );
     }
+
+    case "confirm-mint-sysx": {
+      const { tx } = transfer.logs.find((log) => log.status === "mint-sysx")
+        ?.payload.data;
+      const transactionRaw = await confirmTransaction("utxo", tx, 0, 0);
+      if (!transactionRaw) {
+        return;
+      }
+      dispatch(setStatus("burn-sysx"));
+      break;
+    }
+
     case "burn-sysx": {
       return burnSysxToSys(
         transfer,
