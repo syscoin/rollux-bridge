@@ -48,6 +48,9 @@ const runWithSysToNevmStateMachine = async (
   } = params;
   switch (transfer.status) {
     case "burn-sys": {
+      if (transfer.logs.some((l) => l.status === "burn-sys")) {
+        return dispatch(setStatus("burn-sysx"));
+      }
       const burnSysTransaction = await burnSysToSysx(
         syscoinInstance,
         parseFloat(transfer.amount).toFixed(6),
