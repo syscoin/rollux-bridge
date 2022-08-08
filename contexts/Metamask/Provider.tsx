@@ -97,6 +97,14 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
     if (typeof window.ethereum !== "undefined" && window.ethereum.isMetaMask) {
       setIsEnabled(true);
       setWeb3(new Web3(window.ethereum));
+      switchToMainnet();
+      window.ethereum.on("chainChanged", (chainId) => {
+        setIsTestnet(chainId !== NEVMNetwork.chainId);
+      });
+      setIsTestnet(
+        window.ethereum.networkVersion !==
+          parseInt(NEVMNetwork.chainId, 16).toString()
+      );
     }
   }, []);
 
@@ -111,13 +119,6 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     fetchBalance();
-    window.ethereum.on("chainChanged", (chainId) => {
-      setIsTestnet(chainId !== NEVMNetwork.chainId);
-    });
-    setIsTestnet(
-      window.ethereum.networkVersion !==
-        parseInt(NEVMNetwork.chainId, 16).toString()
-    );
   }, [account, fetchBalance]);
 
   return (
