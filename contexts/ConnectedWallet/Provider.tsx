@@ -127,10 +127,12 @@ const ConnectedWalletProvider: React.FC<{ children: ReactNode }> = ({
               return;
             }
             if (transaction.confirmations >= confirmationsNeeded) {
-              clearInterval(interval);
-              resolve(transaction);
+              setTimeout(() => {
+                clearInterval(interval);
+                resolve(transaction);
+              }, 2000);
             }
-          }, 1000);
+          }, 2000);
           setCreatedIntervals(createdIntervals.concat(interval));
         });
       }
