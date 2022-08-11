@@ -2,11 +2,7 @@ import { SendUtxoTransaction } from "@contexts/ConnectedWallet/Provider";
 import { NEVMInfo, UTXOInfo } from "@contexts/ConnectedWallet/types";
 import { Dispatch } from "react";
 import { SPVProof, syscoin, utils as syscoinUtils } from "syscoinjs-lib";
-import {
-  BlockbookAPIURL,
-  PALIWALLET_INTERTRANSACTION_TIMEOUT,
-  SYSX_ASSET_GUID,
-} from "../constants";
+import { BlockbookAPIURL, SYSX_ASSET_GUID } from "../constants";
 import burnSysToSysx from "./burnSysToSysx";
 import burnSysx from "./burnSysx";
 import { addLog, setStatus, TransferActions } from "../store/actions";

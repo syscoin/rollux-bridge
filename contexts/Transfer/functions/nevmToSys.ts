@@ -3,10 +3,7 @@ import Web3 from "web3";
 import { Contract } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-core";
 import SyscoinERC20ManagerABI from "../abi/SyscoinERC20Manager";
-import {
-  PALIWALLET_INTERTRANSACTION_TIMEOUT,
-  SYSX_ASSET_GUID,
-} from "../constants";
+import { SYSX_ASSET_GUID } from "../constants";
 import { addLog, setStatus, TransferActions } from "../store/actions";
 import { ITransfer } from "../types";
 import { syscoin, utils } from "syscoinjs-lib";
@@ -157,10 +154,7 @@ const burnSysxToSys = async (
 
   const burnSysxTransactionReceipt = await sendUtxoTransaction(transaction);
   dispatch(addLog("burn-sysx", "Burn Sysx", burnSysxTransactionReceipt));
-  setTimeout(
-    () => dispatch(setStatus("finalizing")),
-    PALIWALLET_INTERTRANSACTION_TIMEOUT
-  );
+  dispatch(setStatus("finalizing"));
 };
 
 const runWithNevmToSysStateMachine = async (
@@ -206,6 +200,7 @@ const runWithNevmToSysStateMachine = async (
         return;
       }
       dispatch(setStatus("burn-sysx"));
+
       break;
     }
 
