@@ -8,6 +8,7 @@ import {
 import { TransactionConfig, provider } from "web3-core";
 import Web3 from "web3";
 import { NEVMNetwork } from "../Transfer/constants";
+import { useQuery } from "react-query";
 
 declare global {
   interface Window {
@@ -44,7 +45,14 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
   const [account, setAccount] = useState<string | undefined>();
   const [web3, setWeb3] = useState<Web3>();
   const [balance, setBalance] = useState<string>();
-  const [isTestnet, setIsTestnet] = useState(false);
+  const { data: isTestnet } = useQuery(
+    ["metamask", "isTestnet"],
+    () => window?.ethereum?.networkVersion !== parseInt("0x39", 16).toString(),
+    {
+      enabled: isEnabled,
+      refetchInterval: 1000,
+    }
+  );
 
   const handleAccounstChange = (accounts: string[]) => {
     if (accounts.length > 0) {
@@ -98,13 +106,6 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsEnabled(true);
       setWeb3(new Web3(window.ethereum));
       switchToMainnet();
-      window.ethereum.on("chainChanged", (chainId) => {
-        setIsTestnet(chainId !== NEVMNetwork.chainId);
-      });
-      setIsTestnet(
-        window.ethereum.networkVersion !==
-          parseInt(NEVMNetwork.chainId, 16).toString()
-      );
     }
   }, []);
 
@@ -130,7 +131,7 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
         sendTransaction,
         balance,
         fetchBalance,
-        isTestnet,
+        isTestnet: !!isTestnet,
         switchToMainnet,
       }}
     >
