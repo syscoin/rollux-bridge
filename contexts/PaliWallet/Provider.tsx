@@ -58,7 +58,21 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     const isLocked = await windowController.isLocked();
     if (isLocked) {
-      await connectWallet();
+      connectWallet();
+      await new Promise((resolve, reject) => {
+        let retryCount = 10;
+        const interval = setInterval(async () => {
+          if (retryCount-- <= 0) {
+            clearInterval(interval);
+            reject("Failed to connect");
+          }
+          const isLocked = await windowController.isLocked();
+          if (!isLocked) {
+            clearInterval(interval);
+            resolve(true);
+          }
+        }, 1000);
+      });
     }
     if (!connectedAccount) {
       const account = await windowController.getConnectedAccount();
