@@ -5,6 +5,13 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 
 const getRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
+  if (process.env.NODE_ENV !== "development" && firebase.auth) {
+    await signInWithEmailAndPassword(
+      firebase.auth,
+      process.env.FIREBASE_AUTH_EMAIL!,
+      process.env.FIREBASE_AUTH_PASSWORD!
+    );
+  }
   const document = await getDoc(
     doc(firebase.firestore, "transfers", id as string)
   );
