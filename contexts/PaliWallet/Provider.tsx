@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import { UTXOTransaction } from "syscoinjs-lib";
 import { utils as syscoinUtils } from "syscoinjs-lib";
 import { PaliWallet } from "./types";
@@ -50,6 +51,21 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const [connectedAccount, setConnectedAccount] = useState<string>();
   const [xpubAddress, setXpubAddress] = useState<string>();
   const [walletState, setWalletState] = useState<PaliWallet.WalletState>();
+  const { data: balance } = useQuery(
+    ["pali-wallet", "balance", connectedAccount ?? "unknown"],
+    async () => {
+      const controller = await loadWindowController();
+      const state = await controller.getWalletState();
+      return (
+        state.accounts.find(
+          (account) => account.address.main === connectedAccount
+        )?.balance ?? 0
+      );
+    },
+    {
+      enabled: Boolean(connectedAccount),
+    }
+  );
 
   const sendTransaction = async (transaction: UTXOTransaction) => {
     const windowController = loadWindowController();
@@ -233,9 +249,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
         connectWallet,
         xpubAddress,
         sendTransaction,
-        balance: walletState?.accounts.find(
-          (account) => account.address.main === connectedAccount
-        )?.balance,
+        balance,
         confirmTransaction,
         isTestnet: walletState?.activeNetwork !== "main",
       }}
