@@ -64,6 +64,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     },
     {
       enabled: Boolean(connectedAccount),
+      refetchInterval: 1000,
     }
   );
 
