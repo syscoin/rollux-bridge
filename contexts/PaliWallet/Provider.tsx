@@ -51,22 +51,10 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const [connectedAccount, setConnectedAccount] = useState<string>();
   const [xpubAddress, setXpubAddress] = useState<string>();
   const [walletState, setWalletState] = useState<PaliWallet.WalletState>();
-  const { data: balance } = useQuery(
-    ["pali-wallet", "balance", connectedAccount ?? "unknown"],
-    async () => {
-      const controller = await loadWindowController();
-      const state = await controller.getWalletState();
-      return (
-        state.accounts.find(
-          (account) => account.address.main === connectedAccount
-        )?.balance ?? 0
-      );
-    },
-    {
-      enabled: Boolean(connectedAccount),
-      refetchInterval: 1000,
-    }
-  );
+  const balance =
+    walletState?.accounts.find(
+      (account) => account.address.main === connectedAccount
+    )?.balance ?? 0;
 
   const sendTransaction = async (transaction: UTXOTransaction) => {
     const windowController = loadWindowController();
