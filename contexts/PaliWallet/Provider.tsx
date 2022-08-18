@@ -51,6 +51,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const [connectedAccount, setConnectedAccount] = useState<string>();
   const [xpubAddress, setXpubAddress] = useState<string>();
   const [walletState, setWalletState] = useState<PaliWallet.WalletState>();
+  const [isOnWalletUpdateSet, setIsOnWalletUpdateSet] = useState(false);
   const balance =
     walletState?.accounts.find(
       (account) => account.address.main === connectedAccount
@@ -111,16 +112,19 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     console.log("controller is set");
     const windowController = window.ConnectionsController!;
     setController(controller);
-    windowController.onWalletUpdate(async () => {
-      const xpubAddress = await windowController.getConnectedAccountXpub();
-      const account = await windowController.getConnectedAccount();
-      const walletState = await windowController.getWalletState();
-      setConnectedAccount(account ? account.address.main : undefined);
-      setXpubAddress(xpubAddress);
-      setWalletState(walletState);
-    });
+    if (!isOnWalletUpdateSet) {
+      windowController.onWalletUpdate(async () => {
+        const xpubAddress = await windowController.getConnectedAccountXpub();
+        const account = await windowController.getConnectedAccount();
+        const walletState = await windowController.getWalletState();
+        setConnectedAccount(account ? account.address.main : undefined);
+        setXpubAddress(xpubAddress);
+        setWalletState(walletState);
+      });
+      setIsOnWalletUpdateSet(true);
+    }
     return windowController;
-  }, [controller]);
+  }, [controller, setController, isOnWalletUpdateSet, setIsOnWalletUpdateSet]);
 
   const connectWallet = () => {
     const windowController = loadWindowController();
