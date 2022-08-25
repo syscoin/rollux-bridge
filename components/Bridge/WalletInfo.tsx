@@ -1,10 +1,13 @@
 import { useTransfer } from "@contexts/Transfer/useTransfer";
 import {
+  Alert,
   Box,
   Button,
   Card,
   CardActionArea,
   CardContent,
+  Link,
+  Snackbar,
   styled,
   Typography,
 } from "@mui/material";
@@ -78,23 +81,38 @@ const BridgeWalletInfo: React.FC<IProps> = ({ label, network, walletType }) => {
         </Box>
       )}
       {walletType === "nevm" && nevm.type === "metamask" && (
-        <Box display="flex" alignItems="center">
-          <Image
-            src="/metamask-logo.svg"
-            height="32px"
-            width="32px"
-            alt="Metamask logo"
-          />
-          {transfer.status === "initialize" ? (
-            nevm.account ? (
-              <Typography variant="body2">{nevm.account}</Typography>
+        <>
+          <Box display="flex" alignItems="center">
+            <Image
+              src="/metamask-logo.svg"
+              height="32px"
+              width="32px"
+              alt="Metamask logo"
+            />
+            {transfer.status === "initialize" ? (
+              nevm.account ? (
+                <Typography variant="body2">{nevm.account}</Typography>
+              ) : (
+                <Button onClick={() => connectNEVM("metamask")}>Connect</Button>
+              )
             ) : (
-              <Button onClick={() => connectNEVM("metamask")}>Connect</Button>
-            )
-          ) : (
-            <Typography variant="body2">{transfer.nevmAddress}</Typography>
+              <Typography variant="body2">{transfer.nevmAddress}</Typography>
+            )}
+          </Box>
+          {(nevm.balance ?? 0) < 0.001 && (
+            <Alert severity="error" sx={{ width: "100%", flex: 1 }}>
+              <Typography variant="body2">
+                It seems your wallet does not have any balance.
+              </Typography>
+              <Typography variant="body2">
+                Please go to{" "}
+                <Link href="https://faucet.syscoin.org/">
+                  https://faucet.syscoin.org/
+                </Link>
+              </Typography>
+            </Alert>
           )}
-        </Box>
+        </>
       )}
     </Box>
   );
