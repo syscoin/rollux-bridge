@@ -20,6 +20,7 @@ import BridgeWalletSwitch from "components/Bridge/WalletSwitch";
 import { useTransfer } from "@contexts/Transfer/useTransfer";
 import { usePaliWallet } from "@contexts/PaliWallet/usePaliWallet";
 import { useMetamask } from "@contexts/Metamask/Provider";
+import BlocktimeDisclaimer from "components/BlocktimeDisclaimer";
 
 const TransferTitle = () => {
   const { transfer } = useTransfer();
@@ -54,6 +55,7 @@ const Bridge: NextPage<Props> = ({ transfer }) => {
   return (
     <TransferProvider id={id as string}>
       <DrawerPage>
+        <BlocktimeDisclaimer/>
         <Container sx={{ mt: 10 }}>
           {paliWallet.isTestnet && (
             <Alert severity="error" sx={{ mb: 2 }}>
