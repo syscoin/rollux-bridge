@@ -103,6 +103,7 @@ const BridgeWalletInfo: React.FC<IProps> = ({ label, network, walletType }) => {
             <Alert severity="error" sx={{ width: "100%", flex: 1 }}>
               <Typography variant="body2">
                 It seems your wallet does not have any balance.
+                In order to complete a transaction you need to have SYS in your wallet.
               </Typography>
               <Typography variant="body2">
                 Please go to{" "}
