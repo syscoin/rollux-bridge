@@ -44,7 +44,7 @@ const SysToNevmComplete: React.FC<BridgeTransferCompleteProps> = ({
           Transfer complete!
         </Alert>
       ) : (
-        <Alert severity="warning" sx={{ mb: 3 }}>
+        <Alert severity="info" sx={{ mb: 3 }}>
           Confirming final transaction...
         </Alert>
       )}
@@ -99,7 +99,7 @@ const NevmToSysComplete: React.FC<BridgeTransferCompleteProps> = ({
             Transfer complete!
           </Alert>
         ) : (
-          <Alert severity="warning" sx={{ mb: 3 }}>
+          <Alert severity="info" sx={{ mb: 3 }}>
             Confirming final transaction...
           </Alert>
         )}
