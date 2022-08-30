@@ -147,39 +147,42 @@ const runWithSysToNevmStateMachine = async (
         (sibling) => `0x${sibling}`
       );
       const syscoinBlockheader = `0x${proof.header}`;
-      relayContract.methods
-        .relayTx(
-          nevmBlock.number,
-          txBytes,
-          txIndex,
-          merkleProof.sibling,
-          syscoinBlockheader
-        )
-        .send({
-          from: nevm.account!,
-          gas: 400000,
-        })
-        .once("transactionHash", (hash: string) => {
-          dispatch(
-            addLog("submit-proofs", "Transaction hash", {
-              hash,
-            })
-          );
-          dispatch(setStatus("finalizing"));
-        })
-        .on("error", (error: { message: string }) => {
-          if (/might still be mined/.test(error.message)) {
-            dispatch(setStatus("completed"));
-          } else {
+      return new Promise((resolve, reject) => {
+        relayContract.methods
+          .relayTx(
+            nevmBlock.number,
+            txBytes,
+            txIndex,
+            merkleProof.sibling,
+            syscoinBlockheader
+          )
+          .send({
+            from: nevm.account!,
+            gas: 400000,
+          })
+          .once("transactionHash", (hash: string) => {
             dispatch(
-              addLog("error", error.message ?? "Proof error", {
-                error,
+              addLog("submit-proofs", "Transaction hash", {
+                hash,
               })
             );
-            dispatch(setStatus("error"));
-          }
-        });
-      break;
+            dispatch(setStatus("finalizing"));
+            resolve(hash);
+          })
+          .on("error", (error: { message: string }) => {
+            if (/might still be mined/.test(error.message)) {
+              dispatch(setStatus("completed"));
+              resolve("");
+            } else {
+              dispatch(
+                addLog("error", error.message ?? "Proof error", {
+                  error,
+                })
+              );
+              reject(error.message);
+            }
+          });
+      });
     }
     case "finalizing":
       {

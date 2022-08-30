@@ -18,27 +18,30 @@ const freezeAndBurn = (
   dispatch: Dispatch<TransferActions>
 ) => {
   const amount = toWei(transfer.amount.toString(), "ether");
-  contract.methods
-    .freezeBurnERC20(amount, SYSX_ASSET_GUID, transfer.utxoAddress)
-    .send({ from: transfer.nevmAddress, gas: 400000, value: amount })
-    .once("transactionHash", (transactionHash: string) => {
-      dispatch(
-        addLog("freeze-burn-sys", "Freeze and Burn SYS", transactionHash)
-      );
-      dispatch(setStatus("confirm-freeze-burn-sys"));
-    })
-    .on("error", (error: { message: string }) => {
-      if (/might still be mined/.test(error.message)) {
-        dispatch(setStatus("confirm-freeze-burn-sys"));
-      } else {
+  return new Promise((resolve, reject) => {
+    contract.methods
+      .freezeBurnERC20(amount, SYSX_ASSET_GUID, transfer.utxoAddress)
+      .send({ from: transfer.nevmAddress, gas: 400000, value: amount })
+      .once("transactionHash", (transactionHash: string) => {
         dispatch(
-          addLog("error", "Freeze and Burn error", {
-            error,
-          })
+          addLog("freeze-burn-sys", "Freeze and Burn SYS", transactionHash)
         );
-        dispatch(setStatus("error"));
-      }
-    });
+        dispatch(setStatus("confirm-freeze-burn-sys"));
+        resolve(transactionHash);
+      })
+      .on("error", (error: { message: string }) => {
+        if (/might still be mined/.test(error.message)) {
+          dispatch(setStatus("confirm-freeze-burn-sys"));
+        } else {
+          dispatch(
+            addLog("error", "Freeze and Burn error", {
+              error,
+            })
+          );
+          reject(error.message);
+        }
+      });
+  });
 };
 
 const confirmFreezeAndBurnSys = async (
