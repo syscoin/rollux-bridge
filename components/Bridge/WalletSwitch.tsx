@@ -1,6 +1,6 @@
 import { useTransfer } from "@contexts/Transfer/useTransfer";
 import { CompareArrows, ArrowForward } from "@mui/icons-material";
-import { Grid, IconButton, Typography, Box } from "@mui/material";
+import { Grid, IconButton, Typography, Box, Button } from "@mui/material";
 import BridgeWalletInfo from "./WalletInfo";
 
 const BridgeWalletSwitch: React.FC = () => {
@@ -30,19 +30,29 @@ const BridgeWalletSwitch: React.FC = () => {
         />
       </Grid>
       <Grid item xs={2} display="flex">
-        <Box sx={{ m: "auto", textAlign: 'center' }}>
-          {status !== 'initialize' && <Typography variant="body1" color="primary">{amount} SYS</Typography>}
-          <IconButton
-            color="secondary"
-            disabled={status !== "initialize"}
-            onClick={() =>
-              setTransferType(
-                type === "sys-to-nevm" ? "nevm-to-sys" : "sys-to-nevm"
-              )
-            }
-          >
-            {status === "initialize" ? <CompareArrows /> : <ArrowForward />}
-          </IconButton>
+        <Box sx={{ m: "auto", textAlign: "center" }}>
+          {status !== "initialize" && (
+            <Typography variant="body1" color="primary">
+              {amount} SYS
+            </Typography>
+          )}
+          {status === "initialize" ? (
+            <Button
+              variant="contained"
+              startIcon={<CompareArrows />}
+              onClick={() =>
+                setTransferType(
+                  type === "sys-to-nevm" ? "nevm-to-sys" : "sys-to-nevm"
+                )
+              }
+            >
+              Switch
+            </Button>
+          ) : (
+            <IconButton color="secondary" disabled={true}>
+              <ArrowForward />
+            </IconButton>
+          )}
         </Box>
       </Grid>
       <Grid item xs={5}>

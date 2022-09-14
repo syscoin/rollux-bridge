@@ -6,8 +6,8 @@ export const SyscoinLogo = () => {
   return (
     <Image
       src="/syscoin-logo.svg"
-      height="32px"
-      width="32px"
+      height="48px"
+      width="48px"
       alt="syscoin logo"
     />
   );

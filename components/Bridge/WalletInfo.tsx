@@ -31,20 +31,22 @@ const BridgeWalletInfo: React.FC<IProps> = ({ label, network, walletType }) => {
   const { nevm, utxo, connectUTXO, connectNEVM } = useConnectedWallet();
   const { transfer } = useTransfer();
 
+  const balance = parseFloat(
+    (walletType === "utxo" ? `${utxo.balance}` : nevm.balance) ?? "0"
+  ).toFixed(4);
+  const balanceLabel = `${label} Balance: ${balance}`;
+
   return (
     <Box>
-      <Typography variant="caption" color="gray">
-        {label}
-      </Typography>
       <Card variant="outlined" sx={{ mb: 1 }}>
         <CardContent sx={{ p: "1rem !important" }}>
           <SyscoinLogo />
           <Box display="inline-block" sx={{ ml: 1 }}>
-            <Typography variant="body1" display="block">
+            <Typography variant="h6" display="block">
               {network.name}
             </Typography>
-            <Typography variant="caption" display="block" color="gray">
-              {network.symbol}
+            <Typography variant="body1" display="block" color="gray">
+              {balanceLabel}
             </Typography>
           </Box>
         </CardContent>
@@ -102,8 +104,8 @@ const BridgeWalletInfo: React.FC<IProps> = ({ label, network, walletType }) => {
           {(nevm.balance ?? 0) < 0.001 && (
             <Alert severity="error" sx={{ width: "100%", flex: 1 }}>
               <Typography variant="body2">
-                It seems your wallet does not have any balance.
-                In order to complete a transaction you need to have SYS in your wallet.
+                It seems your wallet does not have any balance. In order to
+                complete a transaction you need to have SYS in your wallet.
               </Typography>
               <Typography variant="body2">
                 Please go to{" "}
