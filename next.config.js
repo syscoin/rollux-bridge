@@ -7,7 +7,10 @@ const nextConfig = {
     return config;
   },
   env: {
-    MONGODB_URI: 'mongodb://admin:admin@localhost:27017/syscoin-bridge'
+    MONGODB_URI: "mongodb://admin:admin@localhost:27017/syscoin-bridge",
+  },
+  experimental: {
+    outputStandalone: true
   }
 };
 
