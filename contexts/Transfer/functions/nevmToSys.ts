@@ -15,12 +15,18 @@ import { toWei } from "web3-utils";
 const freezeAndBurn = (
   contract: Contract,
   transfer: ITransfer,
+  utxo: Partial<UTXOInfo>,
   dispatch: Dispatch<TransferActions>
 ) => {
   const amount = toWei(transfer.amount.toString(), "ether");
+  if (utxo?.xpub !== transfer.utxoAddress) {
+    return Promise.reject(
+      "Invalid freeze and burn, uxto address does not match"
+    );
+  }
   return new Promise((resolve, reject) => {
     contract.methods
-      .freezeBurnERC20(amount, SYSX_ASSET_GUID, transfer.utxoAddress)
+      .freezeBurnERC20(amount, SYSX_ASSET_GUID, utxo.account)
       .send({ from: transfer.nevmAddress, gas: 400000, value: amount })
       .once("transactionHash", (transactionHash: string) => {
         dispatch(
@@ -82,7 +88,7 @@ const confirmFreezeAndBurnSys = async (
 const mintSysx = async (
   transfer: ITransfer,
   syscoinInstance: syscoin,
-  uxto: Partial<UTXOInfo>,
+  utxo: Partial<UTXOInfo>,
   dispatch: Dispatch<TransferActions>,
   sendUtxoTransaction: SendUtxoTransaction
 ) => {
@@ -107,17 +113,17 @@ const mintSysx = async (
     assetOpts,
     txOpts,
     assetMap,
-    utxoAddress: transfer.utxoAddress,
+    utxoAddress: utxo.account,
     feeRate,
-    xpub: uxto.xpub,
+    xpub: utxo.xpub,
   });
   const res = await syscoinInstance.assetAllocationMint(
     assetOpts,
     txOpts,
     assetMap,
-    transfer.utxoAddress,
+    utxo.account,
     feeRate,
-    uxto.xpub
+    utxo.xpub
   );
   if (!res) {
     dispatch(addLog("mint-sysx", "Mint SYS error: Not enough funds", res));
@@ -146,7 +152,7 @@ const burnSysxToSys = async (
       syscoinInstance,
       transfer.amount,
       SYSX_ASSET_GUID,
-      transfer.utxoAddress!,
+      utxo.account!,
       utxo.xpub!,
       ""
     );
@@ -180,7 +186,7 @@ const runWithNevmToSysStateMachine = async (
   );
   switch (transfer.status) {
     case "freeze-burn-sys": {
-      return freezeAndBurn(erc20Manager, transfer, dispatch);
+      return freezeAndBurn(erc20Manager, transfer, utxo, dispatch);
     }
     case "confirm-freeze-burn-sys": {
       return confirmFreezeAndBurnSys(transfer, confirmTransaction, dispatch);

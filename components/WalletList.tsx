@@ -18,7 +18,12 @@ const WalletList: React.FC = () => {
         />
         {utxo.type === "pali-wallet" && utxo.account ? (
           <>
-            <Typography variant="body1" color="secondary">
+            <Typography
+              variant="body1"
+              color="secondary"
+              noWrap
+              maxWidth={"70%"}
+            >
               {utxo.account}
             </Typography>
             <Typography

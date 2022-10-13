@@ -52,7 +52,7 @@ const runWithSysToNevmStateMachine = async (
         syscoinInstance,
         parseFloat(transfer.amount).toFixed(6),
         utxo.xpub!,
-        transfer.utxoAddress!
+        utxo.account!
       );
       await sendUtxoTransaction(burnSysTransaction)
         .then((burnSysTransactionReceipt) => {

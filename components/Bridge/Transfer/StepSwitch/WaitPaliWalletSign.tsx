@@ -18,12 +18,12 @@ const WaitForPaliWalletSign = () => {
     retry();
   };
 
-  if (!utxo.account) {
+  if (!utxo.xpub) {
     severity = "error";
     alertAction = "Reconnect";
     message = "Reconnect Pali wallet";
     handleAlertAction = () => connectUTXO("pali-wallet");
-  } else if (utxoAddress !== utxo.account) {
+  } else if (utxoAddress !== utxo.xpub) {
     severity = "error";
     alertAction = "Reconnect";
     message = `Change to ${utxoAddress}`;

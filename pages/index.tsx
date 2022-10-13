@@ -29,7 +29,7 @@ const SectionContainer = styled(Box)({
 const Home: NextPage = () => {
   const { nevm, utxo } = useConnectedWallet();
 
-  const isReady = nevm.account && utxo.account;
+  const isReady = nevm.account && utxo.xpub;
 
   return (
     <Box>
@@ -44,13 +44,14 @@ const Home: NextPage = () => {
         <Grid component={Container} container sx={{ my: 3 }}>
           <Grid item md={6}>
             <Box>
-              <Image
-                width={"720px"}
-                layout="intrinsic"
-                height={"720px"}
-                alt="bridge animation"
-                src="/bridge-diagram.svg"
-              />
+              <object
+                className="animation"
+                type="image/svg+xml"
+                data="/bridge-diagram.svg"
+                style={{
+                  width: "100%",
+                }}
+              ></object>
             </Box>
           </Grid>
           <Grid item md={6} sx={{ my: "auto", padding: 2 }}>

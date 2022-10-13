@@ -81,22 +81,22 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
   const [error, setError] = useState();
 
   const startTransfer = (amount: number) => {
-    if (!utxo.account || !nevm.account) {
+    if (!utxo.xpub || !nevm.account) {
       console.log("Some accounts are not connected", {
         nevm: nevm.account,
-        utxo: utxo.account,
+        utxo: utxo.xpub,
       });
       return;
     }
     updateAmount(`${amount}`);
-    dispatch(setUtxoAddress(utxo.account));
+    dispatch(setUtxoAddress(utxo.xpub));
     dispatch(setNevmAddress(nevm.account));
     dispatch(setStatus("initialize"));
     dispatch(
       addLog("initialize", "Starting Sys to NEVM transfer", {
         amount: transfer.amount,
         type: transfer.type,
-        utxoAddress: utxo.account,
+        utxoAddress: utxo.xpub,
         nevmAddress: nevm.account,
       })
     );
@@ -223,7 +223,7 @@ const TransferProvider: React.FC<TransferProviderProps> = ({
       const defaultState = {
         ...baseTransfer,
         nevmAddress: nevm.account!,
-        utxoAddress: utxo.account!,
+        utxoAddress: utxo.xpub!,
         id,
       } as ITransfer;
       dispatch(initialize(item ? JSON.parse(item) : defaultState));

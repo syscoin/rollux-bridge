@@ -1,4 +1,10 @@
-import React, { createContext, useCallback, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useQuery } from "react-query";
 import { UTXOTransaction } from "syscoinjs-lib";
 import { utils as syscoinUtils } from "syscoinjs-lib";
@@ -48,14 +54,25 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [controller, setController] = useState<ConnectionsController>();
   const [isInstalled, setIsInstalled] = useState<boolean>();
-  const [connectedAccount, setConnectedAccount] = useState<string>();
   const [xpubAddress, setXpubAddress] = useState<string>();
   const [walletState, setWalletState] = useState<PaliWallet.WalletState>();
   const [isOnWalletUpdateSet, setIsOnWalletUpdateSet] = useState(false);
-  const balance =
-    walletState?.accounts.find(
-      (account) => account.address.main === connectedAccount
-    )?.balance ?? 0;
+  const connectedAccount = useMemo(() => {
+    if (!walletState || !xpubAddress) {
+      return undefined;
+    }
+    return walletState.accounts.find((account) => account.xpub === xpubAddress)
+      ?.address.main;
+  }, [walletState, xpubAddress]);
+  const balance = useMemo(() => {
+    if (!walletState || !xpubAddress) {
+      return undefined;
+    }
+    return (
+      walletState.accounts.find((account) => account.xpub === xpubAddress)
+        ?.balance ?? 0
+    );
+  }, [walletState, xpubAddress]);
 
   const sendTransaction = async (transaction: UTXOTransaction) => {
     const windowController = loadWindowController();
@@ -115,9 +132,7 @@ const PaliWalletContextProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!isOnWalletUpdateSet) {
       windowController.onWalletUpdate(async () => {
         const xpubAddress = await windowController.getConnectedAccountXpub();
-        const account = await windowController.getConnectedAccount();
         const walletState = await windowController.getWalletState();
-        setConnectedAccount(account ? account.address.main : undefined);
         setXpubAddress(xpubAddress);
         setWalletState(walletState);
       });

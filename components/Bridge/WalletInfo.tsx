@@ -1,14 +1,14 @@
+import { UTXOInfo } from "@contexts/ConnectedWallet/types";
+import { TransferType } from "@contexts/Transfer/types";
 import { useTransfer } from "@contexts/Transfer/useTransfer";
 import {
   Alert,
   Box,
   Button,
   Card,
-  CardActionArea,
   CardContent,
   Link,
-  Snackbar,
-  styled,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import Image from "next/image";
@@ -26,6 +26,19 @@ interface IProps {
     symbol: string;
   };
 }
+
+const UTXOAddress: React.FC<{
+  type: TransferType;
+  utxo: Partial<UTXOInfo>;
+}> = ({ type, utxo }) => {
+  return (
+    <Tooltip title={`${utxo.account}`} placement="top">
+      <Typography variant="body2" noWrap>
+        {utxo.account}
+      </Typography>
+    </Tooltip>
+  );
+};
 
 const BridgeWalletInfo: React.FC<IProps> = ({ label, network, walletType }) => {
   const { nevm, utxo, connectUTXO, connectNEVM } = useConnectedWallet();
@@ -60,16 +73,16 @@ const BridgeWalletInfo: React.FC<IProps> = ({ label, network, walletType }) => {
             alt="PaliWallet logo"
           />
           {transfer.status === "initialize" ? (
-            utxo.account ? (
-              <Typography variant="body2">{utxo.account}</Typography>
+            utxo.xpub ? (
+              <UTXOAddress type={transfer.type} utxo={utxo} />
             ) : (
               <Button onClick={() => connectUTXO("pali-wallet")}>
                 Connect
               </Button>
             )
-          ) : utxo.account ? (
-            utxo.account === transfer.utxoAddress ? (
-              <Typography variant="body2">{transfer.utxoAddress}</Typography>
+          ) : utxo.xpub ? (
+            utxo.xpub === transfer.utxoAddress ? (
+              <UTXOAddress type={transfer.type} utxo={utxo} />
             ) : (
               <Typography variant="body2">
                 Change to {transfer.utxoAddress}
