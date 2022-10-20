@@ -4,13 +4,13 @@ const HomeHowItWorks: React.FC = () => {
   return (
     <Box my={4}>
       <Typography variant="h3" textAlign="center" sx={{ mb: 3 }}>
-        HOW IT WORKS?
+        HOW DOES IT WORK?
       </Typography>
       <Card sx={{ mb: 3, p: 4 }}>
         <CardContent sx={{ px: 8 }}>
           <Typography variant="h5" textAlign="center" sx={{ mb: 3 }}>
             Token portability backed by cryptographic proofs. <br />
-            Move tokens back and forth between the Syscoin and NEVM blockchains.
+            Move tokens back and forth between the Syscoin Native (UTXO) and Syscoin NEVM blockchains.
           </Typography>
           <Typography
             variant="body1"
@@ -18,13 +18,12 @@ const HomeHowItWorks: React.FC = () => {
             textAlign="center"
             sx={{ w: "50%", mb: 3 }}
           >
-            An industry-first, zero counterparty bridge for moving tokens back
-            and forth between the Syscoin and NEVM blockchains
+            An industry-first, zero-counterparty bridge.
           </Typography>
 
           <Box sx={{ mb: 3 }}>
             <Typography variant="body1" fontWeight="bold">
-              Burn tokens on the Syscoin or NEVM blockchain
+              Burn tokens on the Syscoin native or NEVM blockchains
             </Typography>
             <Typography variant="body1">
               Burning tokens provably removes them from the circulating supply
@@ -34,7 +33,7 @@ const HomeHowItWorks: React.FC = () => {
           </Box>
           <Box>
             <Typography variant="body1" fontWeight="bold">
-              Mint tokens on the NEVM or Syscoin blockchain
+              Mint tokens on the NEVM or Syscoin native blockchain
             </Typography>
             <Typography variant="body1">
               Using the proof of burn from one chain, new tokens can be minted
