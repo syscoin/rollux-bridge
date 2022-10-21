@@ -18,8 +18,8 @@ const faqs: IFAQ[] = [
     question: "What is Syscoin?",
     answer: (
       <Typography>
-        Syscoin is a decentralized modular blockchain that brings together Bitcoin's secure PoW, 
-        Ethereum's flexible EVM, & scalable computation via Rollups (ZK & Optimistic). All of 
+        Syscoin is a decentralized modular blockchain that brings together Bitcoin&apos;s secure PoW, 
+        Ethereum&apos;s flexible EVM, & scalable computation via Rollups (ZK & Optimistic). All of 
         these best elements are combined into a single plug-and-play network making an ultra 
         fast, scalable, low gas smart contract platform w/ proven security.
         The blockchain trifecta.
@@ -102,7 +102,7 @@ const faqs: IFAQ[] = [
         ZDAG’s probabilistic security (offering global consensus in ten seconds or 
         less) enables you to determine the security/speed trade-off most ideal for 
         your particular use case. Further, each SPT transaction settles onchain with 
-        Bitcoin compliant proof of work. SPTs can also tap into Syscoin Core's option 
+        Bitcoin compliant proof of work. SPTs can also tap into Syscoin Core&apos;s option 
         to call external APIs for the implementation of Notary and offchain business 
         rules. All of this is especially attractive for point of sale applications, 
         stablecoins issuers, and CBDCs. You can learn more about Syscoin ZDAG here:
