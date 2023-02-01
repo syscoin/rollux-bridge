@@ -41,51 +41,100 @@ const Home: NextPage = () => {
       </Head>
 
       <Box component="main">
-        <Grid component={Container} container sx={{ my: 3 }}>
+        <Grid component={Container} container sx={{ my: 3, maxWidth: null }}>
           <Grid item md={6}>
-            <Box>
-              <object
-                className="animation"
-                type="image/svg+xml"
-                data="/bridge-diagram.svg"
-                style={{
-                  width: "100%",
-                }}
-              ></object>
-            </Box>
+            <Grid component={Container} container sx={{ my: 3 }}>
+              <Grid item md={6}>
+                <Box>
+                  <object
+                    className="animation"
+                    type="image/svg+xml"
+                    data="/bridge-diagram.svg"
+                    style={{
+                      width: "100%",
+                    }}
+                  ></object>
+                </Box>
+              </Grid>
+              <Grid item md={6} sx={{ my: "auto", padding: 2 }}>
+                <Typography variant="h2" fontWeight="bold">
+                  SYSCOIN BRIDGE
+                </Typography>
+                <Typography variant="h6" sx={{ mb: 4 }}>
+                  Transfer SYS back and forth between the Syscoin and NEVM
+                  Blockchain
+                </Typography>
+                <WalletList />
+                {isReady && (
+                  <Box display="flex" justifyContent="space-between">
+                    <Link href={`/bridge/${Date.now()}`}>
+                      <Button variant="contained">
+                        Continue
+                        <ArrowForwardIcon />
+                      </Button>
+                    </Link>
+                    <Link href={`/transfers`}>
+                      <Button variant="text" color="secondary">
+                        View My Transfers
+                      </Button>
+                    </Link>
+                  </Box>
+                )}
+              </Grid>
+            </Grid>
           </Grid>
-          <Grid item md={6} sx={{ my: "auto", padding: 2 }}>
-            <Typography variant="h2" fontWeight="bold">
-              SYSCOIN BRIDGE
-            </Typography>
-            <Typography variant="h6" sx={{ mb: 4 }}>
-              Transfer SYS back and forth between the Syscoin and NEVM
-              Blockchain
-            </Typography>
-            <WalletList />
-            {isReady && (
-              <Box display="flex" justifyContent="space-between">
-                <Link href={`/bridge/${Date.now()}`}>
-                  <Button variant="contained">
-                    Continue
-                    <ArrowForwardIcon />
-                  </Button>
-                </Link>
-                <Link href={`/transfers`}>
+          <Grid item md={6}>
+            <Grid component={Container} container sx={{ my: 3 }}>
+              <Grid item md={6}>
+                <Box>
+                  <object
+                    className="animation"
+                    type="image/svg+xml"
+                    data="/bridge-diagram.svg"
+                    style={{
+                      width: "100%",
+                    }}
+                  ></object>
+                </Box>
+              </Grid>
+              <Grid item md={6} sx={{ my: "auto", padding: 2 }}>
+                <Typography variant="h2" fontWeight="bold">
+                  NEVM {'<->'} Rollux Bridge
+                </Typography>
+                <Typography variant="h6" sx={{ mb: 4 }}>
+                  Transfer SYS back and forth between the NEVM and Rollux
+                  Blockchain
+                </Typography>
+                <WalletList />
+                {true && (
+                  <Box display="flex" justifyContent="space-between">
+                    <Link href={`/bridge-nevm-rollux/${Date.now()}`}>
+                      <Button variant="contained">
+                        Continue
+                        <ArrowForwardIcon />
+                      </Button>
+                    </Link>
+                    {/* <Link href={`/transfers`}>
                   <Button variant="text" color="secondary">
                     View My Transfers
                   </Button>
-                </Link>
-              </Box>
-            )}
+                </Link> */}
+                  </Box>
+                )}
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
+
+
         <Container>
           <HomeHowItWorks />
         </Container>
         <Box component={FAQ} mb={3} />
         <Box component={ContactUs} mb={3} />
       </Box>
+
+
       <Footer />
     </Box>
   );
