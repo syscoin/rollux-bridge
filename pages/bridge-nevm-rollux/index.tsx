@@ -3,6 +3,7 @@ import { NextPage } from "next";
 import { Box, Grid, Container, Card, CardContent, Typography, ButtonBase } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { DepositPart } from "./_deposit";
 
 type BridgeNevmRolluxProps = {}
 
@@ -63,6 +64,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     </Grid>
                 </Grid>
             </Box>
+
+            {currentDisplay === CurrentDisplayView.deposit && <DepositPart />}
         </Box>
     )
 }
