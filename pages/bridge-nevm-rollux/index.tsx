@@ -1,9 +1,12 @@
-import React, { FC, useState } from "react";
+import React, { FC, useContext, useState } from "react";
 import { NextPage } from "next";
 import { Box, Grid, Container, Card, CardContent, Typography, ButtonBase } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { DepositPart } from "./_deposit";
+import { useMetamask } from "@contexts/Metamask/Provider";
+import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
+import { ConnectWalletBox } from "./_connectWallet";
 
 type BridgeNevmRolluxProps = {}
 
@@ -15,7 +18,13 @@ enum CurrentDisplayView {
 export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const router = useRouter();
     const [currentDisplay, setCurrentDisplay] = useState<CurrentDisplayView>(CurrentDisplayView.deposit);
+    const metamask = useMetamask();
+    const connectedWalletCtxt = useConnectedWallet();
+    const isConnected = connectedWalletCtxt.nevm.account;
 
+    const switchAction = (action: CurrentDisplayView) => {
+        setCurrentDisplay(action);
+    }
 
     return (
         <Box>
@@ -41,8 +50,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             <Box component={Container} sx={{ alignItems: 'center', my: 3 }}>
                 <Grid container spacing={3}>
                     <Grid xs={6} item alignItems={'center'}>
-                        <Card variant="outlined" sx={{ width: 1 }}>
-                            <ButtonBase onClick={(event) => console.log("Deposit")} sx={{ width: 1 }}>
+                        <Card raised={currentDisplay === CurrentDisplayView.deposit} sx={{ width: 1 }}>
+                            <ButtonBase onClick={(event) => switchAction(CurrentDisplayView.deposit)} sx={{ width: 1 }}>
                                 <CardContent sx={{ alignContent: 'center' }}>
                                     <Typography variant="h5" textAlign={'center'}>
                                         Deposit
@@ -52,8 +61,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                         </Card>
                     </Grid>
                     <Grid xs={6} item alignItems={'center'}>
-                        <Card variant="outlined" sx={{ width: 1 }}>
-                            <ButtonBase onClick={(event) => console.log("Withdraw")} sx={{ width: 1 }}>
+                        <Card raised={currentDisplay === CurrentDisplayView.withdraw} sx={{ width: 1 }}>
+                            <ButtonBase onClick={(event) => switchAction(CurrentDisplayView.withdraw)} sx={{ width: 1 }}>
                                 <CardContent sx={{ alignContent: 'center' }}>
                                     <Typography variant="h5" textAlign={'center'}>
                                         Withdraw
@@ -65,7 +74,15 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 </Grid>
             </Box>
 
-            {currentDisplay === CurrentDisplayView.deposit && <DepositPart />}
+            {isConnected && <>
+                {currentDisplay === CurrentDisplayView.deposit && <DepositPart />}
+            </>}
+
+            {!isConnected && <>
+                <ConnectWalletBox />
+            </>}
+
+
         </Box>
     )
 }
