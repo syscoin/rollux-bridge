@@ -1,10 +1,76 @@
 import { Box, Button, Card, CardContent, Container, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
+import { useEtherBalance, useEthers, useTokenBalance } from '@usedapp/core';
+import { TokenInfo } from 'hooks/Common/useERC20TokenList';
 import { useERC20TokenList } from 'hooks/Common/useERC20TokenList';
-import React, { FC } from 'react'
+import React, { FC, useEffect, useState } from 'react'
+import { ethers } from 'ethers';
 
 export const DepositPart: FC<{}> = () => {
-    const [currency, setCurrency] = React.useState<string>('');
+    const [currency, setCurrency] = useState<string>('');
+    const [selectedTokenAddress, setSelectedTokenAddress] = useState<string | undefined>(undefined);
+    const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
+    const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
     const tokens = useERC20TokenList();
+    const { account } = useEthers();
+
+    const balanceNativeToken = useEtherBalance(account);
+    const balanceERC20Token = useTokenBalance(selectedTokenAddress, account);
+
+    // balance hook
+
+    useEffect(() => {
+        console.log(balanceERC20Token);
+
+        if (currency === 'SYS') {
+            // native
+
+            if (balanceNativeToken) {
+                setBalanceToDisplay(
+                    ethers.utils.formatEther(balanceNativeToken)
+                )
+            }
+        } else {
+            try {
+                if (balanceERC20Token) {
+                    setBalanceToDisplay(
+                        ethers.utils.formatUnits(balanceERC20Token, selectedTokenDecimals)
+                    )
+                } else {
+                    setBalanceToDisplay('0.00');
+                }
+            } catch (e) {
+                console.warn("Failed to load token balance");
+                console.warn(e);
+
+                setBalanceToDisplay('0.00');
+            }
+        }
+    }, [balanceNativeToken, balanceERC20Token, currency, selectedTokenDecimals, account]);
+
+    // currency hook
+    useEffect(() => {
+        if ('SYS' === currency) {
+            return;
+        }
+
+
+        let findToken: TokenInfo | undefined = undefined;
+
+        tokens.forEach((value) => {
+            if (value.symbol === currency) {
+                findToken = value;
+            }
+        })
+
+        if (findToken) {
+            console.log(findToken);
+            // @ts-ignore
+            setSelectedTokenAddress(findToken.address);
+            // @ts-ignore
+            setSelectedTokenDecimals(findToken.decimals);
+        }
+
+    }, [currency, tokens]);
 
     return (
         <>
@@ -22,7 +88,7 @@ export const DepositPart: FC<{}> = () => {
                             <Grid container spacing={2}>
                                 <Grid item xs={7}>
                                     <FormControl fullWidth>
-                                        <TextField id="currency_amount_input" label="Amount of" fullWidth variant='outlined' onChange={(event) => console.log(event.target.value)} />
+                                        <TextField placeholder={balanceToDisplay ?? '0'} label={'Amount'} id="currency_amount_input" fullWidth variant='outlined' onChange={(event) => console.log(event.target.value)} />
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={5}>

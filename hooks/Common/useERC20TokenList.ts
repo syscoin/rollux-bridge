@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-type TokenInfo = {
+export type TokenInfo = {
     address: string,
     symbol: string,
     fullName: string,

@@ -1,4 +1,4 @@
-import React, { FC, useContext, useState } from "react";
+import React, { FC, useContext, useEffect, useState } from "react";
 import { NextPage } from "next";
 import { Box, Grid, Container, Card, CardContent, Typography, ButtonBase } from "@mui/material";
 import Head from "next/head";
@@ -7,6 +7,8 @@ import { DepositPart } from "./_deposit";
 import { useMetamask } from "@contexts/Metamask/Provider";
 import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
 import { ConnectWalletBox } from "./_connectWallet";
+import EthersWrapperProvider from "./EthersContext";
+import { useEthers } from "@usedapp/core";
 
 type BridgeNevmRolluxProps = {}
 
@@ -21,12 +23,29 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const metamask = useMetamask();
     const connectedWalletCtxt = useConnectedWallet();
     const isConnected = connectedWalletCtxt.nevm.account;
+    const { account, activateBrowserWallet } = useEthers();
 
     const switchAction = (action: CurrentDisplayView) => {
         setCurrentDisplay(action);
     }
 
+    /**!SECTION
+     * 
+     * Hack for use useDapp
+     * 
+     * todo : refactor whole app to useDapp instead of web3-react
+     */
+    useEffect(() => {
+        console.log(account);
+        if (!account) {
+            activateBrowserWallet()
+
+            console.log(account);
+        }
+    }, [account, activateBrowserWallet]);
+
     return (
+
         <Box>
             <Head>
                 <title>Syscoin Bridge | Rollux & NEVM </title>

@@ -105,7 +105,7 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
     if (typeof window.ethereum !== "undefined" && window.ethereum.isMetaMask) {
       setIsEnabled(true);
       setWeb3(new Web3(window.ethereum));
-      switchToMainnet();
+      //LINK - switchToMainnet();
     }
   }, []);
 
