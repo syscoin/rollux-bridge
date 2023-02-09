@@ -19,7 +19,6 @@ export const DepositPart: FC<{}> = () => {
     // balance hook
 
     useEffect(() => {
-        console.log(balanceERC20Token);
 
         if (currency === 'SYS') {
             // native
