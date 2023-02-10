@@ -1,0 +1,38 @@
+import { ethers } from "ethers"
+
+const contractsDev = {
+    l1_dev: {
+        AddressManager: '0x1FA6902C9734D55869bf868e30244B6E10eC0DCC',
+        L1CrossDomainMessenger: '0x2C3026b9845264011FdF709Af0e8df0E6ec09F38',
+        L1StandardBridge: '0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A',
+        StateCommitmentChain: ethers.constants.AddressZero,
+        CanonicalTransactionChain: ethers.constants.AddressZero,
+        BondManager: ethers.constants.AddressZero,
+        OptimismPortal: '0x6aa4fEb8078661d0fce3E41C0D783f369B42Ae06',
+        L2OutputOracle: '0xc61c9628ff50E0CC23000Ec851CcB4BBe42228FE',
+    },
+    l2_dev: {
+        L2ToL1MessagePasser: '0x4200000000000000000000000000000000000016',
+        DeployerWhitelist: '0x4200000000000000000000000000000000000002',
+        L2CrossDomainMessenger: '0x4200000000000000000000000000000000000007',
+        GasPriceOracle: '0x420000000000000000000000000000000000000F',
+        L2StandardBridge: '0x4200000000000000000000000000000000000010',
+        SequencerFeeVault: '0x4200000000000000000000000000000000000011',
+        OptimismMintableERC20Factory: '0x4200000000000000000000000000000000000012',
+        L1BlockNumber: '0x4200000000000000000000000000000000000013',
+        L1Block: '0x4200000000000000000000000000000000000015',
+        LegacyERC20ETH: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
+        WETH9: '0x4200000000000000000000000000000000000006',
+        GovernanceToken: '0x4200000000000000000000000000000000000042',
+        LegacyMessagePasser: '0x4200000000000000000000000000000000000000',
+        L2ERC721Bridge: '0x4200000000000000000000000000000000000014',
+        OptimismMintableERC721Factory: '0x4200000000000000000000000000000000000017',
+        ProxyAdmin: '0x4200000000000000000000000000000000000018',
+        BaseFeeVault: '0x4200000000000000000000000000000000000019',
+        L1FeeVault: '0x420000000000000000000000000000000000001a',
+    },
+}
+
+
+
+export default contractsDev;

@@ -1,4 +1,4 @@
-import React, { FC, useContext, useEffect, useState } from "react";
+import React, { FC, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { NextPage } from "next";
 import { Box, Grid, Container, Card, CardContent, Typography, ButtonBase, Button } from "@mui/material";
 import Head from "next/head";
@@ -10,6 +10,8 @@ import { ConnectWalletBox } from "./_connectWallet";
 import { Web3Ethers, useEthers } from "@usedapp/core";
 import { CrossChainMessenger, ETHBridgeAdapter } from "@eth-optimism/sdk";
 import { BigNumber, ethers } from "ethers";
+import { networks, getNetworkByChainId, NetworkData, networksMap, getNetworkByName } from "blockchain/NevmRolluxBridge/config/networks";
+import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
 
 type BridgeNevmRolluxProps = {}
 
@@ -25,77 +27,76 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const connectedWalletCtxt = useConnectedWallet();
     const isConnected = connectedWalletCtxt.nevm.account;
     const { account, activateBrowserWallet, library } = useEthers();
+    const [crossChainMessenger, setCrossChainMessenger] = useState<CrossChainMessenger | undefined>(undefined);
 
-    const contractsTmp = {
-        l1: {
-            AddressManager: '0x1FA6902C9734D55869bf868e30244B6E10eC0DCC',
-            L1CrossDomainMessenger: '0x2C3026b9845264011FdF709Af0e8df0E6ec09F38',
-            L1StandardBridge: '0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A',
-            StateCommitmentChain: ethers.constants.AddressZero,
-            CanonicalTransactionChain: ethers.constants.AddressZero,
-            BondManager: ethers.constants.AddressZero,
-            OptimismPortal: '0x6aa4fEb8078661d0fce3E41C0D783f369B42Ae06',
-            L2OutputOracle: '0xc61c9628ff50E0CC23000Ec851CcB4BBe42228FE',
-        },
-        l2: {
-            L2ToL1MessagePasser: '0x4200000000000000000000000000000000000016',
-            DeployerWhitelist: '0x4200000000000000000000000000000000000002',
-            L2CrossDomainMessenger: '0x4200000000000000000000000000000000000007',
-            GasPriceOracle: '0x420000000000000000000000000000000000000F',
-            L2StandardBridge: '0x4200000000000000000000000000000000000010',
-            SequencerFeeVault: '0x4200000000000000000000000000000000000011',
-            OptimismMintableERC20Factory: '0x4200000000000000000000000000000000000012',
-            L1BlockNumber: '0x4200000000000000000000000000000000000013',
-            L1Block: '0x4200000000000000000000000000000000000015',
-            LegacyERC20ETH: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
-            WETH9: '0x4200000000000000000000000000000000000006',
-            GovernanceToken: '0x4200000000000000000000000000000000000042',
-            LegacyMessagePasser: '0x4200000000000000000000000000000000000000',
-            L2ERC721Bridge: '0x4200000000000000000000000000000000000014',
-            OptimismMintableERC721Factory: '0x4200000000000000000000000000000000000017',
-            ProxyAdmin: '0x4200000000000000000000000000000000000018',
-            BaseFeeVault: '0x4200000000000000000000000000000000000019',
-            L1FeeVault: '0x420000000000000000000000000000000000001a',
-        },
-    }
+    const getCrossChainMessenger = async (library: any) => {
+        if (!library) {
+            console.warn("No library")
+            return undefined;
+        }
 
 
-    const handleDeposit = async () => {
 
+        const w3Provider = library as ethers.providers.JsonRpcProvider;
+        const currentChainId: number = await w3Provider.getSigner().getChainId();
+
+        const network: NetworkData | undefined = getNetworkByChainId(currentChainId, networks);
+
+        if (!network) {
+            console.warn("Can not detect network")
+            return undefined;
+        }
+
+        const netMap = networksMap[network.name] ?? undefined;
+        console.log(network.name);
+
+        if (!netMap) {
+            console.warn("Cant not find net mapping")
+
+            return undefined;
+        }
+
+        const secondNetwork: NetworkData | undefined = getNetworkByName(netMap, networks);
+
+        if (!secondNetwork) {
+            console.warn("Failed to fetch second network by name");
+            return undefined;
+        }
+
+        return crossChainMessengerFactory(
+            network,
+            secondNetwork,
+            w3Provider.getSigner(),
+            new ethers.providers.JsonRpcProvider(secondNetwork?.rpcAddress),
+            true
+        )
+
+
+    };
+
+    const handleDepositMainCurrency = async (amount: string) => {
         if (!library) {
             return;
         }
 
-        const w3Provider = library as ethers.providers.JsonRpcProvider;
+        if (crossChainMessenger) {
+            const depositTx = await crossChainMessenger.depositETH(
+                ethers.utils.parseEther(amount)
+            );
 
-        const _networkL1 = w3Provider.getSigner();
+            const confirmation = await crossChainMessenger.waitForMessageReceipt(depositTx);
 
-        const messenger: CrossChainMessenger = new CrossChainMessenger({
-            l1SignerOrProvider: _networkL1,
-            l2SignerOrProvider: new ethers.providers.JsonRpcProvider('https://bedrock.rollux.com:9545/'),
-            l1ChainId: await _networkL1.getChainId(),
-            l2ChainId: 57000,
-            bedrock: false,
-            contracts: contractsTmp,
-            bridges: {
-                ETH: {
-                    Adapter: ETHBridgeAdapter,
-                    l1Bridge: contractsTmp.l1.L1StandardBridge,
-                    l2Bridge: contractsTmp.l2.L2StandardBridge
-                }
+            if (confirmation.receiptStatus === 1) {
+                console.log('OK')
+            } else {
+                console.log('Error');
+                console.log(confirmation);
             }
-        })
 
+        }
 
-
-        console.log("Bridges");
-        console.log(messenger.bridges);
-
-        const depositTx = await messenger.depositETH(ethers.utils.parseEther("0.001"))
-        const receiptDepositTx = await messenger.waitForMessageReceipt(depositTx);
-
-        console.log(receiptDepositTx, depositTx);
     }
+
 
     const switchAction = (action: CurrentDisplayView) => {
         setCurrentDisplay(action);
@@ -108,13 +109,18 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
      * todo : refactor whole app to useDapp instead of web3-react
      */
     useEffect(() => {
-        console.log(account);
         if (!account) {
             activateBrowserWallet()
-
-            console.log(account);
         }
     }, [account, activateBrowserWallet]);
+
+    useEffect(() => {
+        console.log(library);
+        getCrossChainMessenger(library).then((messenger) => {
+            console.log(messenger);
+            setCrossChainMessenger(messenger);
+        })
+    }, [account, library])
 
     return (
 
@@ -166,7 +172,16 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             </Box>
 
             {isConnected && <>
-                {currentDisplay === CurrentDisplayView.deposit && <DepositPart />}
+                {currentDisplay === CurrentDisplayView.deposit && <DepositPart
+
+                    onClickDepositButton={(amount: string, tokenAddress: string | undefined) => {
+                        if (!tokenAddress) {
+                            handleDepositMainCurrency(amount);
+                        }
+                    }}
+
+                    L1StandardBridgeAddress=""
+                />}
 
 
             </>}
@@ -174,9 +189,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             {!isConnected && <>
                 <ConnectWalletBox />
             </>}
-
-
-            <Button onClick={() => handleDeposit()}>Deposit test</Button>
 
         </Box>
     )

@@ -1,20 +1,28 @@
 import { Box, Button, Card, CardContent, Container, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
-import { useEtherBalance, useEthers, useTokenBalance } from '@usedapp/core';
+import { useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
 import { TokenInfo } from 'hooks/Common/useERC20TokenList';
 import { useERC20TokenList } from 'hooks/Common/useERC20TokenList';
 import React, { FC, useEffect, useState } from 'react'
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 
-export const DepositPart: FC<{}> = () => {
+export type DepositPartProps = {
+    onClickDepositButton: (amount: string, tokenAddress: string | undefined) => void;
+    L1StandardBridgeAddress: string,
+}
+
+export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1StandardBridgeAddress }) => {
     const [currency, setCurrency] = useState<string>('');
     const [selectedTokenAddress, setSelectedTokenAddress] = useState<string | undefined>(undefined);
     const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
+    const [youWillGetAmount, setYouWillGetAmount] = useState<string>('0.00');
+    const [amountToSwap, setAmountToSwap] = useState<string>('0.00');
     const tokens = useERC20TokenList();
     const { account } = useEthers();
 
     const balanceNativeToken = useEtherBalance(account);
     const balanceERC20Token = useTokenBalance(selectedTokenAddress, account);
+    const allowanceERC20Token = useTokenAllowance(selectedTokenAddress, account, L1StandardBridgeAddress);
 
     // balance hook
 
@@ -87,7 +95,14 @@ export const DepositPart: FC<{}> = () => {
                             <Grid container spacing={2}>
                                 <Grid item xs={7}>
                                     <FormControl fullWidth>
-                                        <TextField placeholder={balanceToDisplay ?? '0'} label={'Amount'} id="currency_amount_input" fullWidth variant='outlined' onChange={(event) => console.log(event.target.value)} />
+                                        <TextField
+                                            error={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
+                                            label={'Amount'}
+                                            helperText={balanceToDisplay !== '' ? `${balanceToDisplay} available` : undefined}
+                                            id="currency_amount_input"
+                                            fullWidth variant='outlined'
+                                            onChange={(event) => setAmountToSwap(event.target.value)}
+                                        />
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={5}>
@@ -134,17 +149,61 @@ export const DepositPart: FC<{}> = () => {
                             <Grid container spacing={2}>
                                 <Grid item xs={7}>
                                     <FormControl fullWidth>
-                                        <TextField disabled id="currency_amount_input" label="Amount of" fullWidth variant='outlined' onChange={(event) => console.log(event.target.value)} />
+                                        <TextField
+                                            helperText={currency}
+                                            disabled
+                                            id="currency_amount_input"
+                                            error={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
+                                            fullWidth
+                                            value={amountToSwap}
+                                            variant='outlined'
+                                            onChange={(event) => console.log(event.target.value)}
+                                        />
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={5}>
-                                    <Card variant="outlined" sx={{ width: 1 }}>
-                                        <CardContent>
-                                            <Typography variant='h5'>
-                                                ~ SYS
-                                            </Typography>
-                                        </CardContent>
-                                    </Card>
+                                    {'SYS' === currency && <>
+                                        <Button
+                                            disabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
+                                            variant='contained'
+                                            size='large'
+                                            color='success'
+                                            onClick={() => {
+                                                onClickDepositButton(amountToSwap, undefined);
+                                            }}
+                                            sx={{ width: 1 }}
+                                        >
+                                            Deposit
+                                        </Button>
+                                    </>}
+
+                                    {'SYS' !== currency && <>
+                                        {allowanceERC20Token?.lt(ethers.utils.parseEther(amountToSwap)) && <>
+                                            <Button
+                                                variant='outlined'
+                                                size='large'
+                                                color='secondary'
+                                                sx={{ width: 1 }}
+                                            >
+                                                Approve
+                                            </Button>
+                                        </>}
+
+                                        {allowanceERC20Token?.gte(ethers.utils.parseEther(amountToSwap)) && <>
+                                            <Button
+                                                variant='contained'
+                                                size='large'
+                                                color='secondary'
+                                                sx={{ width: 1 }}
+                                                onClick={() => {
+                                                    onClickDepositButton(amountToSwap, selectedTokenAddress);
+                                                }}
+                                            >
+                                                Deposit ERC20
+                                            </Button>
+                                        </>}
+                                    </>}
+
                                 </Grid>
                             </Grid>
                         </Box>
