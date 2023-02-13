@@ -214,3 +214,5 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1Stan
         </>
     )
 }
+
+export default DepositPart;
