@@ -7,6 +7,9 @@ import { ThemeProvider } from "@mui/material";
 import ConnectedWalletProvider from "../contexts/ConnectedWallet/Provider";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Config, DAppProvider } from "@usedapp/core";
+import { Header } from "components/Header";
+import { RolluxChain, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
+import { NetworkValidator } from "components/Common/NetworkValidator";
 
 const queryClient = new QueryClient();
 
@@ -21,7 +24,8 @@ const dappConfig: Config = {
   },
   multicallAddresses: {
     [5700]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697', // multicall 2 address.
-  }
+  },
+  networks: [RolluxChain, TanenbaumChain]
 }
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -32,7 +36,10 @@ function MyApp({ Component, pageProps }: AppProps) {
           <MetamaskProvider>
             <ConnectedWalletProvider>
               <DAppProvider config={dappConfig}>
-                <Component {...pageProps} />
+                <NetworkValidator>
+                  <Header />
+                  <Component {...pageProps} />
+                </NetworkValidator>
               </DAppProvider>
             </ConnectedWalletProvider>
           </MetamaskProvider>

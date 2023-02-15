@@ -109,18 +109,17 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
      * todo : refactor whole app to useDapp instead of web3-react
      */
     useEffect(() => {
-        if (!account) {
+        console.log(connectedWalletCtxt.nevm.account);
+        if (!account && connectedWalletCtxt.nevm.account) {
             activateBrowserWallet()
         }
-    }, [account, activateBrowserWallet]);
+    }, [account, activateBrowserWallet, connectedWalletCtxt.nevm.account]);
 
     useEffect(() => {
-        console.log(library);
         getCrossChainMessenger(library).then((messenger) => {
-            console.log(messenger);
             setCrossChainMessenger(messenger);
         })
-    }, [account, library])
+    }, [library])
 
     return (
 
