@@ -4,6 +4,8 @@ import { TokenInfo } from 'hooks/Common/useERC20TokenList';
 import { useERC20TokenList } from 'hooks/Common/useERC20TokenList';
 import React, { FC, useEffect, useState } from 'react'
 import { BigNumber, ethers } from 'ethers';
+import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20TokenList';
+import TokenListToken from 'blockchain/NevmRolluxBridge/interfaces/TokenListToken';
 
 export type DepositPartProps = {
     onClickDepositButton: (amount: string, tokenAddress: string | undefined) => void;
@@ -23,8 +25,12 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1Stan
     const balanceNativeToken = useEtherBalance(account);
     const balanceERC20Token = useTokenBalance(selectedTokenAddress, account);
     const allowanceERC20Token = useTokenAllowance(selectedTokenAddress, account, L1StandardBridgeAddress);
-
+    const [allERC20Tokens, setAllERC20Tokens] = useState<TokenListToken[]>([]);
+    const [l1ERC20Tokens, setL1ERC20Tokens] = useState<TokenListToken[]>([]);
     // balance hook
+
+
+
 
     useEffect(() => {
 
@@ -61,9 +67,9 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1Stan
         }
 
 
-        let findToken: TokenInfo | undefined = undefined;
+        let findToken: TokenListToken | undefined = undefined;
 
-        tokens.forEach((value) => {
+        l1ERC20Tokens.forEach((value) => {
             if (value.symbol === currency) {
                 findToken = value;
             }
@@ -77,7 +83,24 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1Stan
             setSelectedTokenDecimals(findToken.decimals);
         }
 
-    }, [currency, tokens]);
+    }, [currency, l1ERC20Tokens]);
+
+
+    /** load tokens hook */
+    useEffect(() => {
+        fetchERC20TokenList().then((tokens) => {
+            const tokensL1: TokenListToken[] = tokens.filter((token) => {
+                if (token.chainId === 5700) {
+                    return true;
+                }
+
+                return false;
+            })
+
+            setL1ERC20Tokens(tokensL1);
+        })
+    }, []);
+
 
     return (
         <>
@@ -118,8 +141,8 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1Stan
                                                 <em>SYS</em>
                                             </MenuItem>
 
-                                            {(tokens && tokens.length > 0) &&
-                                                tokens.map((value, index: number) => {
+                                            {(l1ERC20Tokens && l1ERC20Tokens.length > 0) &&
+                                                l1ERC20Tokens.map((value, index: number) => {
                                                     return <MenuItem selected={value.symbol === currency} onClick={(e) => setCurrency(value.symbol)} value={value.symbol} key={index}>
                                                         <em>{value.symbol}</em>
                                                     </MenuItem>
@@ -178,6 +201,19 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1Stan
                                     </>}
 
                                     {'SYS' !== currency && <>
+                                        {typeof allowanceERC20Token === 'undefined' && <>
+                                            <Button
+                                                variant='outlined'
+                                                size='large'
+                                                color='error'
+                                                sx={{ width: 1 }}
+                                                disabled
+                                            >
+                                                Token error
+                                            </Button>
+                                        </>}
+
+
                                         {allowanceERC20Token?.lt(ethers.utils.parseEther(amountToSwap)) && <>
                                             <Button
                                                 variant='outlined'
