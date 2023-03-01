@@ -42,7 +42,7 @@ const Home: NextPage = () => {
 
       <Box component="main">
         <Grid component={Container} container sx={{ my: 3, maxWidth: null }}>
-          <Grid item md={6}>
+          <Grid item md={12}>
             <Grid component={Container} container sx={{ my: 3 }}>
               <Grid item md={6}>
                 <Box>
@@ -83,47 +83,7 @@ const Home: NextPage = () => {
               </Grid>
             </Grid>
           </Grid>
-          <Grid item md={6}>
-            <Grid component={Container} container sx={{ my: 3 }}>
-              <Grid item md={6}>
-                <Box>
-                  <object
-                    className="animation"
-                    type="image/svg+xml"
-                    data="/bridge-diagram.svg"
-                    style={{
-                      width: "100%",
-                    }}
-                  ></object>
-                </Box>
-              </Grid>
-              <Grid item md={6} sx={{ my: "auto", padding: 2 }}>
-                <Typography variant="h2" fontWeight="bold">
-                  NEVM {'<->'} Rollux Bridge
-                </Typography>
-                <Typography variant="h6" sx={{ mb: 4 }}>
-                  Transfer SYS back and forth between the NEVM and Rollux
-                  Blockchain
-                </Typography>
-                <WalletList />
-                {true && (
-                  <Box display="flex" justifyContent="space-between">
-                    <Link href={`/bridge-nevm-rollux/${Date.now()}`}>
-                      <Button variant="contained">
-                        Continue
-                        <ArrowForwardIcon />
-                      </Button>
-                    </Link>
-                    {/* <Link href={`/transfers`}>
-                  <Button variant="text" color="secondary">
-                    View My Transfers
-                  </Button>
-                </Link> */}
-                  </Box>
-                )}
-              </Grid>
-            </Grid>
-          </Grid>
+
         </Grid>
 
 
