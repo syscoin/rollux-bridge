@@ -138,6 +138,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 } else {
                     console.log('Error');
                     console.log(confirmation);
+                    setIsLoading(false);
                 }
             } catch (e) {
                 setIsLoading(false);
