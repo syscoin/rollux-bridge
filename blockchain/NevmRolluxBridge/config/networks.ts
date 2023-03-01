@@ -31,9 +31,9 @@ export const networks: { [key: string]: NetworkData } = {
         contracts: contractsDev.l1_dev,
     },
     L2Dev: {
-        rpcAddress: 'https://bedrock.rollux.com:9545/',
+        rpcAddress: 'https://rpc-bedrock.rollux.com/',
         name: 'RolluxBedrockDev',
-        explorerUrl: 'https://blockscout.com/optimism/bedrock-alpha/',
+        explorerUrl: 'https://explorer.testnet.rollux.com',
         chainId: 57000,
         contracts: contractsDev.l2_dev,
     }

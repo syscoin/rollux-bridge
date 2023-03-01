@@ -1,35 +1,47 @@
-import { Box, Button, Card, CardContent, Container, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
-import { useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
+import { Box, Button, Card, CardContent, Container, FormControl, Grid, InputLabel, Flex, MenuItem, Select, TextField, Typography } from '@mui/material'
+import { ChainId, ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
 import { TokenInfo } from 'hooks/Common/useERC20TokenList';
 import { useERC20TokenList } from 'hooks/Common/useERC20TokenList';
 import React, { FC, useEffect, useState } from 'react'
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber, Contract, ethers } from 'ethers';
 import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20TokenList';
 import TokenListToken from 'blockchain/NevmRolluxBridge/interfaces/TokenListToken';
+import { TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp';
+import Image from 'next/image';
 
 export type DepositPartProps = {
     onClickDepositButton: (amount: string, tokenAddress: string | undefined) => void;
+    onClickApproveERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
+    onClickDepositERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     L1StandardBridgeAddress: string,
 }
 
-export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1StandardBridgeAddress }) => {
+export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClickApproveERC20, onClickDepositERC20, setIsLoading, L1StandardBridgeAddress }) => {
     const [currency, setCurrency] = useState<string>('');
     const [selectedTokenAddress, setSelectedTokenAddress] = useState<string | undefined>(undefined);
+    const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
     const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
     const [youWillGetAmount, setYouWillGetAmount] = useState<string>('0.00');
     const [amountToSwap, setAmountToSwap] = useState<string>('0.00');
-    const tokens = useERC20TokenList();
-    const { account } = useEthers();
+    const { account, chainId, switchNetwork } = useEthers();
 
     const balanceNativeToken = useEtherBalance(account);
-    const balanceERC20Token = useTokenBalance(selectedTokenAddress, account);
-    const allowanceERC20Token = useTokenAllowance(selectedTokenAddress, account, L1StandardBridgeAddress);
+    const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: TanenbaumChain.chainId });
+    const allowanceERC20Token = useTokenAllowance(selectedTokenAddress, account, L1StandardBridgeAddress, {
+        chainId: TanenbaumChain.chainId
+    });
     const [allERC20Tokens, setAllERC20Tokens] = useState<TokenListToken[]>([]);
     const [l1ERC20Tokens, setL1ERC20Tokens] = useState<TokenListToken[]>([]);
+    const [l2ERC20Tokens, setL2ERC20Tokens] = useState<TokenListToken[]>([]);
     // balance hook
 
-
+    const preCheckNetwork = async (neededNetwork: number, chainId: number) => {
+        if (chainId !== neededNetwork) {
+            await switchNetwork(neededNetwork);
+        }
+    }
 
 
     useEffect(() => {
@@ -44,6 +56,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1Stan
             }
         } else {
             try {
+
                 if (balanceERC20Token) {
                     setBalanceToDisplay(
                         ethers.utils.formatUnits(balanceERC20Token, selectedTokenDecimals)
@@ -68,6 +81,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1Stan
 
 
         let findToken: TokenListToken | undefined = undefined;
+        let findTokenL2: TokenListToken | undefined = undefined;
 
         l1ERC20Tokens.forEach((value) => {
             if (value.symbol === currency) {
@@ -81,13 +95,25 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1Stan
             setSelectedTokenAddress(findToken.address);
             // @ts-ignore
             setSelectedTokenDecimals(findToken.decimals);
+
+            l2ERC20Tokens.forEach((value) => {
+                if (value.symbol === currency && typeof findTokenL2 === 'undefined') {
+                    findTokenL2 = value;
+                }
+            })
+            if (findTokenL2) {
+                //@ts-ignore
+                setSelectedTokenAddressL2(findTokenL2.address);
+            }
         }
 
-    }, [currency, l1ERC20Tokens]);
+    }, [currency, l1ERC20Tokens, l2ERC20Tokens]);
 
 
     /** load tokens hook */
     useEffect(() => {
+        setIsLoading(true);
+
         fetchERC20TokenList().then((tokens) => {
             const tokensL1: TokenListToken[] = tokens.filter((token) => {
                 if (token.chainId === 5700) {
@@ -98,8 +124,46 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1Stan
             })
 
             setL1ERC20Tokens(tokensL1);
+
+            const tokensL2: TokenListToken[] = tokens.filter((token) => {
+                if (token.chainId === 57000) {
+                    return true;
+                }
+
+                return false;
+            })
+
+            setL2ERC20Tokens(tokensL2);
+
+
+            // set all tokens
+
+            setAllERC20Tokens(tokens);
+
+            setIsLoading(false);
         })
-    }, []);
+    }, [setIsLoading]);
+
+    const handleApproval = async () => {
+        if (selectedTokenAddress && selectedTokenAddressL2) {
+
+            await preCheckNetwork(TanenbaumChain.chainId, chainId as number);
+
+            setIsLoading(true);
+            onClickApproveERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseEther(amountToSwap));
+        }
+    }
+
+    const handleERC20Deposit = async () => {
+        if (selectedTokenAddress && selectedTokenAddressL2) {
+
+            await preCheckNetwork(TanenbaumChain.chainId, chainId as number);
+
+            setIsLoading(true);
+            onClickDepositERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseEther(amountToSwap));
+        }
+    }
+
 
 
     return (
@@ -124,7 +188,15 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1Stan
                                             helperText={balanceToDisplay !== '' ? `${balanceToDisplay} available` : undefined}
                                             id="currency_amount_input"
                                             fullWidth variant='outlined'
-                                            onChange={(event) => setAmountToSwap(event.target.value)}
+                                            type='number'
+                                            onChange={(event) => {
+                                                if (event.target.value.length > 0) {
+                                                    setAmountToSwap(event.target.value)
+                                                } else {
+                                                    setAmountToSwap('0.00');
+                                                }
+
+                                            }}
                                         />
                                     </FormControl>
                                 </Grid>
@@ -144,7 +216,15 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1Stan
                                             {(l1ERC20Tokens && l1ERC20Tokens.length > 0) &&
                                                 l1ERC20Tokens.map((value, index: number) => {
                                                     return <MenuItem selected={value.symbol === currency} onClick={(e) => setCurrency(value.symbol)} value={value.symbol} key={index}>
-                                                        <em>{value.symbol}</em>
+                                                        <Container sx={{ display: 'flex', alignItems: 'left' }}>
+
+                                                            <Box sx={{ width: 20, height: 20 }}>
+                                                                <Image src={value.logoURI} alt='logo' width={'20px'} height={'20px'} />
+                                                            </Box>
+                                                            <Typography variant="body1" sx={{ ml: 1 }}>
+                                                                {value.symbol}
+                                                            </Typography>
+                                                        </Container>
                                                     </MenuItem>
                                                 })
                                             }
@@ -201,38 +281,30 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, L1Stan
                                     </>}
 
                                     {'SYS' !== currency && <>
-                                        {typeof allowanceERC20Token === 'undefined' && <>
-                                            <Button
-                                                variant='outlined'
-                                                size='large'
-                                                color='error'
-                                                sx={{ width: 1 }}
-                                                disabled
-                                            >
-                                                Token error
-                                            </Button>
-                                        </>}
 
 
-                                        {allowanceERC20Token?.lt(ethers.utils.parseEther(amountToSwap)) && <>
+
+
+                                        {(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseEther(amountToSwap))) && <>
                                             <Button
                                                 variant='outlined'
                                                 size='large'
                                                 color='secondary'
                                                 sx={{ width: 1 }}
+                                                onClick={() => handleApproval()}
                                             >
                                                 Approve
                                             </Button>
                                         </>}
 
-                                        {allowanceERC20Token?.gte(ethers.utils.parseEther(amountToSwap)) && <>
+                                        {(allowanceERC20Token?.gte(ethers.utils.parseEther(amountToSwap)) && parseFloat(amountToSwap) > 0) && <>
                                             <Button
                                                 variant='contained'
                                                 size='large'
                                                 color='secondary'
                                                 sx={{ width: 1 }}
                                                 onClick={() => {
-                                                    onClickDepositButton(amountToSwap, selectedTokenAddress);
+                                                    handleERC20Deposit()
                                                 }}
                                             >
                                                 Deposit ERC20

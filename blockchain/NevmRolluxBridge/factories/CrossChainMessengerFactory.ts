@@ -1,4 +1,4 @@
-import { CrossChainMessenger, ETHBridgeAdapter, SignerOrProviderLike } from "@eth-optimism/sdk";
+import { CrossChainMessenger, ETHBridgeAdapter, SignerOrProviderLike, StandardBridgeAdapter } from "@eth-optimism/sdk";
 import { NetworkData } from "../config/networks";
 
 /**
@@ -30,6 +30,12 @@ export const crossChainMessengerFactory = (
             ETH: {
                 Adapter: ETHBridgeAdapter,
                 l1Bridge: l1Network.contracts.L1StandardBridge,
+                l2Bridge: l2Network.contracts.L2StandardBridge,
+            },
+            Standard: {
+                Adapter: StandardBridgeAdapter,
+                l1Bridge:
+                    l1Network.contracts.L1StandardBridge,
                 l2Bridge: l2Network.contracts.L2StandardBridge,
             }
         }

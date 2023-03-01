@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { NextPage } from "next";
-import { Box, Grid, Container, Card, CardContent, Typography, ButtonBase, Button } from "@mui/material";
+import { Box, Grid, Container, Card, CardContent, Typography, ButtonBase, Button, Backdrop, CircularProgress } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { DepositPart } from "./_deposit";
@@ -8,7 +8,7 @@ import { useMetamask } from "@contexts/Metamask/Provider";
 import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
 import { ConnectWalletBox } from "./_connectWallet";
 import { Web3Ethers, useEthers } from "@usedapp/core";
-import { CrossChainMessenger, ETHBridgeAdapter } from "@eth-optimism/sdk";
+import { CrossChainMessenger, ETHBridgeAdapter, MessageStatus } from "@eth-optimism/sdk";
 import { BigNumber, ethers } from "ethers";
 import { networks, getNetworkByChainId, NetworkData, networksMap, getNetworkByName } from "blockchain/NevmRolluxBridge/config/networks";
 import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
@@ -28,6 +28,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const isConnected = connectedWalletCtxt.nevm.account;
     const { account, activateBrowserWallet, library } = useEthers();
     const [crossChainMessenger, setCrossChainMessenger] = useState<CrossChainMessenger | undefined>(undefined);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const getCrossChainMessenger = async (library: any) => {
         if (!library) {
@@ -74,23 +75,73 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     };
 
+    const handleERC20Approval = async (l1Token: string, l2Token: string, amount: BigNumber) => {
+        if (!library) {
+            console.warn("approval:no-library")
+            return; // not connected wallet
+        }
+
+        if (!crossChainMessenger) {
+            console.warn("approval:no-messenger")
+            return; // no messenger initialized
+        }
+
+        try {
+            await crossChainMessenger.approveERC20(l1Token, l2Token, amount);
+
+            setIsLoading(false);
+        } catch (e) {
+            console.log(e);
+            setIsLoading(false);
+        }
+    }
+
+    const handleERC20Deposit = async (l1Token: string, l2Token: string, amount: BigNumber) => {
+        if (!library || !crossChainMessenger) {
+            return; // not connected or not initialized
+        }
+
+        try {
+            const tx = await crossChainMessenger.depositERC20(l1Token, l2Token, amount);
+            await tx.wait();
+
+            await crossChainMessenger.waitForMessageStatus(tx.hash,
+                MessageStatus.RELAYED)
+
+            setIsLoading(false);
+        } catch (e) {
+            setIsLoading(false);
+            console.log(e);
+        }
+
+        // if success
+
+    }
+
     const handleDepositMainCurrency = async (amount: string) => {
         if (!library) {
             return;
         }
 
         if (crossChainMessenger) {
-            const depositTx = await crossChainMessenger.depositETH(
-                ethers.utils.parseEther(amount)
-            );
+            try {
+                const depositTx = await crossChainMessenger.depositETH(
+                    ethers.utils.parseEther(amount)
+                );
 
-            const confirmation = await crossChainMessenger.waitForMessageReceipt(depositTx);
+                const confirmation = await crossChainMessenger.waitForMessageReceipt(depositTx);
 
-            if (confirmation.receiptStatus === 1) {
-                console.log('OK')
-            } else {
-                console.log('Error');
-                console.log(confirmation);
+                if (confirmation.receiptStatus === 1) {
+                    console.log('OK')
+
+                    setIsLoading(false);
+                } else {
+                    console.log('Error');
+                    console.log(confirmation);
+                }
+            } catch (e) {
+                setIsLoading(false);
+                console.log(e);
             }
 
         }
@@ -109,7 +160,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
      * todo : refactor whole app to useDapp instead of web3-react
      */
     useEffect(() => {
-        console.log(connectedWalletCtxt.nevm.account);
         if (!account && connectedWalletCtxt.nevm.account) {
             activateBrowserWallet()
         }
@@ -170,6 +220,17 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 </Grid>
             </Box>
 
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={isLoading}
+                onClick={() => {
+                    // handle nothing . Wait for tx ends or results.
+                }}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
+
+
             {isConnected && <>
                 {currentDisplay === CurrentDisplayView.deposit && <DepositPart
 
@@ -178,8 +239,17 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                             handleDepositMainCurrency(amount);
                         }
                     }}
+                    onClickApproveERC20={(l1Token: string, l2Token: string, amount: BigNumber) => {
+                        handleERC20Approval(l1Token, l2Token, amount);
+                    }}
 
-                    L1StandardBridgeAddress=""
+                    onClickDepositERC20={(l1Token: string, l2Token: string, amount: BigNumber) => {
+                        handleERC20Deposit(l1Token, l2Token, amount);
+                    }}
+
+                    setIsLoading={setIsLoading}
+
+                    L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
                 />}
 
 

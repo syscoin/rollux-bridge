@@ -11,6 +11,9 @@ const nextConfig = {
   },
   experimental: {
     outputStandalone: true
+  },
+  images: {
+    domains: ['syscoin.github.io']
   }
 };
 

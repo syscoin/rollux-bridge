@@ -1,5 +1,5 @@
 import { Box, Button, Container, Grid, Modal, Typography } from "@mui/material";
-import React, { FC, useState } from "react";
+import React, { FC, forwardRef, useState } from "react";
 import { shortenAddress, useEthers } from "@usedapp/core";
 import { AccountDetails } from "./AccountDetails";
 
@@ -25,8 +25,12 @@ export const AccountBar: FC = () => {
             <Modal
                 open={isModalOpened}
                 onClose={closeModal}
+
             >
-                <AccountDetails />
+                <div>
+                    <AccountDetails />
+                </div>
+
             </Modal>
         </>
     )
