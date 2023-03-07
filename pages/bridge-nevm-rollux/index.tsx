@@ -4,6 +4,7 @@ import { Box, Grid, Container, Card, CardContent, Typography, ButtonBase, Button
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { DepositPart } from "./_deposit";
+import { WithdrawPart } from "./_withdraw"
 import { useMetamask } from "@contexts/Metamask/Provider";
 import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
 import { ConnectWalletBox } from "./_connectWallet";
@@ -247,6 +248,16 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     onClickDepositERC20={(l1Token: string, l2Token: string, amount: BigNumber) => {
                         handleERC20Deposit(l1Token, l2Token, amount);
                     }}
+
+                    setIsLoading={setIsLoading}
+
+                    L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
+                />}
+
+                {currentDisplay === CurrentDisplayView.withdraw && <WithdrawPart
+                    onClickApproveERC20={(l1Token, l2Token, amount) => { }}
+                    onClickWithdrawButton={(amount, address) => { }}
+                    onClickWithdrawERC20={(l1Token, l2Token, amount) => { }}
 
                     setIsLoading={setIsLoading}
 
