@@ -10,7 +10,7 @@ import { RolluxChain, TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/
 import Image from 'next/image';
 
 export type WithdrawPartProps = {
-    onClickWithdrawButton: (amount: string, tokenAddress: string | undefined) => void;
+    onClickWithdrawButton: (amount: string) => void;
     onClickApproveERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     onClickWithdrawERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -44,7 +44,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
         try {
             const contract = new Contract(tokenAddress, ERC20Interface,
-                new ethers.providers.StaticJsonRpcProvider(RolluxChain.rpcUrl, { chainId: RolluxChain.chainId })
+                new ethers.providers.StaticJsonRpcProvider(RolluxChain.rpcUrl)
             );
 
             const balance = await contract.balanceOf(owner);
@@ -52,8 +52,8 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
             return ethers.utils.formatUnits(balance, decimals);
 
         } catch (e) {
-            console.warn("Could not fetch balance for token.");
-            console.warn(e);
+            // console.warn("Could not fetch balance for token.");
+            // console.warn(e);
 
             return ret;
         }
@@ -324,8 +324,9 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                                             variant='contained'
                                             size='large'
                                             color='success'
-                                            onClick={() => {
-                                                onClickWithdrawButton(amountToSwap, undefined);
+                                            onClick={async () => {
+                                                await preCheckNetwork(RolluxChain.chainId, chainId as number);
+                                                onClickWithdrawButton(amountToSwap);
                                             }}
                                             sx={{ width: 1 }}
                                         >
@@ -356,7 +357,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                                                 size='large'
                                                 color='secondary'
                                                 sx={{ width: 1 }}
-                                                onClick={() => {
+                                                onClick={async () => {
                                                     handleERC20Withdraw()
                                                 }}
                                             >

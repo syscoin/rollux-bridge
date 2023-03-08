@@ -27,7 +27,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     const [amountToSwap, setAmountToSwap] = useState<string>('0.00');
     const { account, chainId, switchNetwork } = useEthers();
 
-    const balanceNativeToken = useEtherBalance(account);
+    const balanceNativeToken = useEtherBalance(account, { chainId: TanenbaumChain.chainId });
     const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: TanenbaumChain.chainId });
     const allowanceERC20Token = useTokenAllowance(selectedTokenAddress, account, L1StandardBridgeAddress, {
         chainId: TanenbaumChain.chainId
@@ -52,7 +52,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             return ethers.utils.formatUnits(balance, decimals);
 
         } catch (e) {
-            console.warn("Could not fetch balance for token.");
+            // console.warn("Could not fetch balance for token.");
 
             return ret;
         }
@@ -326,7 +326,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     <Grid item xs={12}>
                         <Card>
                             <CardContent>
-                                {'SYS' === currency && <>
+                                {('SYS' === currency && (chainId && chainId === TanenbaumChain.chainId)) && <>
                                     <Button
                                         disabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
                                         variant='contained'
@@ -338,6 +338,21 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                                         sx={{ width: 1 }}
                                     >
                                         Deposit
+                                    </Button>
+                                </>}
+
+                                {('SYS' === currency && (chainId !== TanenbaumChain.chainId)) && <>
+                                    <Button
+                                        disabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
+                                        variant='contained'
+                                        size='large'
+                                        color='success'
+                                        onClick={async () => {
+                                            await switchNetwork(TanenbaumChain.chainId);
+                                        }}
+                                        sx={{ width: 1 }}
+                                    >
+                                        Switch to Tanenbaum Chain
                                     </Button>
                                 </>}
 

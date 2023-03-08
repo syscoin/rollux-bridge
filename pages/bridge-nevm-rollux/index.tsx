@@ -13,6 +13,7 @@ import { CrossChainMessenger, ETHBridgeAdapter, MessageStatus } from "@eth-optim
 import { BigNumber, ethers } from "ethers";
 import { networks, getNetworkByChainId, NetworkData, networksMap, getNetworkByName } from "blockchain/NevmRolluxBridge/config/networks";
 import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
+import { RolluxChain, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
 
 type BridgeNevmRolluxProps = {}
 
@@ -31,16 +32,17 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const [crossChainMessenger, setCrossChainMessenger] = useState<CrossChainMessenger | undefined>(undefined);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const getCrossChainMessenger = async (library: any) => {
+    const getCrossChainMessenger = async (library: any, currentDisplay: CurrentDisplayView) => {
         if (!library) {
             console.warn("No library")
             return undefined;
         }
 
 
-
         const w3Provider = library as ethers.providers.JsonRpcProvider;
         const currentChainId: number = await w3Provider.getSigner().getChainId();
+
+        console.log(currentChainId);
 
         const network: NetworkData | undefined = getNetworkByChainId(currentChainId, networks);
 
@@ -65,11 +67,33 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             return undefined;
         }
 
+        console.log(network, secondNetwork);
+
+        const l1Contracts = network.layer === 1 ? network : secondNetwork;
+        const l2Contracts = secondNetwork.layer === 2 ? secondNetwork : network;
+
+
+        if (currentDisplay === CurrentDisplayView.deposit) {
+
+            return crossChainMessengerFactory(
+                l1Contracts,
+                l2Contracts,
+                w3Provider.getSigner(),
+                new ethers.providers.JsonRpcProvider(secondNetwork?.rpcAddress),
+                true
+            )
+
+        }
+
+        // withdraw
+
+        console.log('w');
+
         return crossChainMessengerFactory(
-            network,
-            secondNetwork,
+            l1Contracts,
+            l2Contracts,
+            new ethers.providers.JsonRpcProvider(TanenbaumChain.rpcUrl),
             w3Provider.getSigner(),
-            new ethers.providers.JsonRpcProvider(secondNetwork?.rpcAddress),
             true
         )
 
@@ -119,6 +143,47 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     }
 
+    const handleWithdrawMainCurrency = async (amount: string) => {
+        if (!library || !crossChainMessenger) {
+            console.log('no lib or messenger')
+            return;
+        }
+
+        try {
+            const withdrawTx = await crossChainMessenger.withdrawETH(
+                ethers.utils.parseEther(amount)
+            );
+
+            await withdrawTx.wait();
+
+            console.log('waited 1');
+
+
+            await crossChainMessenger.waitForMessageStatus(withdrawTx.hash,
+                MessageStatus.READY_TO_PROVE)
+
+            console.log('status message #1');
+
+            const proveTx = await crossChainMessenger.proveMessage(withdrawTx.hash);
+
+            await proveTx.wait();
+
+            console.log(proveTx);
+
+            await crossChainMessenger.waitForMessageStatus(withdrawTx.hash,
+                MessageStatus.READY_FOR_RELAY)
+
+            const finalizeTx = await crossChainMessenger.finalizeMessage(withdrawTx.hash);
+
+            await finalizeTx.wait();
+
+            await crossChainMessenger.waitForMessageStatus(withdrawTx,
+                MessageStatus.RELAYED)
+        } catch (e) {
+            console.log(`Withdraw SYS failed. Error - ${e}`)
+        }
+    }
+
     const handleDepositMainCurrency = async (amount: string) => {
         if (!library) {
             return;
@@ -126,6 +191,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
         if (crossChainMessenger) {
             try {
+
+                setIsLoading(true);
+
                 const depositTx = await crossChainMessenger.depositETH(
                     ethers.utils.parseEther(amount)
                 );
@@ -168,10 +236,11 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     }, [account, activateBrowserWallet, connectedWalletCtxt.nevm.account]);
 
     useEffect(() => {
-        getCrossChainMessenger(library).then((messenger) => {
+        getCrossChainMessenger(library, currentDisplay).then((messenger) => {
+            console.log(messenger);
             setCrossChainMessenger(messenger);
         })
-    }, [library])
+    }, [library, currentDisplay])
 
     return (
 
@@ -256,7 +325,10 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
                 {currentDisplay === CurrentDisplayView.withdraw && <WithdrawPart
                     onClickApproveERC20={(l1Token, l2Token, amount) => { }}
-                    onClickWithdrawButton={(amount, address) => { }}
+                    onClickWithdrawButton={(amount) => {
+                        console.log(amount);
+                        handleWithdrawMainCurrency(amount);
+                    }}
                     onClickWithdrawERC20={(l1Token, l2Token, amount) => { }}
 
                     setIsLoading={setIsLoading}

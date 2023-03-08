@@ -6,6 +6,7 @@ export type NetworkData = {
     name: string,
     explorerUrl: string,
     chainId: number,
+    layer: number,
     contracts: { [key: string]: string }
 }
 
@@ -13,6 +14,7 @@ export type NetworkData = {
 
 export const networksMap: { [key: string]: string } = {
     'L1Dev': 'RolluxBedrockDev',
+    'RolluxBedrockDev': 'L1Dev'
 };
 
 export const networks: { [key: string]: NetworkData } = {
@@ -21,6 +23,7 @@ export const networks: { [key: string]: NetworkData } = {
         name: 'sysNeVM',
         explorerUrl: 'https://tanenbaum.io',
         chainId: 5701,
+        layer: 1,
         contracts: {}
     },
     L1Dev: {
@@ -28,6 +31,7 @@ export const networks: { [key: string]: NetworkData } = {
         name: 'L1Dev',
         explorerUrl: 'https://tanenbaum.io',
         chainId: 5700,
+        layer: 1,
         contracts: contractsDev.l1_dev,
     },
     L2Dev: {
@@ -35,6 +39,7 @@ export const networks: { [key: string]: NetworkData } = {
         name: 'RolluxBedrockDev',
         explorerUrl: 'https://explorer.testnet.rollux.com',
         chainId: 57000,
+        layer: 2,
         contracts: contractsDev.l2_dev,
     }
 }

@@ -33,7 +33,7 @@ interface AddEthereumChainParameter {
 
 export const AccountDetails: FC = () => {
     const { account, library, deactivate, chainId, switchNetwork } = useEthers();
-    const balance = useEtherBalance(account);
+    const balance = useEtherBalance(account, { chainId: chainId });
 
 
     const [currentNetwork, setCurrentNetwork] = useState<'L1' | 'L2' | 'N/A'>('L1');
