@@ -211,11 +211,6 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
         }
     }
 
-    const menuPlacement = useBreakpointValue<PlacementWithLogical>({
-        base: 'bottom',
-        md: 'right'
-    })
-
 
 
     return (
@@ -243,7 +238,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                         <NumberInputField placeholder='0.00'/>
                     </NumberInput>
 
-                    <Menu isLazy lazyBehavior="unmount" placement={menuPlacement} autoSelect={false}>
+                    <Menu isLazy lazyBehavior="unmount" placement="top-start" autoSelect={false}>
                         <MenuButton minW="fit-content">
                             <HStack>
                                 {
@@ -265,7 +260,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                             </HStack>
                         </MenuButton>
 
-                        <MenuList maxH="calc(100vh - 100px)" overflow="scroll">
+                        <MenuList maxH="300px" overflow="scroll" position="absolute" left="-100px" top="50px">
                             <MenuItem
                                 onClick={() => setCurrency('SYS')}
                             >

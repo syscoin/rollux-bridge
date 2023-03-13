@@ -261,7 +261,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <VStack spacing={{ base: '-20', xl: '0' }}>
+            <VStack spacing={{ base: '-20', xl: '0' }} pb="50px">
                 <Flex
                     id="bg"
                     boxSize={{ base: undefined, xl: '100%' }}
