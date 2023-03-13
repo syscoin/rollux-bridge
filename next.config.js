@@ -10,7 +10,7 @@ const nextConfig = {
     MONGODB_URI: "mongodb://admin:admin@localhost:27017/syscoin-bridge",
   },
   experimental: {
-    outputStandalone: true
+    output: 'standalone'
   },
   images: {
     domains: ['syscoin.github.io']

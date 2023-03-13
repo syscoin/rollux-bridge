@@ -68,8 +68,8 @@ const BridgeWalletInfo: React.FC<IProps> = ({ label, network, walletType }) => {
         <Box display="flex" alignItems="center">
           <Image
             src="/pali-wallet-logo.svg"
-            height="32px"
-            width="32px"
+            height={32}
+            width={32}
             alt="PaliWallet logo"
           />
           {transfer.status === "initialize" ? (
@@ -100,8 +100,8 @@ const BridgeWalletInfo: React.FC<IProps> = ({ label, network, walletType }) => {
           <Box display="flex" alignItems="center">
             <Image
               src="/metamask-logo.svg"
-              height="32px"
-              width="32px"
+              height={32}
+              width={32}
               alt="Metamask logo"
             />
             {transfer.status === "initialize" ? (

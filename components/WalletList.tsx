@@ -12,8 +12,8 @@ const WalletList: React.FC = () => {
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Image
           src="/pali-wallet-logo.svg"
-          height="32px"
-          width="32px"
+          height={32}
+          width={32}
           alt="PaliWallet logo"
         />
         {utxo.type === "pali-wallet" && utxo.account ? (
@@ -61,8 +61,8 @@ const WalletList: React.FC = () => {
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Image
           src="/metamask-logo.svg"
-          height="32px"
-          width="32px"
+          height={32}
+          width={32}
           alt="Metamask logo"
         />
 
