@@ -8,12 +8,13 @@ import { WithdrawPart } from "./_withdraw"
 import { useMetamask } from "@contexts/Metamask/Provider";
 import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
 import { ConnectWalletBox } from "./_connectWallet";
-import { Web3Ethers, useEthers } from "@usedapp/core";
-import { CrossChainMessenger, ETHBridgeAdapter, MessageStatus } from "@eth-optimism/sdk";
+import { useEthers, useLogs, useSigner } from "@usedapp/core";
+import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
 import { BigNumber, ethers } from "ethers";
 import { networks, getNetworkByChainId, NetworkData, networksMap, getNetworkByName } from "blockchain/NevmRolluxBridge/config/networks";
 import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
 import { RolluxChain, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
+import OnGoingTxns from "components/BridgeL1L2/WIthdraw/OnGoingTxns";
 
 type BridgeNevmRolluxProps = {}
 
@@ -28,7 +29,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const metamask = useMetamask();
     const connectedWalletCtxt = useConnectedWallet();
     const isConnected = connectedWalletCtxt.nevm.account;
-    const { account, activateBrowserWallet, library } = useEthers();
+    const { account, activateBrowserWallet, library, switchNetwork } = useEthers();
     const [crossChainMessenger, setCrossChainMessenger] = useState<CrossChainMessenger | undefined>(undefined);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -86,8 +87,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         }
 
         // withdraw
-
-        console.log('w');
 
         return crossChainMessengerFactory(
             l1Contracts,
@@ -150,11 +149,15 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         }
 
         try {
-            const withdrawTx = await crossChainMessenger.withdrawETH(
-                ethers.utils.parseEther(amount)
-            );
+            // const withdrawTx = await crossChainMessenger.withdrawETH(
+            //     ethers.utils.parseEther(amount)
+            // );
 
-            await withdrawTx.wait();
+            // await withdrawTx.wait();
+
+            const withdrawTx = {
+                hash: '0x957e9cfbf261fb404e31c34645986c081b3983890f61a26d9d1ac8b778dc4cc4',
+            }
 
             console.log('waited 1');
 
@@ -164,21 +167,40 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
             console.log('status message #1');
 
-            const proveTx = await crossChainMessenger.proveMessage(withdrawTx.hash);
+            await switchNetwork(5700);
+
+            const messengerL1 = crossChainMessengerFactory(
+                networks.L1Dev,
+                networks.L2Dev,
+                (library as ethers.providers.JsonRpcProvider).getSigner(),
+                new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl),
+                true
+            );
+
+
+            const proveTx = await messengerL1.proveMessage(withdrawTx.hash);
 
             await proveTx.wait();
 
             console.log(proveTx);
 
-            await crossChainMessenger.waitForMessageStatus(withdrawTx.hash,
+            console.log('wait 2');
+
+            await messengerL1.waitForMessageStatus(withdrawTx.hash,
                 MessageStatus.READY_FOR_RELAY)
 
-            const finalizeTx = await crossChainMessenger.finalizeMessage(withdrawTx.hash);
+            console.log('wait3');
+
+
+
+            // 1st step = 2h / 2nd step = 25m / 3rd = 5m
+
+
+            const finalizeTx = await messengerL1.finalizeMessage(withdrawTx.hash);
 
             await finalizeTx.wait();
 
-            await crossChainMessenger.waitForMessageStatus(withdrawTx,
-                MessageStatus.RELAYED)
+
         } catch (e) {
             console.log(`Withdraw SYS failed. Error - ${e}`)
         }
@@ -218,12 +240,11 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     }
 
-
     const switchAction = (action: CurrentDisplayView) => {
         setCurrentDisplay(action);
     }
 
-    /**!SECTION
+    /**
      * 
      * Hack for use useDapp
      * 
@@ -240,7 +261,17 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             console.log(messenger);
             setCrossChainMessenger(messenger);
         })
+
+        /// load txns for withdrawals which're pending if current display is for withdrawal
+
+        if (currentDisplay === CurrentDisplayView.withdraw) {
+
+        }
     }, [library, currentDisplay])
+
+    // const {logs} = useLogs(
+    //     {contract: new ethers.Contract(crossChainMessenger?.contracts.l2.L2StandardBridge, )}
+    // )
 
     return (
 
@@ -323,18 +354,30 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
                 />}
 
-                {currentDisplay === CurrentDisplayView.withdraw && <WithdrawPart
-                    onClickApproveERC20={(l1Token, l2Token, amount) => { }}
-                    onClickWithdrawButton={(amount) => {
-                        console.log(amount);
-                        handleWithdrawMainCurrency(amount);
-                    }}
-                    onClickWithdrawERC20={(l1Token, l2Token, amount) => { }}
+                {currentDisplay === CurrentDisplayView.withdraw && <div>
 
-                    setIsLoading={setIsLoading}
 
-                    L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
-                />}
+                    <WithdrawPart
+                        onClickWithdrawButton={(amount) => {
+                            console.log(amount);
+                            handleWithdrawMainCurrency(amount);
+                        }}
+                        onClickWithdrawERC20={(l1Token, l2Token, amount) => { }}
+
+                        setIsLoading={setIsLoading}
+
+                        L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
+                    />
+
+                    <OnGoingTxns txns={[{ hash: '0x', amount: '11', symbol: 'SYS', step: 1 }, { hash: '0x1', amount: '15', symbol: 'SYS', step: 2 }]}
+                        onTxnInfoRequested={(hash: string) => {
+                            console.log(hash);
+                        }}
+
+                    />
+                </div>}
+
+
 
 
             </>}

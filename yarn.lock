@@ -2113,6 +2113,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask/detect-provider@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@metamask/detect-provider@npm:2.0.0"
+  checksum: 45d3128069310e6cdb9a572b31da88b3fddb0aa78f94deba71657efd7e40d0680912a4ee0291a7a0e9ab66681aba271e74de87c5464d979f115726c740db641b
+  languageName: node
+  linkType: hard
+
 "@metamask/eth-sig-util@npm:^4.0.0":
   version: 4.0.1
   resolution: "@metamask/eth-sig-util@npm:4.0.1"
@@ -3607,22 +3614,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@usedapp/core@npm:^1.2.2":
-  version: 1.2.2
-  resolution: "@usedapp/core@npm:1.2.2"
+"@usedapp/core@npm:^1.2.7":
+  version: 1.2.7
+  resolution: "@usedapp/core@npm:1.2.7"
   dependencies:
-    "@metamask/detect-provider": ^1.2.0
+    "@metamask/detect-provider": ^2.0.0
     "@uniswap/token-lists": ^1.0.0-beta.27
     fetch-mock: ^9.11.0
     lodash.merge: ^4.6.2
     lodash.pickby: ^4.6.0
     nanoid: 3.3.4
   peerDependencies:
-    ethers: "*"
+    ethers: ^5
     react: "*"
   bin:
     usedapp-generate-hooks: bin/usedapp-generate-hooks.js
-  checksum: 656df73e33b96d2d414bd9b84fbff529aae6c454a2978b0e4a84b092254a1440bd63ed1db4566656374febdf4bf028b1425e3c2932a5737d878b21d03b8d6208
+  checksum: 0d6eacd808319ffb16df390a8c9953b45054f4881c6606f15e769f0a1c6b8f41d59dd0af5e004e025704dba2f04f7f7df4acba27e0ca5f5d45353ad5fffc57b3
   languageName: node
   linkType: hard
 
@@ -13497,7 +13504,7 @@ __metadata:
     "@types/node": 17.0.32
     "@types/react": 18.0.9
     "@types/react-dom": 18.0.3
-    "@usedapp/core": ^1.2.2
+    "@usedapp/core": ^1.2.7
     "@web3-react/core": ^6.1.9
     "@web3-react/metamask": ^8.0.0-beta.0
     axios: ^0.27.2
@@ -13518,6 +13525,7 @@ __metadata:
     satoshi-bitcoin: ^1.0.5
     syscoinjs-lib: ^1.0.214
     typescript: 4.6.4
+    usehooks-ts: ^2.9.1
   languageName: unknown
   linkType: soft
 
@@ -14267,6 +14275,16 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
   checksum: 8993a0b642f91d7fcdbb02b7b3ac984bd3af4769686f38291fe7fcfe73dfb73d6c64d20dfb7e5e7fbf5a6da8f5392d6f8e5b00c243a04975595946e82c02b883
+  languageName: node
+  linkType: hard
+
+"usehooks-ts@npm:^2.9.1":
+  version: 2.9.1
+  resolution: "usehooks-ts@npm:2.9.1"
+  peerDependencies:
+    react: ^16.8.0  || ^17.0.0 || ^18.0.0
+    react-dom: ^16.8.0  || ^17.0.0 || ^18.0.0
+  checksum: 36f1e4142ce23bc019b81d2e93aefd7f2c350abcf255598c21627114a69a2f2f116b35dc3a353375f09c6e4c9b704a04f104e3d10e98280545c097feca66c30a
   languageName: node
   linkType: hard
 
