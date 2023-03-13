@@ -1,10 +1,13 @@
 import {
+    ChakraProvider,
+    extendTheme,
     Flex, Heading,
     Highlight, Tab,
     TabList,
     TabPanel,
     TabPanels,
     Tabs,
+    theme,
     VStack
 } from '@chakra-ui/react';
 import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
@@ -15,8 +18,10 @@ import { TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp
 import { getNetworkByChainId, getNetworkByName, NetworkData, networks, networksMap } from "blockchain/NevmRolluxBridge/config/networks";
 import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
 import { ConnectionWarning } from 'components/ConnectionWarning';
+import { RolluxHeader } from 'components/RolluxHeader';
 import { BigNumber, ethers } from "ethers";
 import { NextPage } from "next";
+import { Roboto } from 'next/font/google';
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -30,6 +35,57 @@ enum CurrentDisplayView {
     deposit,
     withdraw
 }
+
+const roboto = Roboto({
+    weight: ['400', '700'],
+    subsets: ['latin']
+})
+
+const chakraTheme = extendTheme({
+    fonts: {
+        body: roboto.style.fontFamily,
+        heading: roboto.style.fontFamily,
+    },
+    colors: {
+        brand: {
+            primary: '#DBEF88',
+            primaryGradient: 'linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)',
+            secondaryGradient: 'linear-gradient(90deg, #E0E0E0 4.05%, #DBEF88 95.38%)'
+        }
+    },
+    components: {
+        Button: {
+            variants: {
+                primary: {
+                    bg: 'brand.primaryGradient',
+                    _hover: {
+                        _disabled: {
+                            bg: 'brand.primaryGradient'
+                        }
+                    }
+                },
+                secondary: {
+                    bg: 'brand.secondaryGradient',
+                    _hover: {
+                        _disabled: {
+                            bg: 'brand.secondaryGradient'
+                        }
+                    }
+                }
+            }
+        }
+    },
+    styles: {
+        global: {
+            'html': {
+                height: '100%'
+            },
+            'body': {
+                minHeight: '100%',
+            }
+        }
+    }
+})
 
 export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const router = useRouter();
@@ -253,13 +309,15 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     return (
 
-        <>
+        <ChakraProvider theme={chakraTheme}>
             <Head>
                 <title>Syscoin Bridge | Rollux & NEVM </title>
                 <link rel="shortcut icon" href="/favicon.ico" />
                 <meta name="description" content="Syscoin Trustless Bridge" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
+
+            <RolluxHeader />
 
             <VStack spacing={{ base: '-20', xl: '0' }} pb="50px">
                 <Flex
@@ -292,7 +350,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     >
                         <Highlight
                             query={['L1 NEVM', 'L2 Rollux']}
-                            styles={{ bg: '#DBEF88', textShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)' }}
+                            styles={{ bg: 'brand.primary', textShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)' }}
                         >
                             Bridge your $ SYS between L1 NEVM and L2 Rollux
                         </Highlight>
@@ -314,14 +372,14 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 >
                     <Flex
                         px={{ base: '16px', md: '40px' }}
-                        py={{ base: '16px', md: '32px' }}                        
+                        py={{ base: '16px', md: '32px' }}
                         flex={1}
                         bg="white"
-                        boxShadow="7px 7px #DBEF88"
+                        boxShadow={`7px 7px ${chakraTheme.colors.brand.primary}`}
                         borderRadius="12px"
-                        border="1px solid #DBEF88"
+                        border={`1px solid ${chakraTheme.colors.brand.primary}`}
                         justifyContent="center"
-                        flexDir="column"                        
+                        flexDir="column"
                         m="0 auto"
                     >
                         <Tabs variant="soft-rounded" w="100%" onChange={(index) => setCurrentDisplay(index === 0 ? CurrentDisplayView.deposit : CurrentDisplayView.withdraw)}>
@@ -331,7 +389,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                     px="36px"
                                     _selected={{
                                         color: '#000',
-                                        bg: 'linear-gradient(90deg, #E0E0E0 4.05%, #DBEF88 128.36%)',
+                                        bg: 'brand.secondaryGradient',
                                     }}
                                 >
                                     Deposit
@@ -341,7 +399,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                     borderRadius="6px"
                                     _selected={{
                                         color: '#000',
-                                        bg: 'linear-gradient(90deg, #E0E0E0 4.05%, #DBEF88 128.36%)',
+                                        bg: 'brand.secondaryGradient',
                                     }}
                                 >
                                     Withdraw
@@ -387,11 +445,11 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                         </Tabs>
                     </Flex>
 
-                    {!isConnected && <ConnectionWarning />}                    
-                </Flex>                
+                    {!isConnected && <ConnectionWarning />}
+                </Flex>
             </VStack>
-                            
-        </>
+
+        </ChakraProvider>
     )
 }
 

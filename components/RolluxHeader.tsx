@@ -18,7 +18,7 @@ export const RolluxHeader: React.FC = () => {
     >
       <Img src={src} />
       
-      <ConnectButton bg="linear-gradient(90deg, #E0E0E0 4.05%, #DBEF88 95.38%)" />
+      <ConnectButton variant="secondary" />
     </Flex>
   )
 }

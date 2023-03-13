@@ -325,20 +325,17 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                 __css={{
                     button: {
                         w: '100%',
-                        textAlign: 'center !important',
-                        background:
-                            'linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%) !important',
                     },
                 }}
             >
                 {!account && (
-                    <Button bg="linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)">Connect Wallet</Button>
+                    <Button variant="primary">Connect Wallet</Button>
                 )}
 
                 {'SYS' !== currency && account && <>
                     {(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseEther(amountToSwap))) && <>
                         <Button
-                            bg="linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)"
+                            variant="primary"
                             onClick={() => handleApproval()}
                         >
                             Approve
@@ -347,7 +344,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
                     {(allowanceERC20Token?.gte(ethers.utils.parseEther(amountToSwap)) && parseFloat(amountToSwap) > 0) && <>
                         <Button
-                            bg="linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)"
+                            variant="primary"
                             onClick={() => {
                                 handleERC20Withdraw()
                             }}
@@ -360,7 +357,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                 {('SYS' === currency && account && (chainId !== RolluxChain.chainId)) && <>
                     <Button
                         isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
-                        bg="linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)"
+                        variant="primary"
                         onClick={async () => {
                             await switchNetwork(RolluxChain.chainId);
                         }}
@@ -372,7 +369,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                 {('SYS' === currency && account && (chainId && chainId === RolluxChain.chainId)) && <>
                     <Button
                         isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) || !parseFloat(amountToSwap)}
-                        bg="linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)"
+                        variant="primary"
                         onClick={async () => {
                             await preCheckNetwork(RolluxChain.chainId, chainId as number);
                             onClickWithdrawButton(amountToSwap);

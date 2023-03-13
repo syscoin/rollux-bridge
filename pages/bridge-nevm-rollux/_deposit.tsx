@@ -323,21 +323,18 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 w="100%"
                 __css={{
                     button: {
-                        w: '100%',
-                        textAlign: 'center !important',
-                        background:
-                            'linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%) !important',
-                    },
+                        w: '100%'
+                    }
                 }}
             >
                 {!account && (
-                    <Button bg="linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)">Connect Wallet</Button>
+                    <Button variant="primary">Connect Wallet</Button>
                 )}
 
                 {'SYS' !== currency && account && <>
                     {(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseEther(amountToSwap))) && <>
                         <Button
-                            bg="linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)"
+                            variant="primary"
                             onClick={() => handleApproval()}
                         >
                             Approve
@@ -346,7 +343,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
                     {(allowanceERC20Token?.gte(ethers.utils.parseEther(amountToSwap)) && parseFloat(amountToSwap) > 0) && <>
                         <Button
-                            bg="linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)"
+                            variant="primary"
                             onClick={() => {
                                 handleERC20Deposit()
                             }}
@@ -359,7 +356,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 {('SYS' === currency && (chainId !== TanenbaumChain.chainId)) && <>
                     <Button
                         isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
-                        bg="linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)"
+                        variant="primary"
                         onClick={async () => {
                             await switchNetwork(TanenbaumChain.chainId);
                         }}
@@ -371,7 +368,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 {('SYS' === currency && account && (chainId && chainId === TanenbaumChain.chainId)) && <>
                     <Button
                         isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) || !parseFloat(amountToSwap)}
-                        bg="linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)"
+                        variant="primary"
                         onClick={() => {
                             onClickDepositButton(amountToSwap, undefined);
                         }}

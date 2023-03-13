@@ -33,48 +33,8 @@ const dappConfig: Config = {
   networks: [RolluxChain, TanenbaumChain]
 }
 
-const roboto = Roboto({
-  weight: ['400', '700'],
-  subsets: ['latin']
-})
-
-const chakraTheme = extendTheme({
-  fonts: {
-    body: roboto.style.fontFamily,
-    heading: roboto.style.fontFamily,
-  },
-  styles: {
-    global: {
-      'html': {
-        height: '100%'
-      },
-      'body': {
-        minHeight: '100%',
-      }
-    }
-  }
-})
-
 function MyApp({ Component, pageProps }: AppProps) {
   const { pathname } = useRouter()
-
-  if (pathname === '/bridge-nevm-rollux')
-    return (
-      <QueryClientProvider client={queryClient}>
-        <PaliWalletContextProvider>
-          <MetamaskProvider>
-            <ConnectedWalletProvider>
-              <ChakraProvider theme={chakraTheme}>
-                <DAppProvider config={dappConfig}>
-                  <RolluxHeader />
-                  <Component {...pageProps} />
-                </DAppProvider>
-              </ChakraProvider>
-            </ConnectedWalletProvider>
-          </MetamaskProvider>
-        </PaliWalletContextProvider>
-      </QueryClientProvider>
-    )
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -84,7 +44,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <DAppProvider config={dappConfig}>
               <NetworkValidator>
                 <ThemeProvider theme={theme}>
-                  <Header />
+                  {pathname === '/bridge-nevm-rollux' ? null : <Header />}
                 </ThemeProvider>
                 <Component {...pageProps} />
               </NetworkValidator>

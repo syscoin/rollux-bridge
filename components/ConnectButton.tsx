@@ -16,20 +16,15 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
   return <>
     {!account ? (
       <Button 
-        bgColor="linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)" 
+        variant="primary"
         px="32.5px" 
-        onClick={() => connectedWalletCtxt.connectNEVM('metamask')} 
-        _hover={{
-          bg: rest.bg || 'linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)'
-        }}
+        onClick={() => connectedWalletCtxt.connectNEVM('metamask')}
         {...rest}
       >
         Connect Wallet
       </Button>
     ) : (
-      <Button bg="linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)" px="32.5px" onClick={onOpen} _hover={{
-        bg: rest.bg || 'linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)'
-      }} {...rest}>
+      <Button px="32.5px" onClick={onOpen} {...rest}>
         {account.substring(0, 5)}...{account.substring(account.length - 4, account.length)}
       </Button>
     )}
@@ -48,7 +43,7 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
           <ButtonGroup variant="outline" w="100%" my="32px" spacing={{ base: '20px', xl: '44px' }} px="24px">
             <Button w="100%" py="12px" h="min" onClick={() => switchNetwork(TanenbaumChain.chainId)}>
               <VStack>
-                <Text bg="#DBEF88" borderRadius="full" boxSize="44px" display="flex" alignItems="center" justifyContent="center" fontWeight="bold" fontSize="xl">
+                <Text bg="brand.primary" borderRadius="full" boxSize="44px" display="flex" alignItems="center" justifyContent="center" fontWeight="bold" fontSize="xl">
                   L1
                 </Text>
                 <Text>Add L1 network</Text>
@@ -57,7 +52,7 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
 
             <Button w="100%" py="12px" h="min" onClick={() => switchNetwork(RolluxChain.chainId)}>
               <VStack>
-                <Text bg="#DBEF88" borderRadius="full" boxSize="44px" display="flex" alignItems="center" justifyContent="center" fontWeight="bold" fontSize="xl">
+                <Text bg="brand.primary" borderRadius="full" boxSize="44px" display="flex" alignItems="center" justifyContent="center" fontWeight="bold" fontSize="xl">
                   L2
                 </Text>
                 <Text>Add L2 network</Text>
