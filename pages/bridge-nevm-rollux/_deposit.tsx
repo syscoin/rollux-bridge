@@ -7,6 +7,7 @@ import { ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useToken
 import { TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp';
 import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20TokenList';
 import TokenListToken from 'blockchain/NevmRolluxBridge/interfaces/TokenListToken';
+import { ConnectButton } from 'components/ConnectButton';
 import { ConnectionWarning } from 'components/ConnectionWarning';
 import { BigNumber, Contract, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
@@ -328,7 +329,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 }}
             >
                 {!account && (
-                    <Button variant="primary">Connect Wallet</Button>
+                    <ConnectButton />
                 )}
 
                 {'SYS' !== currency && account && <>
@@ -353,7 +354,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     </>}
                 </>}
 
-                {('SYS' === currency && (chainId !== TanenbaumChain.chainId)) && <>
+                {('SYS' === currency && account && (chainId !== TanenbaumChain.chainId)) && <>
                     <Button
                         isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
                         variant="primary"

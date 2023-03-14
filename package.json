@@ -19,7 +19,7 @@
     "@mui/lab": "^5.0.0-alpha.89",
     "@mui/material": "^5.7.0",
     "@mui/x-data-grid": "^5.11.1",
-    "@usedapp/core": "^1.2.2",
+    "@usedapp/core": "^1.2.7",
     "@web3-react/core": "^6.1.9",
     "@web3-react/metamask": "^8.0.0-beta.0",
     "axios": "^0.27.2",
@@ -36,7 +36,8 @@
     "react-hook-form": "^7.31.3",
     "react-query": "^3.39.1",
     "satoshi-bitcoin": "^1.0.5",
-    "syscoinjs-lib": "^1.0.214"
+    "syscoinjs-lib": "^1.0.214",
+    "usehooks-ts": "^2.9.1"
   },
   "devDependencies": {
     "@types/node": "17.0.32",

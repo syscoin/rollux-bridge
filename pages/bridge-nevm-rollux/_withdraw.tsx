@@ -7,25 +7,24 @@ import { ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useToken
 import { RolluxChain, TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp';
 import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20TokenList';
 import TokenListToken from 'blockchain/NevmRolluxBridge/interfaces/TokenListToken';
+import { ConnectButton } from 'components/ConnectButton';
 import { BigNumber, Contract, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 import React, { FC, useEffect, useState } from 'react';
 
 export type WithdrawPartProps = {
     onClickWithdrawButton: (amount: string) => void;
-    onClickApproveERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     onClickWithdrawERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     L1StandardBridgeAddress: string,
 }
 
-export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onClickApproveERC20, onClickWithdrawERC20, setIsLoading, L1StandardBridgeAddress }) => {
+export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onClickWithdrawERC20, setIsLoading, L1StandardBridgeAddress }) => {
     const [currency, setCurrency] = useState<string>('SYS');
     const [selectedTokenAddress, setSelectedTokenAddress] = useState<string | undefined>(undefined);
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
     const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
-    const [youWillGetAmount, setYouWillGetAmount] = useState<string>('0.00');
     const [amountToSwap, setAmountToSwap] = useState<string>('0.00');
     const { account, chainId, switchNetwork } = useEthers();
 
@@ -191,15 +190,15 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
         })
     }, [setIsLoading, account]);
 
-    const handleApproval = async () => {
-        if (selectedTokenAddress && selectedTokenAddressL2) {
+    // const handleApproval = async () => {
+    //     if (selectedTokenAddress && selectedTokenAddressL2) {
 
-            await preCheckNetwork(RolluxChain.chainId, chainId as number);
+    //         await preCheckNetwork(RolluxChain.chainId, chainId as number);
 
-            setIsLoading(true);
-            onClickApproveERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseEther(amountToSwap));
-        }
-    }
+    //         setIsLoading(true);
+    //         onClickApproveERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseEther(amountToSwap));
+    //     }
+    // }
 
     const handleERC20Withdraw = async () => {
         if (selectedTokenAddress && selectedTokenAddressL2) {
@@ -329,18 +328,18 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                 }}
             >
                 {!account && (
-                    <Button variant="primary">Connect Wallet</Button>
+                    <ConnectButton />
                 )}
 
                 {'SYS' !== currency && account && <>
-                    {(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseEther(amountToSwap))) && <>
+                    {/*{(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseEther(amountToSwap))) && <>
                         <Button
                             variant="primary"
                             onClick={() => handleApproval()}
                         >
                             Approve
                         </Button>
-                    </>}
+                    </>}*/}
 
                     {(allowanceERC20Token?.gte(ethers.utils.parseEther(amountToSwap)) && parseFloat(amountToSwap) > 0) && <>
                         <Button
@@ -349,7 +348,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                                 handleERC20Withdraw()
                             }}
                         >
-                            Deposit ERC20
+                            Withdraw
                         </Button>
                     </>}
                 </>}
@@ -375,7 +374,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                             onClickWithdrawButton(amountToSwap);
                         }}
                     >
-                        Deposit
+                        Withdraw
                     </Button>
                 </>}
             </Flex>
