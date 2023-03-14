@@ -1,15 +1,19 @@
-import "../styles/globals.css";
-import type { AppProps } from "next/app";
-import PaliWalletContextProvider from "../contexts/PaliWallet/Provider";
-import MetamaskProvider from "../contexts/Metamask/Provider";
-import theme from "../components/theme";
+import { ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
 import { ThemeProvider } from "@mui/material";
-import ConnectedWalletProvider from "../contexts/ConnectedWallet/Provider";
-import { QueryClient, QueryClientProvider } from "react-query";
 import { Config, DAppProvider } from "@usedapp/core";
-import { Header } from "components/Header";
 import { RolluxChain, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
 import { NetworkValidator } from "components/Common/NetworkValidator";
+import { Header } from "components/Header";
+import { RolluxHeader } from "components/RolluxHeader";
+import type { AppProps } from "next/app";
+import { Roboto } from 'next/font/google';
+import { useRouter } from "next/router";
+import { QueryClient, QueryClientProvider } from "react-query";
+import theme from "../components/theme";
+import ConnectedWalletProvider from "../contexts/ConnectedWallet/Provider";
+import MetamaskProvider from "../contexts/Metamask/Provider";
+import PaliWalletContextProvider from "../contexts/PaliWallet/Provider";
+import "../styles/globals.css";
 
 const queryClient = new QueryClient();
 
@@ -30,22 +34,24 @@ const dappConfig: Config = {
 }
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const { pathname } = useRouter()
+
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <PaliWalletContextProvider>
-          <MetamaskProvider>
-            <ConnectedWalletProvider>
-              <DAppProvider config={dappConfig}>
-                <NetworkValidator>
-                  <Header />
-                  <Component {...pageProps} />
-                </NetworkValidator>
-              </DAppProvider>
-            </ConnectedWalletProvider>
-          </MetamaskProvider>
-        </PaliWalletContextProvider>
-      </ThemeProvider>
+      <PaliWalletContextProvider>
+        <MetamaskProvider>
+          <ConnectedWalletProvider>
+            <DAppProvider config={dappConfig}>
+              <NetworkValidator>
+                <ThemeProvider theme={theme}>
+                  {pathname === '/bridge-nevm-rollux' ? null : <Header />}
+                </ThemeProvider>
+                <Component {...pageProps} />
+              </NetworkValidator>
+            </DAppProvider>
+          </ConnectedWalletProvider>
+        </MetamaskProvider>
+      </PaliWalletContextProvider>
     </QueryClientProvider>
   );
 }

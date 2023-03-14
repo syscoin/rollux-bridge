@@ -1,13 +1,17 @@
-import { Box, Button, Card, CardContent, Container, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
-import { ChainId, ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
-import { TokenInfo } from 'hooks/Common/useERC20TokenList';
-import { useERC20TokenList } from 'hooks/Common/useERC20TokenList';
-import React, { FC, useEffect, useState } from 'react'
-import { BigNumber, Contract, ethers } from 'ethers';
+import { ChevronDownIcon } from '@chakra-ui/icons';
+import {
+    Button, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Image, Input, Menu,
+    MenuButton, MenuItem, MenuList, NumberInput, NumberInputField, PlacementWithLogical, Text, useBreakpointValue, Wrap
+} from '@chakra-ui/react';
+import { ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
+import { TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp';
 import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20TokenList';
 import TokenListToken from 'blockchain/NevmRolluxBridge/interfaces/TokenListToken';
-import { TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp';
-import Image from 'next/image';
+import { ConnectButton } from 'components/ConnectButton';
+import { ConnectionWarning } from 'components/ConnectionWarning';
+import { BigNumber, Contract, ethers } from 'ethers';
+import { formatEther } from 'ethers/lib/utils';
+import React, { FC, useEffect, useState } from 'react';
 
 export type DepositPartProps = {
     onClickDepositButton: (amount: string, tokenAddress: string | undefined) => void;
@@ -18,7 +22,7 @@ export type DepositPartProps = {
 }
 
 export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClickApproveERC20, onClickDepositERC20, setIsLoading, L1StandardBridgeAddress }) => {
-    const [currency, setCurrency] = useState<string>('');
+    const [currency, setCurrency] = useState<string>('SYS');
     const [selectedTokenAddress, setSelectedTokenAddress] = useState<string | undefined>(undefined);
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
     const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
@@ -38,6 +42,9 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
     const [tokenBalancesMap, setTokenBalancesMap] = useState<{ [key: string]: string }>({});
 
+    const selectedToken = currency !== 'SYS' ?
+        l1ERC20Tokens?.find(token => token.symbol === currency) :
+        { address: '', chainId: chainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }
 
     const viewTokenBalance = async (tokenAddress: string, decimals: number, owner: string): Promise<string> => {
         let ret: string = '0.00';
@@ -206,193 +213,172 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     }
 
 
-
-
-
     return (
-        <>
-            <Box component={Container} sx={{ alignItems: 'center', my: '3' }}>
-                <Card>
-                    <CardContent>
-                        <Box component={Container}>
-                            <Typography variant='h6'>
-                                From Syscoin NEVM
-                            </Typography>
-                        </Box>
+        <Flex flexDir="column">
+            <FormControl isInvalid={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}>
+                <Flex justifyContent="space-between">
+                    <FormLabel fontWeight="700">
+                        From Syscoin NEVM
+                    </FormLabel>
 
+                    {
+                        selectedToken && selectedToken?.symbol !== 'SYS' ?
+                            <Text opacity={.5}>Available {tokenBalancesMap?.[selectedToken.symbol] || '0.00'}</Text> : selectedToken ?
+                                <Text opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'}</Text> : <></>
+                    }
+                </Flex>
+                <HStack bg="#f4fadb" borderRadius="6px" minH="48px" px="19px" border={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? '2px solid' : 'none'} borderColor="red.400">
+                    <NumberInput variant="unstyled" size="lg" onChange={(valueAsString) => {
+                        if (valueAsString.length > 0) {
+                            setAmountToSwap(valueAsString)
+                        } else {
+                            setAmountToSwap('0.00');
+                        }
+                    }}>
+                        <NumberInputField placeholder='0.00' />
+                    </NumberInput>
 
-                        <Box component={Container} sx={{ my: 3 }}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={7}>
-                                    <FormControl fullWidth>
-                                        <TextField
-                                            error={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
-                                            label={'Amount'}
-                                            helperText={balanceToDisplay !== '' ? `${balanceToDisplay} available` : undefined}
-                                            id="currency_amount_input"
-                                            fullWidth variant='outlined'
-                                            type='number'
-                                            onChange={(event) => {
-                                                if (event.target.value.length > 0) {
-                                                    setAmountToSwap(event.target.value)
-                                                } else {
-                                                    setAmountToSwap('0.00');
-                                                }
+                    <Menu isLazy lazyBehavior="unmount" placement="top-start" autoSelect={false}>
+                        <MenuButton minW="fit-content">
+                            <HStack>
+                                {
+                                    selectedToken && (
+                                        <>
+                                            <Image
+                                                borderRadius="full"
+                                                src={selectedToken.logoURI}
+                                                alt={`${selectedToken.name} logo`}
+                                                boxSize="6"
+                                            />
+                                            <Text>
+                                                {selectedToken ? selectedToken.symbol : ''}
+                                            </Text>
+                                        </>
+                                    )
+                                }
+                                <ChevronDownIcon fontSize="xl" />
+                            </HStack>
+                        </MenuButton>
 
-                                            }}
+                        <MenuList maxH="300px" overflow="scroll" position="absolute" left="-100px" top="50px">
+                            <MenuItem
+                                onClick={() => setCurrency('SYS')}
+                            >
+                                <HStack>
+                                    <Image
+                                        borderRadius="full"
+                                        src="/syscoin-logo.svg"
+                                        alt={`SYS logo`}
+                                        boxSize="6"
+                                    />
+                                    <Text>SYS</Text>
+                                </HStack>
+                            </MenuItem>
+                            {l1ERC20Tokens?.map((token) => (
+                                <MenuItem
+                                    key={token.address + token.name}
+                                    onClick={() => setCurrency(token.symbol)}
+                                >
+                                    <HStack>
+                                        <Image
+                                            borderRadius="full"
+                                            src={token.logoURI}
+                                            alt={`${token.name} logo`}
+                                            boxSize="6"
                                         />
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={5}>
-                                    <FormControl fullWidth>
-                                        <InputLabel id="currency_select_label" htmlFor='currency_select'> Select currency </InputLabel>
-                                        <Select
-                                            labelId='currency_select_label'
-                                            id='currency_select'
-                                            label="Select currency"
-                                            value={currency}
-                                        >
-                                            <MenuItem value="SYS" selected={'SYS' === currency} onClick={() => setCurrency("SYS")}>
-                                                <Container sx={{ display: 'flex', alignItems: 'left' }}>
+                                        <Text>{token.name}</Text>
+                                    </HStack>
+                                </MenuItem>
+                            ))}
+                        </MenuList>
+                    </Menu>
+                </HStack>
 
-                                                    <Box sx={{ width: 20, height: 20 }}>
-                                                        <Image src="/syscoin-logo.svg" alt='logo' width={'20px'} height={'20px'} />
-                                                    </Box>
-                                                    <Typography variant="body1" sx={{ ml: 1 }}>
-                                                        SYS {balanceNativeToken ? ethers.utils.formatEther(balanceNativeToken) : '0.00'}
-                                                    </Typography>
-                                                </Container>
-                                            </MenuItem>
+                <FormErrorMessage>Invalid amount</FormErrorMessage>
+            </FormControl>
 
-                                            {(l1ERC20Tokens && l1ERC20Tokens.length > 0) &&
-                                                l1ERC20Tokens.map((value, index: number) => {
+            {selectedToken && (
+                <Flex flexDir="column" maxW="100%">
+                    <Text fontWeight={700} mt={{ base: '24px', md: '44px' }}>
+                        You will get on Rollux
+                    </Text>
 
-                                                    return <MenuItem selected={value.symbol === currency} onClick={(e) => setCurrency(value.symbol)} value={value.symbol} key={index}>
-                                                        <Container sx={{ display: 'flex', alignItems: 'left' }}>
+                    <Wrap alignItems="center" mt="15px" spacing="27px" maxW="calc(100vw - 70px)">
+                        <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>{amountToSwap}</Text>
 
-                                                            <Box sx={{ width: 20, height: 20 }}>
-                                                                <Image src={value.logoURI} alt='logo' width={'20px'} height={'20px'} />
-                                                            </Box>
-                                                            <Typography variant="body1" sx={{ ml: 1 }}>
-                                                                {value.symbol} {tokenBalancesMap[value.symbol]}
-                                                            </Typography>
-                                                        </Container>
-                                                    </MenuItem>
-                                                })
-                                            }
+                        <HStack mt="44px" alignItems="center">
+                            <Image
+                                alt="coin logo"
+                                boxSize="24px"
+                                borderRadius="full"
+                                src={selectedToken.logoURI}
+                            />
+                            <Text>{selectedToken.symbol}</Text>
+                        </HStack>
+                    </Wrap>
+                </Flex>
+            )}
 
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                            </Grid>
-                        </Box>
-                    </CardContent>
-                </Card>
-            </Box >
+            <Flex
+                mt={{ base: '32px', md: '44px' }}
+                w="100%"
+                __css={{
+                    button: {
+                        w: '100%'
+                    }
+                }}
+            >
+                {!account && (
+                    <ConnectButton />
+                )}
 
-            <Box component={Container} sx={{ alignItems: 'center', mt: 4 }}>
-                <Card>
-                    <CardContent>
-                        <Box component={Container}>
-                            <Typography variant='h6'>
-                                You will receive
-                            </Typography>
-                        </Box>
+                {'SYS' !== currency && account && <>
+                    {(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseEther(amountToSwap))) && <>
+                        <Button
+                            variant="primary"
+                            onClick={() => handleApproval()}
+                        >
+                            Approve
+                        </Button>
+                    </>}
 
+                    {(allowanceERC20Token?.gte(ethers.utils.parseEther(amountToSwap)) && parseFloat(amountToSwap) > 0) && <>
+                        <Button
+                            variant="primary"
+                            onClick={() => {
+                                handleERC20Deposit()
+                            }}
+                        >
+                            Deposit ERC20
+                        </Button>
+                    </>}
+                </>}
 
-                        <Box component={Container} sx={{ my: 3 }}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    <FormControl fullWidth>
-                                        <TextField
-                                            helperText={currency}
-                                            disabled
-                                            id="currency_amount_input"
-                                            error={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
-                                            fullWidth
-                                            value={amountToSwap}
-                                            variant='outlined'
-                                            onChange={(event) => console.log(event.target.value)}
-                                        />
-                                    </FormControl>
-                                </Grid>
-                            </Grid>
-                        </Box>
-                    </CardContent>
-                </Card>
-            </Box>
-            <Box component={Container} sx={{ alignItems: 'center', mt: 4 }}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                        <Card>
-                            <CardContent>
-                                {('SYS' === currency && (chainId && chainId === TanenbaumChain.chainId)) && <>
-                                    <Button
-                                        disabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
-                                        variant='contained'
-                                        size='large'
-                                        color='success'
-                                        onClick={() => {
-                                            onClickDepositButton(amountToSwap, undefined);
-                                        }}
-                                        sx={{ width: 1 }}
-                                    >
-                                        Deposit
-                                    </Button>
-                                </>}
+                {('SYS' === currency && account && (chainId !== TanenbaumChain.chainId)) && <>
+                    <Button
+                        isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
+                        variant="primary"
+                        onClick={async () => {
+                            await switchNetwork(TanenbaumChain.chainId);
+                        }}
+                    >
+                        Switch to Tanenbaum Chain
+                    </Button>
+                </>}
 
-                                {('SYS' === currency && (chainId !== TanenbaumChain.chainId)) && <>
-                                    <Button
-                                        disabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
-                                        variant='contained'
-                                        size='large'
-                                        color='success'
-                                        onClick={async () => {
-                                            await switchNetwork(TanenbaumChain.chainId);
-                                        }}
-                                        sx={{ width: 1 }}
-                                    >
-                                        Switch to Tanenbaum Chain
-                                    </Button>
-                                </>}
-
-                                {'SYS' !== currency && <>
-
-
-
-
-                                    {(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseEther(amountToSwap))) && <>
-                                        <Button
-                                            variant='outlined'
-                                            size='large'
-                                            color='secondary'
-                                            sx={{ width: 1 }}
-                                            onClick={() => handleApproval()}
-                                        >
-                                            Approve
-                                        </Button>
-                                    </>}
-
-                                    {(allowanceERC20Token?.gte(ethers.utils.parseEther(amountToSwap)) && parseFloat(amountToSwap) > 0) && <>
-                                        <Button
-                                            variant='contained'
-                                            size='large'
-                                            color='secondary'
-                                            sx={{ width: 1 }}
-                                            onClick={() => {
-                                                handleERC20Deposit()
-                                            }}
-                                        >
-                                            Deposit ERC20
-                                        </Button>
-                                    </>}
-                                </>}
-                            </CardContent></Card>
-                    </Grid>
-                </Grid >
-            </Box >
-
-        </>
+                {('SYS' === currency && account && (chainId && chainId === TanenbaumChain.chainId)) && <>
+                    <Button
+                        isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) || !parseFloat(amountToSwap)}
+                        variant="primary"
+                        onClick={() => {
+                            onClickDepositButton(amountToSwap, undefined);
+                        }}
+                    >
+                        Deposit
+                    </Button>
+                </>}
+            </Flex>            
+        </Flex>
     )
 }
 

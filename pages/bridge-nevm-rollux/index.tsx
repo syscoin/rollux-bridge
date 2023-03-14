@@ -1,20 +1,33 @@
-import React, { FC, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+    ChakraProvider,
+    extendTheme,
+    Flex, Heading,
+    Highlight, Tab,
+    TabList,
+    TabPanel,
+    TabPanels,
+    Tabs,
+    theme,
+    VStack
+} from '@chakra-ui/react';
+import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
+import { useMetamask } from "@contexts/Metamask/Provider";
+import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
+import { useEthers } from "@usedapp/core";
+import { RolluxChain, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
+import { getNetworkByChainId, getNetworkByName, NetworkData, networks, networksMap } from "blockchain/NevmRolluxBridge/config/networks";
+import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
+import { ConnectionWarning } from 'components/ConnectionWarning';
+import { RolluxHeader } from 'components/RolluxHeader';
+import { BigNumber, ethers } from "ethers";
 import { NextPage } from "next";
-import { Box, Grid, Container, Card, CardContent, Typography, ButtonBase, Button, Backdrop, CircularProgress } from "@mui/material";
+import { Roboto } from 'next/font/google';
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { DepositPart } from "./_deposit";
-import { WithdrawPart } from "./_withdraw"
-import { useMetamask } from "@contexts/Metamask/Provider";
-import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
-import { ConnectWalletBox } from "./_connectWallet";
-import { useEthers, useLogs, useSigner } from "@usedapp/core";
-import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
-import { BigNumber, ethers } from "ethers";
-import { networks, getNetworkByChainId, NetworkData, networksMap, getNetworkByName } from "blockchain/NevmRolluxBridge/config/networks";
-import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
-import { RolluxChain, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
-import OnGoingTxns from "components/BridgeL1L2/WIthdraw/OnGoingTxns";
+import { useEffect, useState } from "react";
+import DepositPart from './_deposit';
+import WithdrawPart from './_withdraw';
+
 
 type BridgeNevmRolluxProps = {}
 
@@ -22,6 +35,57 @@ enum CurrentDisplayView {
     deposit,
     withdraw
 }
+
+const roboto = Roboto({
+    weight: ['400', '700'],
+    subsets: ['latin']
+})
+
+const chakraTheme = extendTheme({
+    fonts: {
+        body: roboto.style.fontFamily,
+        heading: roboto.style.fontFamily,
+    },
+    colors: {
+        brand: {
+            primary: '#DBEF88',
+            primaryGradient: 'linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)',
+            secondaryGradient: 'linear-gradient(90deg, #E0E0E0 4.05%, #DBEF88 95.38%)'
+        }
+    },
+    components: {
+        Button: {
+            variants: {
+                primary: {
+                    bg: 'brand.primaryGradient',
+                    _hover: {
+                        _disabled: {
+                            bg: 'brand.primaryGradient'
+                        }
+                    }
+                },
+                secondary: {
+                    bg: 'brand.secondaryGradient',
+                    _hover: {
+                        _disabled: {
+                            bg: 'brand.secondaryGradient'
+                        }
+                    }
+                }
+            }
+        }
+    },
+    styles: {
+        global: {
+            'html': {
+                height: '100%'
+            },
+            'body': {
+                minHeight: '100%',
+            }
+        }
+    }
+})
 
 export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const router = useRouter();
@@ -275,7 +339,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     return (
 
-        <Box>
+        <ChakraProvider theme={chakraTheme}>
             <Head>
                 <title>Syscoin Bridge | Rollux & NEVM </title>
                 <link rel="shortcut icon" href="/favicon.ico" />
@@ -283,110 +347,137 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <Box component={Container} sx={{ alignItems: 'center', my: 3 }}>
-                <Grid container spacing={2}>
-                    <Grid xs={12} item>
-                        <Card variant="outlined" sx={{ padding: '10px' }}>
-                            <Typography variant="h3">
-                                Swap your SYS between NEVM and Rollux.
-                            </Typography>
-                        </Card>
-                    </Grid>
-                </Grid>
-            </Box>
+            <RolluxHeader />
 
-            <Box component={Container} sx={{ alignItems: 'center', my: 3 }}>
-                <Grid container spacing={3}>
-                    <Grid xs={6} item alignItems={'center'}>
-                        <Card raised={currentDisplay === CurrentDisplayView.deposit} sx={{ width: 1 }}>
-                            <ButtonBase onClick={(event) => switchAction(CurrentDisplayView.deposit)} sx={{ width: 1 }}>
-                                <CardContent sx={{ alignContent: 'center' }}>
-                                    <Typography variant="h5" textAlign={'center'}>
-                                        Deposit
-                                    </Typography>
-                                </CardContent>
-                            </ButtonBase>
-                        </Card>
-                    </Grid>
-                    <Grid xs={6} item alignItems={'center'}>
-                        <Card raised={currentDisplay === CurrentDisplayView.withdraw} sx={{ width: 1 }}>
-                            <ButtonBase onClick={(event) => switchAction(CurrentDisplayView.withdraw)} sx={{ width: 1 }}>
-                                <CardContent sx={{ alignContent: 'center' }}>
-                                    <Typography variant="h5" textAlign={'center'}>
-                                        Withdraw
-                                    </Typography>
-                                </CardContent>
-                            </ButtonBase>
-                        </Card>
-                    </Grid>
-                </Grid>
-            </Box>
-
-            <Backdrop
-                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                open={isLoading}
-                onClick={() => {
-                    // handle nothing . Wait for tx ends or results.
-                }}
-            >
-                <CircularProgress color="inherit" />
-            </Backdrop>
-
-
-            {isConnected && <>
-                {currentDisplay === CurrentDisplayView.deposit && <DepositPart
-
-                    onClickDepositButton={(amount: string, tokenAddress: string | undefined) => {
-                        if (!tokenAddress) {
-                            handleDepositMainCurrency(amount);
-                        }
+            <VStack spacing={{ base: '-20', xl: '0' }} pb="50px">
+                <Flex
+                    id="bg"
+                    boxSize={{ base: undefined, xl: '100%' }}
+                    overflow="visible"
+                    position={{ base: 'initial', xl: 'absolute' }}
+                    bg="#28282F"
+                    top="0"
+                    p={{ base: '16px', xl: '100px' }}
+                    clipPath={{
+                        base: undefined,
+                        xl: 'polygon(0% -15%, 100% 120%, 100% 100%, 0% 100%)',
                     }}
-                    onClickApproveERC20={(l1Token: string, l2Token: string, amount: BigNumber) => {
-                        handleERC20Approval(l1Token, l2Token, amount);
-                    }}
+                    pb={{ base: '103px', xl: '100px' }}
+                    zIndex={-1}
+                    w="100%"
+                >
+                    <Heading
+                        color="white"
+                        fontSize={{ base: '33px', xl: '5xl' }}
+                        maxW={{ base: '300px', md: '400px' }}
+                        lineHeight="135.69%"
+                        position={{ base: 'initial', xl: 'absolute' }}
+                        top="50%"
+                        right="65%"
+                        w="100%"
+                        transform={{ base: undefined, xl: 'translateY(-50%)' }}
+                        m="0 auto"
+                    >
+                        <Highlight
+                            query={['L1 NEVM', 'L2 Rollux']}
+                            styles={{ bg: 'brand.primary', textShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)' }}
+                        >
+                            Bridge your $ SYS between L1 NEVM and L2 Rollux
+                        </Highlight>
+                    </Heading>
+                </Flex>
 
-                    onClickDepositERC20={(l1Token: string, l2Token: string, amount: BigNumber) => {
-                        handleERC20Deposit(l1Token, l2Token, amount);
-                    }}
+                <Flex
+                    as="main"
+                    position={{ base: 'initial', xl: 'absolute' }}
+                    top="50%"
+                    left="60%"
+                    transform={{ base: undefined, xl: 'translate(-50%, -50%)' }}
+                    p={{ base: '16px' }}
+                    mt={{ base: '9', xl: 0 }}
+                    flexDir="column"
+                    maxW="483px"
+                    w={{ base: '100%', md: '483px' }}
+                    gap="21px"
+                >
+                    <Flex
+                        px={{ base: '16px', md: '40px' }}
+                        py={{ base: '16px', md: '32px' }}
+                        flex={1}
+                        bg="white"
+                        boxShadow={`7px 7px ${chakraTheme.colors.brand.primary}`}
+                        borderRadius="12px"
+                        border={`1px solid ${chakraTheme.colors.brand.primary}`}
+                        justifyContent="center"
+                        flexDir="column"
+                        m="0 auto"
+                    >
+                        <Tabs variant="soft-rounded" w="100%" onChange={(index) => setCurrentDisplay(index === 0 ? CurrentDisplayView.deposit : CurrentDisplayView.withdraw)}>
+                            <TabList justifyContent="center" bg="#f4fadb" w="max-content" m="0 auto" borderRadius="6px">
+                                <Tab
+                                    borderRadius="6px"
+                                    px="36px"
+                                    _selected={{
+                                        color: '#000',
+                                        bg: 'brand.secondaryGradient',
+                                    }}
+                                >
+                                    Deposit
+                                </Tab>
+                                <Tab
+                                    px="36px"
+                                    borderRadius="6px"
+                                    _selected={{
+                                        color: '#000',
+                                        bg: 'brand.secondaryGradient',
+                                    }}
+                                >
+                                    Withdraw
+                                </Tab>
+                            </TabList>
 
-                    setIsLoading={setIsLoading}
+                            <TabPanels>
+                                <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
+                                    <DepositPart
+                                        onClickDepositButton={(amount: string, tokenAddress: string | undefined) => {
+                                            if (!tokenAddress) {
+                                                handleDepositMainCurrency(amount);
+                                            }
+                                        }}
+                                        onClickApproveERC20={(l1Token: string, l2Token: string, amount: BigNumber) => {
+                                            handleERC20Approval(l1Token, l2Token, amount);
+                                        }}
 
-                    L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
-                />}
+                                        onClickDepositERC20={(l1Token: string, l2Token: string, amount: BigNumber) => {
+                                            handleERC20Deposit(l1Token, l2Token, amount);
+                                        }}
 
-                {currentDisplay === CurrentDisplayView.withdraw && <div>
+                                        setIsLoading={setIsLoading}
 
+                                        L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
+                                    />
+                                </TabPanel>
 
-                    <WithdrawPart
-                        onClickWithdrawButton={(amount) => {
-                            console.log(amount);
-                            handleWithdrawMainCurrency(amount);
-                        }}
-                        onClickWithdrawERC20={(l1Token, l2Token, amount) => { }}
+                                <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
+                                    <WithdrawPart
+                                        onClickWithdrawButton={(amount) => {
+                                            console.log(amount);
+                                            handleWithdrawMainCurrency(amount);
+                                        }}
+                                        onClickWithdrawERC20={(l1Token, l2Token, amount) => { }}
+                                        setIsLoading={setIsLoading}
+                                        L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
+                                    />
+                                </TabPanel>
+                            </TabPanels>
+                        </Tabs>
+                    </Flex>
 
-                        setIsLoading={setIsLoading}
+                    {!isConnected && <ConnectionWarning />}
+                </Flex>
+            </VStack>
 
-                        L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
-                    />
-
-                    <OnGoingTxns txns={[{ hash: '0x', amount: '11', symbol: 'SYS', step: 1 }, { hash: '0x1', amount: '15', symbol: 'SYS', step: 2 }]}
-                        onTxnInfoRequested={(hash: string) => {
-                            console.log(hash);
-                        }}
-
-                    />
-                </div>}
-
-
-
-
-            </>}
-
-            {!isConnected && <>
-                <ConnectWalletBox />
-            </>}
-
-        </Box>
+        </ChakraProvider>
     )
 }
 
