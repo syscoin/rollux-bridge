@@ -7,26 +7,34 @@ import {
     TabPanel,
     TabPanels,
     Tabs,
+    Text,
     theme,
+    useDisclosure,
     VStack
 } from '@chakra-ui/react';
 import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
 import { useMetamask } from "@contexts/Metamask/Provider";
 import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
-import { useEthers } from "@usedapp/core";
+import { useEthers, useLogs, useSigner } from "@usedapp/core";
 import { RolluxChain, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
+import contractsDev from 'blockchain/NevmRolluxBridge/config/contracts';
 import { getNetworkByChainId, getNetworkByName, NetworkData, networks, networksMap } from "blockchain/NevmRolluxBridge/config/networks";
 import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
 import { ConnectionWarning } from 'components/ConnectionWarning';
 import { RolluxHeader } from 'components/RolluxHeader';
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, Contract, ethers } from "ethers";
 import { NextPage } from "next";
 import { Roboto } from 'next/font/google';
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import DepositPart from './_deposit';
 import WithdrawPart from './_withdraw';
+import L2StandardBridgeABI from "blockchain/NevmRolluxBridge/abi/L2StandardBridge"
+import UnfinishedWithdrawalItem from 'components/BridgeL1L2/WIthdraw/UnfinishedWithdrawalItem';
+import ViewWithdrawalModal from 'components/BridgeL1L2/WIthdraw/ViewWithdrawalModal';
+import ProveMessageStep from 'components/BridgeL1L2/WIthdraw/Steps/ProveMessageStep';
+import { useLocalStorage } from 'usehooks-ts';
 
 
 type BridgeNevmRolluxProps = {}
@@ -93,9 +101,33 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const metamask = useMetamask();
     const connectedWalletCtxt = useConnectedWallet();
     const isConnected = connectedWalletCtxt.nevm.account;
-    const { account, activateBrowserWallet, library, switchNetwork } = useEthers();
+    const { account, activateBrowserWallet, library, switchNetwork, chainId } = useEthers();
     const [crossChainMessenger, setCrossChainMessenger] = useState<CrossChainMessenger | undefined>(undefined);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [unfinishedWithdrawals, setUnfinishedWithdrawals] = useState<{ status: MessageStatus, txHash: string }[]>([])
+
+    const { isOpen: withdrawIsOpen, onOpen: withdrawOnOpen, onClose: widthdrawOnClose } = useDisclosure();
+
+    const [withdrawalModalData, setWithdrawalModalData] = useState<{ status: MessageStatus, txHash: string }>({ status: 0, txHash: '' });
+    const signer = useSigner();
+    // [{withdrawTx, proveTx}]
+    const [proveTxns, setProveTxns] = useLocalStorage<{ withdrawTx: string, proveTx: string }[]>('prove-txns', []);
+
+    const getProveTxn = (withdrawTxHash: string, data: { withdrawTx: string, proveTx: string }[]): string | null => {
+        try {
+
+            const target = data.find(item => item.withdrawTx === withdrawTxHash);
+
+            if (target) {
+                return target.proveTx ?? null;
+            }
+        } catch {
+            return null;
+        }
+
+        return null;
+    }
+
 
     const getCrossChainMessenger = async (library: any, currentDisplay: CurrentDisplayView) => {
         if (!library) {
@@ -227,7 +259,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
 
             await crossChainMessenger.waitForMessageStatus(withdrawTx.hash,
-                MessageStatus.READY_TO_PROVE)
+                MessageStatus.RELAYED)
 
             console.log('status message #1');
 
@@ -304,10 +336,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     }
 
-    const switchAction = (action: CurrentDisplayView) => {
-        setCurrentDisplay(action);
-    }
-
     /**
      * 
      * Hack for use useDapp
@@ -333,9 +361,58 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         }
     }, [library, currentDisplay])
 
-    // const {logs} = useLogs(
-    //     {contract: new ethers.Contract(crossChainMessenger?.contracts.l2.L2StandardBridge, )}
-    // )
+
+
+
+    const widthdrawalsLogs = useCallback(async () => {
+        if (currentDisplay === CurrentDisplayView.withdraw && account) {
+            // check for withdrawals
+
+            const L2BridgeContract = new Contract(
+                contractsDev.l2_dev.L2StandardBridge,
+                new ethers.utils.Interface(L2StandardBridgeABI),
+                new ethers.providers.StaticJsonRpcProvider(RolluxChain.rpcUrl)
+            )
+
+
+            const filter = L2BridgeContract.filters['WithdrawalInitiated'](null, null, account)
+
+            const events = await L2BridgeContract.queryFilter(filter);
+
+            if (events.length > 0) {
+                const messengerL1 = crossChainMessengerFactory(
+                    networks.L1Dev,
+                    networks.L2Dev,
+                    new ethers.providers.StaticJsonRpcProvider(TanenbaumChain.rpcUrl),
+                    new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl),
+                    true
+                );
+
+                const checks = await Promise.all(events.map(async (value) => {
+                    const status = await messengerL1.getMessageStatus(value.transactionHash)
+
+                    return { status: status, txHash: value.transactionHash };
+                }))
+                return checks;
+            }
+
+            return [];
+
+
+        }
+    }, [currentDisplay, account])
+
+    useEffect(() => {
+        widthdrawalsLogs().then(results => {
+            if (results) {
+                setUnfinishedWithdrawals(results.filter((value) => {
+                    return value.status !== MessageStatus.RELAYED;
+                }))
+            }
+        })
+    }, [widthdrawalsLogs])
+
+
 
     return (
 
@@ -459,12 +536,94 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                 </TabPanel>
 
                                 <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
+
+                                    {unfinishedWithdrawals.length > 0 && <>
+
+                                        {withdrawalModalData.txHash !== '' && <>
+                                            <ViewWithdrawalModal isOpen={withdrawIsOpen} onClose={widthdrawOnClose}
+                                                status={withdrawalModalData.status}
+                                                txnHash={withdrawalModalData.txHash}
+                                            >
+                                                {withdrawalModalData.status === MessageStatus.READY_TO_PROVE && <>
+                                                    <ProveMessageStep
+                                                        chainId={chainId || 1}
+                                                        proveTxHash={getProveTxn(withdrawalModalData.txHash, proveTxns) ?? ''}
+                                                        requiredChainId={TanenbaumChain.chainId}
+                                                        onClickProveMessage={async () => {
+                                                            if (!signer) {
+                                                                return;
+                                                            }
+
+                                                            const messengerL1 = crossChainMessengerFactory(
+                                                                networks.L1Dev,
+                                                                networks.L2Dev,
+                                                                signer,
+                                                                new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl),
+                                                                true
+                                                            );
+
+                                                            const proveTx = await messengerL1.proveMessage(withdrawalModalData.txHash);
+
+                                                            const tmpProven = [...proveTxns]
+                                                            tmpProven.push({ withdrawTx: withdrawalModalData.txHash, proveTx: proveTx.hash });
+
+                                                            setProveTxns([...tmpProven]);
+                                                        }}
+                                                        onClickSwitchNetwork={async () => {
+                                                            await switchNetwork(TanenbaumChain.chainId)
+                                                        }}
+                                                    />
+                                                </>}
+
+
+                                            </ViewWithdrawalModal>
+                                        </>}
+
+
+                                        <Flex
+                                            px={{ base: '8px', md: '20px' }}
+                                            py={{ base: '8px', md: '16px' }}
+                                            flex={1}
+                                            bg="white"
+                                            boxShadow={`7px 7px ${chakraTheme.colors.brand.primary}`}
+                                            borderRadius="12px"
+                                            border={`1px solid ${chakraTheme.colors.brand.primary}`}
+                                            justifyContent="center"
+                                            flexDir="column"
+                                            m="0 0 30px 0"
+                                            maxW="380px"
+                                        >
+                                            <Heading size="s" sx={{ marginBottom: 5 }}>
+                                                You have unfinished withdrawals
+                                            </Heading>
+                                            {unfinishedWithdrawals.map((item) => {
+                                                return <UnfinishedWithdrawalItem key={item.txHash} status={item.status} txHash={item.txHash}
+                                                    onClickView={() => {
+                                                        setWithdrawalModalData({
+                                                            status: item.status,
+                                                            txHash: item.txHash
+                                                        })
+                                                        console.log({
+                                                            status: item.status,
+                                                            txHash: item.txHash
+                                                        })
+
+                                                        withdrawOnOpen();
+                                                    }}
+                                                />
+                                            })}
+                                        </Flex>
+
+                                    </>}
+
+
+
                                     <WithdrawPart
                                         onClickWithdrawButton={(amount) => {
                                             console.log(amount);
                                             handleWithdrawMainCurrency(amount);
                                         }}
-                                        onClickWithdrawERC20={(l1Token, l2Token, amount) => { }}
+                                        onClickWithdrawERC20={(_l1Token, _l2Token, amount) => { }}
                                         setIsLoading={setIsLoading}
                                         L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
                                     />

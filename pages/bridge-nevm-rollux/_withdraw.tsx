@@ -234,7 +234,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                             setAmountToSwap('0.00');
                         }
                     }}>
-                        <NumberInputField placeholder='0.00'/>
+                        <NumberInputField placeholder='0.00' />
                     </NumberInput>
 
                     <Menu isLazy lazyBehavior="unmount" placement="top-start" autoSelect={false}>
