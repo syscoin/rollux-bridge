@@ -8,7 +8,7 @@ const contractsDev = {
         StateCommitmentChain: ethers.constants.AddressZero,
         CanonicalTransactionChain: ethers.constants.AddressZero,
         BondManager: ethers.constants.AddressZero,
-        OptimismPortal: '0x633e54718F0090Fc17f1B86CF0774B1Bd390A2ec',
+        OptimismPortal: '0x61200B9fcBB421aFD0Bb5A732fe48ec98482E39C',
         L2OutputOracle: '0x63D297aa3feCbf6eEdE0aCd15B0308B9C8379afb',
     },
     l2_dev: {
