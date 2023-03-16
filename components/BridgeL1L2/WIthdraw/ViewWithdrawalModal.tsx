@@ -1,7 +1,8 @@
 import { MessageStatus } from "@eth-optimism/sdk"
 import React, { FC } from "react"
-import { useDisclosure, Modal, ModalOverlay, ModalContent, ModalBody, ModalFooter, Button, ModalHeader, Text, ModalCloseButton, Heading, List, ListItem } from "@chakra-ui/react"
+import { useClipboard, Modal, Badge, ModalOverlay, ModalContent, ModalBody, ModalFooter, Button, ModalHeader, Text, ModalCloseButton, Heading, List, ListItem, Flex } from "@chakra-ui/react"
 import CrossChainMessageStatusLabel from "../CrossChainMessageStatusLabel"
+import { shortenIfTransactionHash } from "@usedapp/core"
 
 export type ViewWithdrawalModalProps = {
     txnHash: string,
@@ -22,14 +23,6 @@ export const ViewWithdrawalModal: FC<ViewWithdrawalModalProps> = ({ children, tx
                 <ModalHeader>Withdrawal Details</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <List>
-                        <ListItem>
-                            <Heading size="xs">TXN ID</Heading> {txnHash}
-                        </ListItem>
-                        <ListItem>
-                            <Heading size="xs">Status</Heading> <CrossChainMessageStatusLabel status={status} />
-                        </ListItem>
-                    </List>
                     <div>
                         {children}
                     </div>

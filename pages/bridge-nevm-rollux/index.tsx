@@ -35,6 +35,8 @@ import UnfinishedWithdrawalItem from 'components/BridgeL1L2/WIthdraw/UnfinishedW
 import ViewWithdrawalModal from 'components/BridgeL1L2/WIthdraw/ViewWithdrawalModal';
 import ProveMessageStep from 'components/BridgeL1L2/WIthdraw/Steps/ProveMessageStep';
 import { useLocalStorage } from 'usehooks-ts';
+import RelayMessageStep from 'components/BridgeL1L2/WIthdraw/Steps/RelayMessageStep';
+import { PendingMessage } from 'components/BridgeL1L2/WIthdraw/Steps/PendingMessage';
 
 
 type BridgeNevmRolluxProps = {}
@@ -112,7 +114,10 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const signer = useSigner();
     // [{withdrawTx, proveTx}]
     const [proveTxns, setProveTxns] = useLocalStorage<{ withdrawTx: string, proveTx: string }[]>('prove-txns', []);
+    const [relayTxns, setRelayTxns] = useLocalStorage<{ withdrawTx: string, relayTx: string }[]>('relay-txns', []);
 
+
+    // todo refactor this 2 similar functions
     const getProveTxn = (withdrawTxHash: string, data: { withdrawTx: string, proveTx: string }[]): string | null => {
         try {
 
@@ -120,6 +125,21 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
             if (target) {
                 return target.proveTx ?? null;
+            }
+        } catch {
+            return null;
+        }
+
+        return null;
+    }
+
+    const getRelayTxn = (withdrawTxHash: string, data: { withdrawTx: string, relayTx: string }[]): string | null => {
+        try {
+
+            const target = data.find(item => item.withdrawTx === withdrawTxHash);
+
+            if (target) {
+                return target.relayTx ?? null;
             }
         } catch {
             return null;
@@ -245,56 +265,59 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         }
 
         try {
-            // const withdrawTx = await crossChainMessenger.withdrawETH(
-            //     ethers.utils.parseEther(amount)
-            // );
-
-            // await withdrawTx.wait();
-
-            const withdrawTx = {
-                hash: '0x957e9cfbf261fb404e31c34645986c081b3983890f61a26d9d1ac8b778dc4cc4',
-            }
-
-            console.log('waited 1');
-
-
-            await crossChainMessenger.waitForMessageStatus(withdrawTx.hash,
-                MessageStatus.RELAYED)
-
-            console.log('status message #1');
-
-            await switchNetwork(5700);
-
-            const messengerL1 = crossChainMessengerFactory(
-                networks.L1Dev,
-                networks.L2Dev,
-                (library as ethers.providers.JsonRpcProvider).getSigner(),
-                new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl),
-                true
+            const withdrawTx = await crossChainMessenger.withdrawETH(
+                ethers.utils.parseEther(amount)
             );
 
+            await withdrawTx.wait();
 
-            const proveTx = await messengerL1.proveMessage(withdrawTx.hash);
 
-            await proveTx.wait();
+            widthdrawalsLogs().then(results => {
+                if (results) {
+                    setUnfinishedWithdrawals(results.filter((value) => {
+                        return value.status !== MessageStatus.RELAYED;
+                    }))
+                }
+            })
 
-            console.log(proveTx);
 
-            console.log('wait 2');
+            // await crossChainMessenger.waitForMessageStatus(withdrawTx.hash,
+            //     MessageStatus.RELAYED)
 
-            await messengerL1.waitForMessageStatus(withdrawTx.hash,
-                MessageStatus.READY_FOR_RELAY)
+            // console.log('status message #1');
 
-            console.log('wait3');
+            // await switchNetwork(5700);
+
+            // const messengerL1 = crossChainMessengerFactory(
+            //     networks.L1Dev,
+            //     networks.L2Dev,
+            //     (library as ethers.providers.JsonRpcProvider).getSigner(),
+            //     new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl),
+            //     true
+            // );
+
+
+            // const proveTx = await messengerL1.proveMessage(withdrawTx.hash);
+
+            // await proveTx.wait();
+
+            // console.log(proveTx);
+
+            // console.log('wait 2');
+
+            // await messengerL1.waitForMessageStatus(withdrawTx.hash,
+            //     MessageStatus.READY_FOR_RELAY)
+
+            // console.log('wait3');
 
 
 
             // 1st step = 2h / 2nd step = 25m / 3rd = 5m
 
 
-            const finalizeTx = await messengerL1.finalizeMessage(withdrawTx.hash);
+            // const finalizeTx = await messengerL1.finalizeMessage(withdrawTx.hash);
 
-            await finalizeTx.wait();
+            // await finalizeTx.wait();
 
 
         } catch (e) {
@@ -403,13 +426,19 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     }, [currentDisplay, account])
 
     useEffect(() => {
-        widthdrawalsLogs().then(results => {
-            if (results) {
-                setUnfinishedWithdrawals(results.filter((value) => {
-                    return value.status !== MessageStatus.RELAYED;
-                }))
-            }
-        })
+        const loadWithdrawalLogs = () => {
+            widthdrawalsLogs().then(results => {
+                if (results) {
+                    setUnfinishedWithdrawals(results.filter((value) => {
+                        return value.status !== MessageStatus.RELAYED;
+                    }))
+                }
+            })
+        }
+
+        loadWithdrawalLogs();
+        const intervalId = setInterval(loadWithdrawalLogs, 10000)
+        return () => clearInterval(intervalId)
     }, [widthdrawalsLogs])
 
 
@@ -544,6 +573,11 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                 status={withdrawalModalData.status}
                                                 txnHash={withdrawalModalData.txHash}
                                             >
+                                                {[MessageStatus.IN_CHALLENGE_PERIOD, MessageStatus.STATE_ROOT_NOT_PUBLISHED, MessageStatus.UNCONFIRMED_L1_TO_L2_MESSAGE].includes(withdrawalModalData.status) && <>
+                                                    <PendingMessage status={withdrawalModalData.status} />
+                                                </>}
+
+
                                                 {withdrawalModalData.status === MessageStatus.READY_TO_PROVE && <>
                                                     <ProveMessageStep
                                                         chainId={chainId || 1}
@@ -568,6 +602,37 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                             tmpProven.push({ withdrawTx: withdrawalModalData.txHash, proveTx: proveTx.hash });
 
                                                             setProveTxns([...tmpProven]);
+                                                        }}
+                                                        onClickSwitchNetwork={async () => {
+                                                            await switchNetwork(TanenbaumChain.chainId)
+                                                        }}
+                                                    />
+                                                </>}
+
+                                                {withdrawalModalData.status === MessageStatus.READY_FOR_RELAY && <>
+                                                    <RelayMessageStep
+                                                        chainId={chainId || 1}
+                                                        relayTxHash={getRelayTxn(withdrawalModalData.txHash, relayTxns) ?? ''}
+                                                        requiredChainId={TanenbaumChain.chainId}
+                                                        onClickRelayMessage={async () => {
+                                                            if (!signer) {
+                                                                return;
+                                                            }
+
+                                                            const messengerL1 = crossChainMessengerFactory(
+                                                                networks.L1Dev,
+                                                                networks.L2Dev,
+                                                                signer,
+                                                                new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl),
+                                                                true
+                                                            );
+
+                                                            const relayTx = await messengerL1.finalizeMessage(withdrawalModalData.txHash);
+
+                                                            const tmpRelayed = [...relayTxns]
+                                                            tmpRelayed.push({ withdrawTx: withdrawalModalData.txHash, relayTx: relayTx.hash });
+
+                                                            setRelayTxns([...tmpRelayed]);
                                                         }}
                                                         onClickSwitchNetwork={async () => {
                                                             await switchNetwork(TanenbaumChain.chainId)

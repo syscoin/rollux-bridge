@@ -3,15 +3,15 @@ import React, { FC } from 'react'
 import { CheckCircleIcon, InfoOutlineIcon } from "@chakra-ui/icons"
 import { useLocalStorage } from 'usehooks-ts';
 
-export type ProveMessageStepProps = {
+export type RelayMessageStepProps = {
     onClickSwitchNetwork: () => void;
     chainId: number;
     requiredChainId: number;
-    onClickProveMessage: () => void;
-    proveTxHash: string;
+    onClickRelayMessage: () => void;
+    relayTxHash: string;
 }
 
-export const ProveMessageStep: FC<ProveMessageStepProps> = ({ onClickSwitchNetwork, chainId, requiredChainId, onClickProveMessage, proveTxHash }) => {
+export const RelayMessageStep: FC<RelayMessageStepProps> = ({ onClickSwitchNetwork, chainId, requiredChainId, onClickRelayMessage, relayTxHash }) => {
 
     return (<div>
 
@@ -23,7 +23,7 @@ export const ProveMessageStep: FC<ProveMessageStepProps> = ({ onClickSwitchNetwo
 
                         <Heading size={'s'} sx={{ marginBottom: 3 }}>
                             <ListIcon as={chainId === requiredChainId ? CheckCircleIcon : InfoOutlineIcon} color='green.500' />
-                            Switch Network to L1 before prove withdrawal.
+                            Switch Network to L1 before finalize withdrawal.
                         </Heading>
 
                         {chainId !== requiredChainId && <>
@@ -42,14 +42,14 @@ export const ProveMessageStep: FC<ProveMessageStepProps> = ({ onClickSwitchNetwo
                     <CardBody>
 
                         <Heading size={'s'} sx={{ marginBottom: 3 }}>
-                            <ListIcon as={proveTxHash !== '' ? CheckCircleIcon : InfoOutlineIcon} color='green.500' />
-                            Prove withdrawal
+                            <ListIcon as={relayTxHash !== '' ? CheckCircleIcon : InfoOutlineIcon} color='green.500' />
+                            Finalize withdrawal
                         </Heading>
 
 
-                        {(proveTxHash === '' && chainId === requiredChainId) && <>
-                            <Button variant={'primary'} onClick={() => onClickProveMessage()}>
-                                Prove Withdrawal
+                        {(relayTxHash === '' && chainId === requiredChainId) && <>
+                            <Button variant={'primary'} onClick={() => onClickRelayMessage()}>
+                                Finalize Withdrawal
                             </Button>
                         </>}
 
@@ -65,8 +65,8 @@ export const ProveMessageStep: FC<ProveMessageStepProps> = ({ onClickSwitchNetwo
                     <CardBody>
 
                         <Heading size={'s'} sx={{ marginBottom: 3 }}>
-                            {proveTxHash !== '' && <Spinner sx={{ marginRight: 2 }} color='green.500' />}
-                            Wait until message will be proven in L1. Might take some time. You can close this window.
+                            {relayTxHash !== '' && <Spinner sx={{ marginRight: 2 }} color='green.500' />}
+                            Wait until message will be finalized in L1. Might take some time. You can close this window.
                         </Heading>
                     </CardBody>
                 </Card>
@@ -76,4 +76,4 @@ export const ProveMessageStep: FC<ProveMessageStepProps> = ({ onClickSwitchNetwo
     </div>);
 }
 
-export default ProveMessageStep;
+export default RelayMessageStep;

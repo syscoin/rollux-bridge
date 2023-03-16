@@ -61,6 +61,6 @@ export const RolluxChain: Chain = {
     getExplorerTransactionLink: (address: string) => {
         return address;
     },
-    rpcUrl: "https://rpc-tanenbaum.rollux.com/",
+    rpcUrl: "https://rpc-bedrock.rollux.com/",
     blockExplorerUrl: "https://rollux.tanenbaum.io",
 }
