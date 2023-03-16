@@ -1892,9 +1892,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eth-optimism/sdk@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@eth-optimism/sdk@npm:2.0.0"
+"@eth-optimism/sdk@npm:0.0.0-20230313235858":
+  version: 0.0.0-20230313235858
+  resolution: "@eth-optimism/sdk@npm:0.0.0-20230313235858"
   dependencies:
     "@eth-optimism/contracts": 0.5.40
     "@eth-optimism/contracts-bedrock": 0.13.0
@@ -1904,7 +1904,7 @@ __metadata:
     rlp: ^2.2.7
   peerDependencies:
     ethers: ^5
-  checksum: 4b371ba69ecae2065b05513839e8c2b9d1c3a7c27c2f30ab4f4323bcbe1704ffbd17e7b9d9167916bf05f87751f0f007663a4f034143d795005ce576398fc449
+  checksum: d858f20011b84f76219568f2348bbf2c56937a36135c5ab3acca473664a650a01060c5d9106c52b02eabdccd154875883aa52e165005b400def0e21c8bb699ae
   languageName: node
   linkType: hard
 
@@ -15033,7 +15033,7 @@ __metadata:
     "@chakra-ui/react": ^2.5.1
     "@emotion/react": ^11.10.6
     "@emotion/styled": ^11.10.6
-    "@eth-optimism/sdk": ^2.0.0
+    "@eth-optimism/sdk": 0.0.0-20230313235858
     "@mui/icons-material": ^5.8.0
     "@mui/lab": ^5.0.0-alpha.89
     "@mui/material": ^5.7.0
