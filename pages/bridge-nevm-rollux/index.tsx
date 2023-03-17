@@ -566,6 +566,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
                                 <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
 
+
                                     {unfinishedWithdrawals.length > 0 && <>
 
                                         {withdrawalModalData.txHash !== '' && <>
@@ -596,7 +597,13 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                                 true
                                                             );
 
-                                                            const proveTx = await messengerL1.proveMessage(withdrawalModalData.txHash);
+                                                            console.log(withdrawalModalData.txHash);
+
+                                                            const proveTx = await messengerL1.proveMessage(withdrawalModalData.txHash, {
+                                                                // overrides: {
+                                                                //     gasLimit: 200_000
+                                                                // }
+                                                            });
 
                                                             const tmpProven = [...proveTxns]
                                                             tmpProven.push({ withdrawTx: withdrawalModalData.txHash, proveTx: proveTx.hash });
@@ -657,6 +664,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                             flexDir="column"
                                             m="0 0 30px 0"
                                             maxW="380px"
+                                            maxH={"400px"}
+                                            overflow={"scroll-y"}
                                         >
                                             <Heading size="s" sx={{ marginBottom: 5 }}>
                                                 You have unfinished withdrawals

@@ -14,7 +14,7 @@
     "@chakra-ui/react": "^2.5.1",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
-    "@eth-optimism/sdk": "0.0.0-20230313235858",
+    "@eth-optimism/sdk": "latest",
     "@mui/icons-material": "^5.8.0",
     "@mui/lab": "^5.0.0-alpha.89",
     "@mui/material": "^5.7.0",

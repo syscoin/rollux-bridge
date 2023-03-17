@@ -1842,16 +1842,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eth-optimism/contracts-bedrock@npm:0.13.0":
-  version: 0.13.0
-  resolution: "@eth-optimism/contracts-bedrock@npm:0.13.0"
+"@eth-optimism/contracts-bedrock@npm:0.13.1":
+  version: 0.13.1
+  resolution: "@eth-optimism/contracts-bedrock@npm:0.13.1"
   dependencies:
     "@eth-optimism/core-utils": ^0.12.0
     "@openzeppelin/contracts": 4.7.3
     "@openzeppelin/contracts-upgradeable": 4.7.3
     ethers: ^5.7.0
     hardhat: ^2.9.6
-  checksum: f684a31d9f0df03f8e32dbfcf43945781ed3a07b9a2d3f432ff458b40bcf35fe3aeb880421c75dd8219d726ce124e9091c378785d594a57589f64ba872e9cd2d
+  checksum: 2347f7e984a39c74e65e114adc4efe5e8bf6843291c8d417df94b6616e821a4e5fc677aff875ca8edbbaea154c4d4f2cb936f0412c7b6e1eaa9010990f9f854b
   languageName: node
   linkType: hard
 
@@ -1892,19 +1892,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eth-optimism/sdk@npm:0.0.0-20230313235858":
-  version: 0.0.0-20230313235858
-  resolution: "@eth-optimism/sdk@npm:0.0.0-20230313235858"
+"@eth-optimism/sdk@npm:latest":
+  version: 2.0.1
+  resolution: "@eth-optimism/sdk@npm:2.0.1"
   dependencies:
     "@eth-optimism/contracts": 0.5.40
-    "@eth-optimism/contracts-bedrock": 0.13.0
+    "@eth-optimism/contracts-bedrock": 0.13.1
     "@eth-optimism/core-utils": 0.12.0
     lodash: ^4.17.21
     merkletreejs: ^0.2.27
     rlp: ^2.2.7
   peerDependencies:
     ethers: ^5
-  checksum: d858f20011b84f76219568f2348bbf2c56937a36135c5ab3acca473664a650a01060c5d9106c52b02eabdccd154875883aa52e165005b400def0e21c8bb699ae
+  checksum: da64fa7c0e9a17687560ed979b5d840b8a016ab867204b13f87a25fbe2bf6dbdf615b71f13fb1b2f4386ef21057d59a12957c880011a81004018dc779f8f536f
   languageName: node
   linkType: hard
 
@@ -15033,7 +15033,7 @@ __metadata:
     "@chakra-ui/react": ^2.5.1
     "@emotion/react": ^11.10.6
     "@emotion/styled": ^11.10.6
-    "@eth-optimism/sdk": 0.0.0-20230313235858
+    "@eth-optimism/sdk": latest
     "@mui/icons-material": ^5.8.0
     "@mui/lab": ^5.0.0-alpha.89
     "@mui/material": ^5.7.0

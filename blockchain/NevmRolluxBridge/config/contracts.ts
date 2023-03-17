@@ -4,7 +4,7 @@ const contractsDev = {
     l1_dev: {
         AddressManager: '0xf2ad472ade2009Ef5eeb26B7fe27BA9fd27dE46A',
         L1CrossDomainMessenger: '0x9032E3EB1DC211ad0280A108303EC238f82A7A7F',
-        L1StandardBridge: '0x902d9b41CabF3581d01061760b57EBEf340731A5',
+        L1StandardBridge: '0x39CadECd381928F1330D1B2c13c8CAC358Dce65A',
         StateCommitmentChain: ethers.constants.AddressZero,
         CanonicalTransactionChain: ethers.constants.AddressZero,
         BondManager: ethers.constants.AddressZero,
