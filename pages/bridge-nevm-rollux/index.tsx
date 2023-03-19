@@ -321,6 +321,15 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     }
 
+    const getWaitTimeForTx = (hash: string) => {
+
+        if (!crossChainMessenger) return 0;
+
+        return crossChainMessenger.estimateMessageWaitTimeSeconds(hash)
+            .then((value) => value)
+            .catch(err => 0);
+    }
+
     const handleWithdrawERC20Token = async (l1Token: string, l2Token: string, amount: BigNumber) => {
         if (!library || !crossChainMessenger) {
             return false;
@@ -562,7 +571,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                 txnHash={withdrawalModalData.txHash}
                                             >
                                                 {[MessageStatus.IN_CHALLENGE_PERIOD, MessageStatus.STATE_ROOT_NOT_PUBLISHED, MessageStatus.UNCONFIRMED_L1_TO_L2_MESSAGE].includes(withdrawalModalData.status) && <>
-                                                    <PendingMessage status={withdrawalModalData.status} />
+                                                    <PendingMessage status={withdrawalModalData.status} waitTime={getWaitTimeForTx(withdrawalModalData.txHash)} />
                                                 </>}
 
 
@@ -585,11 +594,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                             );
                                                             const _tx = await (new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl)).getTransaction(withdrawalModalData.txHash);
 
-                                                            const proveTx = await messengerL1.proveMessage(_tx, {
-                                                                // overrides: {
-                                                                //     gasLimit: 200_000
-                                                                // }
-                                                            });
+                                                            const proveTx = await messengerL1.proveMessage(_tx);
 
                                                             const tmpProven = [...proveTxns]
                                                             tmpProven.push({ withdrawTx: withdrawalModalData.txHash, proveTx: proveTx.hash });

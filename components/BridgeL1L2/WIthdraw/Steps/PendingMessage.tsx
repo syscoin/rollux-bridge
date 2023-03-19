@@ -1,13 +1,14 @@
 import { MessageStatus } from "@eth-optimism/sdk";
 import React, { FC } from "react";
-import { Card, CardHeader, CardBody, Flex, Spinner, Heading, Badge } from '@chakra-ui/react'
+import { Card, CardHeader, CardBody, Flex, Spinner, Heading, Badge, Text } from '@chakra-ui/react'
 import CrossChainMessageStatusLabel from "components/BridgeL1L2/CrossChainMessageStatusLabel";
 
 export type PendingMessageProps = {
-    status: MessageStatus
+    status: MessageStatus,
+    waitTime: number,
 }
 
-export const PendingMessage: FC<PendingMessageProps> = ({ status }) => {
+export const PendingMessage: FC<PendingMessageProps> = ({ status, waitTime }) => {
     return (
         <Card>
             <CardBody>
@@ -34,7 +35,13 @@ export const PendingMessage: FC<PendingMessageProps> = ({ status }) => {
                             <CrossChainMessageStatusLabel status={status} />
                         </Badge>
                     </Flex>
-
+                    <Flex justify={'center'} align={'center'} marginTop={4}>
+                        {waitTime !== 0 && <>
+                            <Heading size={'xs'}>
+                                Estimated wait time - {waitTime}
+                            </Heading>
+                        </>}
+                    </Flex>
                 </CardBody>
             </CardBody>
         </Card >
