@@ -1892,7 +1892,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eth-optimism/sdk@npm:latest":
+"@eth-optimism/sdk@npm:2.0.1":
   version: 2.0.1
   resolution: "@eth-optimism/sdk@npm:2.0.1"
   dependencies:
@@ -15033,7 +15033,7 @@ __metadata:
     "@chakra-ui/react": ^2.5.1
     "@emotion/react": ^11.10.6
     "@emotion/styled": ^11.10.6
-    "@eth-optimism/sdk": latest
+    "@eth-optimism/sdk": 2.0.1
     "@mui/icons-material": ^5.8.0
     "@mui/lab": ^5.0.0-alpha.89
     "@mui/material": ^5.7.0

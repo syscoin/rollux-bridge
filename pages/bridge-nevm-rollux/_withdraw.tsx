@@ -30,38 +30,13 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
     const balanceNativeToken = useEtherBalance(account, { chainId: RolluxChain.chainId });
     const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: RolluxChain.chainId });
-    const allowanceERC20Token = useTokenAllowance(selectedTokenAddress, account, L1StandardBridgeAddress, {
-        chainId: RolluxChain.chainId
-    });
     const [allERC20Tokens, setAllERC20Tokens] = useState<TokenListToken[]>([]);
     const [l1ERC20Tokens, setL1ERC20Tokens] = useState<TokenListToken[]>([]);
     const [l2ERC20Tokens, setL2ERC20Tokens] = useState<TokenListToken[]>([]);
 
-    const [tokenBalancesMap, setTokenBalancesMap] = useState<{ [key: string]: string }>({});
-
     const selectedToken = currency !== 'SYS' ?
-        l1ERC20Tokens?.find(token => token.symbol === currency) :
+        l2ERC20Tokens?.find(token => token.symbol === currency) :
         { address: '', chainId: chainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }
-
-    const viewTokenBalance = async (tokenAddress: string, decimals: number, owner: string): Promise<string> => {
-        let ret: string = '0.00';
-
-        try {
-            const contract = new Contract(tokenAddress, ERC20Interface,
-                new ethers.providers.StaticJsonRpcProvider(RolluxChain.rpcUrl)
-            );
-
-            const balance = await contract.balanceOf(owner);
-
-            return ethers.utils.formatUnits(balance, decimals);
-
-        } catch (e) {
-            // console.warn("Could not fetch balance for token.");
-            // console.warn(e);
-
-            return ret;
-        }
-    }
 
 
     // balance hook
@@ -165,40 +140,12 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
             setL2ERC20Tokens(tokensL2);
 
-            if (account) {
-                /**
-                 * balances mapping
-                 */
-
-                const balancesInfo: { [key: string]: string } = {};
-
-                tokensL2.forEach((token) => {
-                    viewTokenBalance(token.address, token.decimals, account).then((balance: string) => {
-                        balancesInfo[token.symbol] = balance;
-                    })
-                })
-
-                setTokenBalancesMap(balancesInfo);
-            }
-
-
-            // set all tokens
-
             setAllERC20Tokens(tokens);
 
             setIsLoading(false);
         })
     }, [setIsLoading, account]);
 
-    // const handleApproval = async () => {
-    //     if (selectedTokenAddress && selectedTokenAddressL2) {
-
-    //         await preCheckNetwork(RolluxChain.chainId, chainId as number);
-
-    //         setIsLoading(true);
-    //         onClickApproveERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseEther(amountToSwap));
-    //     }
-    // }
 
     const handleERC20Withdraw = async () => {
         if (selectedTokenAddress && selectedTokenAddressL2) {
@@ -206,7 +153,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
             await preCheckNetwork(RolluxChain.chainId, chainId as number);
 
             setIsLoading(true);
-            onClickWithdrawERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseEther(amountToSwap));
+            onClickWithdrawERC20(selectedTokenAddressL2, selectedTokenAddress, ethers.utils.parseEther(amountToSwap));
         }
     }
 
@@ -222,7 +169,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
                     {
                         selectedToken && selectedToken?.symbol !== 'SYS' ?
-                            <Text opacity={.5}>Available {tokenBalancesMap?.[selectedToken.symbol] || '0.00'}</Text> : selectedToken ?
+                            <Text opacity={.5}>Available {parseFloat(ethers.utils.formatUnits(balanceERC20Token || BigNumber.from('0'), selectedTokenDecimals)).toFixed(2) || '0.00'}</Text> : selectedToken ?
                                 <Text opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'}</Text> : <></>
                     }
                 </Flex>
@@ -331,17 +278,9 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                     <ConnectButton />
                 )}
 
-                {'SYS' !== currency && account && <>
-                    {/*{(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseEther(amountToSwap))) && <>
-                        <Button
-                            variant="primary"
-                            onClick={() => handleApproval()}
-                        >
-                            Approve
-                        </Button>
-                    </>}*/}
+                {('SYS' !== currency && account && chainId === RolluxChain.chainId) && <>
 
-                    {(allowanceERC20Token?.gte(ethers.utils.parseEther(amountToSwap)) && parseFloat(amountToSwap) > 0) && <>
+                    {(parseFloat(amountToSwap) > 0 && (balanceERC20Token && balanceERC20Token.gte(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals)))) && <>
                         <Button
                             variant="primary"
                             onClick={() => {
@@ -378,7 +317,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                     </Button>
                 </>}
             </Flex>
-        </Flex>
+        </Flex >
     )
 }
 

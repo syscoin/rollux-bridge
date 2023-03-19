@@ -14,7 +14,7 @@ import { formatEther } from 'ethers/lib/utils';
 import React, { FC, useEffect, useState } from 'react';
 
 export type DepositPartProps = {
-    onClickDepositButton: (amount: string, tokenAddress: string | undefined) => void;
+    onClickDepositButton: (amount: string) => void;
     onClickApproveERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     onClickDepositERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -371,13 +371,13 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                         isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) || !parseFloat(amountToSwap)}
                         variant="primary"
                         onClick={() => {
-                            onClickDepositButton(amountToSwap, undefined);
+                            onClickDepositButton(amountToSwap);
                         }}
                     >
                         Deposit
                     </Button>
                 </>}
-            </Flex>            
+            </Flex>
         </Flex>
     )
 }

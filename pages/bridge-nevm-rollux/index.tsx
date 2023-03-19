@@ -7,8 +7,6 @@ import {
     TabPanel,
     TabPanels,
     Tabs,
-    Text,
-    theme,
     useDisclosure,
     VStack
 } from '@chakra-ui/react';
@@ -21,8 +19,8 @@ import contractsDev from 'blockchain/NevmRolluxBridge/config/contracts';
 import { getNetworkByChainId, getNetworkByName, NetworkData, networks, networksMap } from "blockchain/NevmRolluxBridge/config/networks";
 import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
 import { ConnectionWarning } from 'components/ConnectionWarning';
-import { RolluxHeader } from 'components/RolluxHeader';
 import { BigNumber, Contract, ethers } from "ethers";
+import { RolluxHeader } from 'components/RolluxHeader';
 import { NextPage } from "next";
 import { Roboto } from 'next/font/google';
 import Head from "next/head";
@@ -37,6 +35,7 @@ import ProveMessageStep from 'components/BridgeL1L2/WIthdraw/Steps/ProveMessageS
 import { useLocalStorage } from 'usehooks-ts';
 import RelayMessageStep from 'components/BridgeL1L2/WIthdraw/Steps/RelayMessageStep';
 import { PendingMessage } from 'components/BridgeL1L2/WIthdraw/Steps/PendingMessage';
+import { StringifyOptions } from 'querystring';
 
 
 type BridgeNevmRolluxProps = {}
@@ -258,6 +257,16 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     }
 
+    const updateWithdrawalLogs = async () => {
+        widthdrawalsLogs().then(results => {
+            if (results) {
+                setUnfinishedWithdrawals(results.filter((value) => {
+                    return value.status !== MessageStatus.RELAYED;
+                }))
+            }
+        })
+    }
+
     const handleWithdrawMainCurrency = async (amount: string) => {
         if (!library || !crossChainMessenger) {
             console.log('no lib or messenger')
@@ -271,54 +280,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
             await withdrawTx.wait();
 
-
-            widthdrawalsLogs().then(results => {
-                if (results) {
-                    setUnfinishedWithdrawals(results.filter((value) => {
-                        return value.status !== MessageStatus.RELAYED;
-                    }))
-                }
-            })
-
-
-            // await crossChainMessenger.waitForMessageStatus(withdrawTx.hash,
-            //     MessageStatus.RELAYED)
-
-            // console.log('status message #1');
-
-            // await switchNetwork(5700);
-
-            // const messengerL1 = crossChainMessengerFactory(
-            //     networks.L1Dev,
-            //     networks.L2Dev,
-            //     (library as ethers.providers.JsonRpcProvider).getSigner(),
-            //     new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl),
-            //     true
-            // );
-
-
-            // const proveTx = await messengerL1.proveMessage(withdrawTx.hash);
-
-            // await proveTx.wait();
-
-            // console.log(proveTx);
-
-            // console.log('wait 2');
-
-            // await messengerL1.waitForMessageStatus(withdrawTx.hash,
-            //     MessageStatus.READY_FOR_RELAY)
-
-            // console.log('wait3');
-
-
-
-            // 1st step = 2h / 2nd step = 25m / 3rd = 5m
-
-
-            // const finalizeTx = await messengerL1.finalizeMessage(withdrawTx.hash);
-
-            // await finalizeTx.wait();
-
+            await updateWithdrawalLogs();
 
         } catch (e) {
             console.log(`Withdraw SYS failed. Error - ${e}`)
@@ -357,6 +319,31 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
         }
 
+    }
+
+    const handleWithdrawERC20Token = async (l1Token: string, l2Token: string, amount: BigNumber) => {
+        if (!library || !crossChainMessenger) {
+            return false;
+        }
+
+        try {
+            setIsLoading(true);
+
+            console.log(l1Token, l2Token);
+
+            const withDrawERC20Tx = await crossChainMessenger.withdrawERC20(
+                l1Token, l2Token, amount
+            );
+
+            await withDrawERC20Tx.wait();
+
+            await updateWithdrawalLogs();
+
+        } catch (e) {
+            console.log(`Error when withdrawing ERC20 - ${e}`);
+
+            setIsLoading(false);
+        }
     }
 
     /**
@@ -437,8 +424,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         }
 
         loadWithdrawalLogs();
-        const intervalId = setInterval(loadWithdrawalLogs, 10000)
-        return () => clearInterval(intervalId)
+        // const intervalId = setInterval(loadWithdrawalLogs, 10000)
+        // return () => clearInterval(intervalId)
     }, [widthdrawalsLogs])
 
 
@@ -545,22 +532,22 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                             <TabPanels>
                                 <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
                                     <DepositPart
-                                        onClickDepositButton={(amount: string, tokenAddress: string | undefined) => {
-                                            if (!tokenAddress) {
-                                                handleDepositMainCurrency(amount);
-                                            }
+                                        onClickDepositButton={(amount: string) => {
+                                            handleDepositMainCurrency(amount);
                                         }}
                                         onClickApproveERC20={(l1Token: string, l2Token: string, amount: BigNumber) => {
                                             handleERC20Approval(l1Token, l2Token, amount);
                                         }}
 
                                         onClickDepositERC20={(l1Token: string, l2Token: string, amount: BigNumber) => {
+
+                                            console.log(l1Token, l2Token, amount);
                                             handleERC20Deposit(l1Token, l2Token, amount);
                                         }}
 
                                         setIsLoading={setIsLoading}
 
-                                        L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
+                                        L1StandardBridgeAddress="0x39CadECd381928F1330D1B2c13c8CAC358Dce65A"
                                     />
                                 </TabPanel>
 
@@ -596,10 +583,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                                 new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl),
                                                                 true
                                                             );
+                                                            const _tx = await (new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl)).getTransaction(withdrawalModalData.txHash);
 
-                                                            console.log(withdrawalModalData.txHash);
-
-                                                            const proveTx = await messengerL1.proveMessage(withdrawalModalData.txHash, {
+                                                            const proveTx = await messengerL1.proveMessage(_tx, {
                                                                 // overrides: {
                                                                 //     gasLimit: 200_000
                                                                 // }
@@ -694,10 +680,11 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
                                     <WithdrawPart
                                         onClickWithdrawButton={(amount) => {
-                                            console.log(amount);
                                             handleWithdrawMainCurrency(amount);
                                         }}
-                                        onClickWithdrawERC20={(_l1Token, _l2Token, amount) => { }}
+                                        onClickWithdrawERC20={(_l1Token, _l2Token, amount) => {
+                                            handleWithdrawERC20Token(_l1Token, _l2Token, amount);
+                                        }}
                                         setIsLoading={setIsLoading}
                                         L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
                                     />
