@@ -321,14 +321,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     }
 
-    const getWaitTimeForTx = (hash: string) => {
-
-        if (!crossChainMessenger) return 0;
-
-        return crossChainMessenger.estimateMessageWaitTimeSeconds(hash)
-            .then((value) => value)
-            .catch(err => 0);
-    }
 
     const handleWithdrawERC20Token = async (l1Token: string, l2Token: string, amount: BigNumber) => {
         if (!library || !crossChainMessenger) {
@@ -571,7 +563,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                 txnHash={withdrawalModalData.txHash}
                                             >
                                                 {[MessageStatus.IN_CHALLENGE_PERIOD, MessageStatus.STATE_ROOT_NOT_PUBLISHED, MessageStatus.UNCONFIRMED_L1_TO_L2_MESSAGE].includes(withdrawalModalData.status) && <>
-                                                    <PendingMessage status={withdrawalModalData.status} waitTime={getWaitTimeForTx(withdrawalModalData.txHash)} />
+                                                    <PendingMessage status={withdrawalModalData.status} waitTime={0} />
                                                 </>}
 
 
