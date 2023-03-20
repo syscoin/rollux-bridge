@@ -14,6 +14,8 @@ import ConnectedWalletProvider from "../contexts/ConnectedWallet/Provider";
 import MetamaskProvider from "../contexts/Metamask/Provider";
 import PaliWalletContextProvider from "../contexts/PaliWallet/Provider";
 import "../styles/globals.css";
+import { ErrorBoundary } from 'react-error-boundary'
+import { ErrorFallback } from "components/Common/ErrorFallback";
 
 const queryClient = new QueryClient();
 
@@ -43,20 +45,22 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <PaliWalletContextProvider>
-        <MetamaskProvider>
-          <ConnectedWalletProvider>
-            <DAppProvider config={dappConfig}>
-              <NetworkValidator>
-                <ThemeProvider theme={theme}>
-                  {removeMuiHeader.includes(pathname) ? null : <Header />}
-                </ThemeProvider>
-                <Component {...pageProps} />
-              </NetworkValidator>
-            </DAppProvider>
-          </ConnectedWalletProvider>
-        </MetamaskProvider>
-      </PaliWalletContextProvider>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <PaliWalletContextProvider>
+          <MetamaskProvider>
+            <ConnectedWalletProvider>
+              <DAppProvider config={dappConfig}>
+                <NetworkValidator>
+                  <ThemeProvider theme={theme}>
+                    {removeMuiHeader.includes(pathname) ? null : <Header />}
+                  </ThemeProvider>
+                  <Component {...pageProps} />
+                </NetworkValidator>
+              </DAppProvider>
+            </ConnectedWalletProvider>
+          </MetamaskProvider>
+        </PaliWalletContextProvider>
+      </ErrorBoundary>
     </QueryClientProvider>
   );
 }
