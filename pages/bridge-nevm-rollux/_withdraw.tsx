@@ -153,7 +153,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
             await preCheckNetwork(RolluxChain.chainId, chainId as number);
 
             setIsLoading(true);
-            onClickWithdrawERC20(selectedTokenAddressL2, selectedTokenAddress, ethers.utils.parseEther(amountToSwap));
+            onClickWithdrawERC20(selectedTokenAddressL2, selectedTokenAddress, ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals));
         }
     }
 
@@ -161,7 +161,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
     return (
         <Flex flexDir="column">
-            <FormControl isInvalid={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}>
+            <FormControl isInvalid={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}>
                 <Flex justifyContent="space-between">
                     <FormLabel fontWeight="700">
                         From Rollux
@@ -173,7 +173,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                                 <Text opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'}</Text> : <></>
                     }
                 </Flex>
-                <HStack bg="#f4fadb" borderRadius="6px" minH="48px" px="19px" border={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? '2px solid' : 'none'} borderColor="red.400">
+                <HStack bg="#f4fadb" borderRadius="6px" minH="48px" px="19px" border={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals)) ? '2px solid' : 'none'} borderColor="red.400">
                     <NumberInput variant="unstyled" size="lg" onChange={(valueAsString) => {
                         if (valueAsString.length > 0) {
                             setAmountToSwap(valueAsString)
@@ -278,23 +278,24 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                     <ConnectButton />
                 )}
 
-                {('SYS' !== currency && account && chainId === RolluxChain.chainId) && <>
+                {('SYS' !== currency && account) && <>
 
-                    {(parseFloat(amountToSwap) > 0 && (balanceERC20Token && balanceERC20Token.gte(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals)))) && <>
+                    {((balanceERC20Token && balanceERC20Token.gte(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals)))) && <>
                         <Button
                             variant="primary"
                             onClick={() => {
                                 handleERC20Withdraw()
                             }}
                         >
-                            Withdraw
+                            {chainId !== RolluxChain.chainId && 'Switch to Rollux'}
+                            {chainId === RolluxChain.chainId && 'Withdraw'}
                         </Button>
                     </>}
                 </>}
 
                 {('SYS' === currency && account && (chainId !== RolluxChain.chainId)) && <>
                     <Button
-                        isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
+                        isDisabled={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}
                         variant="primary"
                         onClick={async () => {
                             await switchNetwork(RolluxChain.chainId);
@@ -306,7 +307,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
                 {('SYS' === currency && account && (chainId && chainId === RolluxChain.chainId)) && <>
                     <Button
-                        isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) || !parseFloat(amountToSwap)}
+                        isDisabled={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}
                         variant="primary"
                         onClick={async () => {
                             await preCheckNetwork(RolluxChain.chainId, chainId as number);
