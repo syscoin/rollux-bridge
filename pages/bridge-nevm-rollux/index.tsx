@@ -98,15 +98,13 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     }
 
 
-    const getCrossChainMessenger = async (library: any, currentDisplay: CurrentDisplayView) => {
-        if (!library) {
-            console.warn("No library")
+    const getCrossChainMessenger = async (signer: ethers.providers.JsonRpcSigner | undefined, currentDisplay: CurrentDisplayView) => {
+        if (!signer) {
+            console.warn("No Signer")
             return undefined;
         }
 
-
-        const w3Provider = library as ethers.providers.JsonRpcProvider;
-        const currentChainId: number = await w3Provider.getSigner().getChainId();
+        const currentChainId: number = await signer.getChainId();
 
         console.log(currentChainId);
 
@@ -144,7 +142,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             return crossChainMessengerFactory(
                 l1Contracts,
                 l2Contracts,
-                w3Provider.getSigner(),
+                signer,
                 new ethers.providers.JsonRpcProvider(secondNetwork?.rpcAddress),
                 true
             )
@@ -157,7 +155,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             l1Contracts,
             l2Contracts,
             new ethers.providers.JsonRpcProvider(TanenbaumChain.rpcUrl),
-            w3Provider.getSigner(),
+            signer,
             true
         )
 
@@ -176,11 +174,35 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         }
 
         try {
+
+            toast({
+                title: 'Approve ERC20.',
+                description: "Initialising approval transaction",
+                status: 'info',
+                duration: 9000,
+                isClosable: true,
+            })
+
             await crossChainMessenger.approveERC20(l1Token, l2Token, amount);
+
+            toast({
+                title: 'Approve ERC20.',
+                description: "Approval transaction sent.",
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+            })
 
             setIsLoading(false);
         } catch (e) {
             console.log(e);
+            toast({
+                title: 'Approve ERC20 error.',
+                description: "Approval transaction error.",
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+            })
             setIsLoading(false);
         }
     }
@@ -450,17 +472,11 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     }, [account, activateBrowserWallet, connectedWalletCtxt.nevm.account]);
 
     useEffect(() => {
-        getCrossChainMessenger(library, currentDisplay).then((messenger) => {
+        getCrossChainMessenger(signer, currentDisplay).then((messenger) => {
             console.log(messenger);
             setCrossChainMessenger(messenger);
         })
-
-        /// load txns for withdrawals which're pending if current display is for withdrawal
-
-        if (currentDisplay === CurrentDisplayView.withdraw) {
-
-        }
-    }, [library, currentDisplay])
+    }, [signer, currentDisplay])
 
 
 
