@@ -1,6 +1,6 @@
-import { ChevronDownIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon, InfoIcon } from '@chakra-ui/icons';
 import {
-    Button, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Image, Input, Menu,
+    Button, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Icon, Image, Input, Menu,
     MenuButton, MenuItem, MenuList, NumberInput, NumberInputField, PlacementWithLogical, Spinner, Text, useBreakpointValue, useToast, Wrap
 } from '@chakra-ui/react';
 import { ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
@@ -333,7 +333,15 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 )}
 
                 {'SYS' !== currency && account && <>
-                    {(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseEther(amountToSwap))) && <>
+
+                    <Flex flexDir={'row'} maxW={'100%'}>
+                        <InfoIcon color={'orange.500'} height={6} marginRight={3} />
+                        <Text size={'xl'}>
+                            Allowance {ethers.utils.formatUnits(allowanceERC20Token || '0', selectedTokenDecimals)}
+                        </Text>
+                    </Flex>
+
+                    {(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals))) && <>
                         <Button
                             variant="primary"
                             onClick={() => {
@@ -344,7 +352,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                         </Button>
                     </>}
 
-                    {(allowanceERC20Token?.gte(ethers.utils.parseEther(amountToSwap)) && parseFloat(amountToSwap) > 0) && <>
+                    {(allowanceERC20Token?.gte(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals)) && parseFloat(amountToSwap) > 0) && <>
                         <Button
                             variant="primary"
                             onClick={() => {
