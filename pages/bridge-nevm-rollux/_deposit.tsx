@@ -1,7 +1,7 @@
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
     Button, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Image, Input, Menu,
-    MenuButton, MenuItem, MenuList, NumberInput, NumberInputField, PlacementWithLogical, Text, useBreakpointValue, Wrap
+    MenuButton, MenuItem, MenuList, NumberInput, NumberInputField, PlacementWithLogical, Spinner, Text, useBreakpointValue, useToast, Wrap
 } from '@chakra-ui/react';
 import { ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
 import { TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp';
@@ -11,7 +11,7 @@ import { ConnectButton } from 'components/ConnectButton';
 import { ConnectionWarning } from 'components/ConnectionWarning';
 import { BigNumber, Contract, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState, useCallback } from 'react';
 
 export type DepositPartProps = {
     onClickDepositButton: (amount: string) => void;
@@ -27,10 +27,9 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
     const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
-    const [youWillGetAmount, setYouWillGetAmount] = useState<string>('0.00');
     const [amountToSwap, setAmountToSwap] = useState<string>('0.00');
-    const { account, chainId, switchNetwork } = useEthers();
 
+    const { account, chainId, switchNetwork } = useEthers();
     const balanceNativeToken = useEtherBalance(account, { chainId: TanenbaumChain.chainId });
     const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: TanenbaumChain.chainId });
     const allowanceERC20Token = useTokenAllowance(selectedTokenAddress, account, L1StandardBridgeAddress, {
@@ -68,11 +67,11 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
     // balance hook
 
-    const preCheckNetwork = async (neededNetwork: number, chainId: number) => {
+    const preCheckNetwork = useCallback(async (neededNetwork: number, chainId: number) => {
         if (chainId !== neededNetwork) {
             await switchNetwork(neededNetwork);
         }
-    }
+    }, [switchNetwork])
 
 
     useEffect(() => {
@@ -143,7 +142,6 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
     /** load tokens hook */
     useEffect(() => {
-        setIsLoading(true);
 
         fetchERC20TokenList().then((tokens) => {
             const tokensL1: TokenListToken[] = tokens.filter((token) => {
@@ -188,19 +186,21 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
             setAllERC20Tokens(tokens);
 
-            setIsLoading(false);
         })
-    }, [setIsLoading, account]);
+    }, [account]);
 
-    const handleApproval = async () => {
+    const handleApproval = useCallback(async () => {
         if (selectedTokenAddress && selectedTokenAddressL2) {
 
             await preCheckNetwork(TanenbaumChain.chainId, chainId as number);
 
             setIsLoading(true);
             onClickApproveERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseEther(amountToSwap));
+
+
+
         }
-    }
+    }, [selectedTokenAddress, selectedTokenAddressL2, preCheckNetwork, chainId, setIsLoading, onClickApproveERC20, amountToSwap]);
 
     const handleERC20Deposit = async () => {
         if (selectedTokenAddress && selectedTokenAddressL2) {
@@ -336,7 +336,9 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     {(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseEther(amountToSwap))) && <>
                         <Button
                             variant="primary"
-                            onClick={() => handleApproval()}
+                            onClick={() => {
+                                handleApproval();
+                            }}
                         >
                             Approve
                         </Button>

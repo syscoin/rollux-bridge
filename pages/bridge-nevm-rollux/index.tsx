@@ -1,12 +1,15 @@
 import {
+    Card,
+    CardBody,
     ChakraProvider,
     Flex, Heading,
-    Highlight, Tab,
+    Highlight, Spinner, Tab,
     TabList,
     TabPanel,
     TabPanels,
     Tabs,
     useDisclosure,
+    useToast,
     VStack
 } from '@chakra-ui/react';
 import { chakraTheme } from 'components/chakraTheme';
@@ -55,7 +58,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const [unfinishedWithdrawals, setUnfinishedWithdrawals] = useState<{ status: MessageStatus, txHash: string }[]>([])
 
     const { isOpen: withdrawIsOpen, onOpen: withdrawOnOpen, onClose: widthdrawOnClose } = useDisclosure();
-
+    const toast = useToast();
     const [withdrawalModalData, setWithdrawalModalData] = useState<{ status: MessageStatus, txHash: string }>({ status: 0, txHash: '' });
     const signer = useSigner();
     // [{withdrawTx, proveTx}]
@@ -184,15 +187,43 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     const handleERC20Deposit = async (l1Token: string, l2Token: string, amount: BigNumber) => {
         if (!library || !crossChainMessenger) {
+            toast({
+                title: 'Error.',
+                description: "Wallet not connected.",
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+            })
             return; // not connected or not initialized
         }
 
         try {
+            toast({
+                title: 'Deposit.',
+                description: "Initialising deposit transaction",
+                status: 'info',
+                duration: 9000,
+                isClosable: true,
+            })
             const tx = await crossChainMessenger.depositERC20(l1Token, l2Token, amount);
-            await tx.wait();
 
+            toast({
+                title: 'Deposit confirmation.',
+                description: "Waiting for deposit confirmation",
+                status: 'info',
+                isClosable: false,
+            })
+
+            await tx.wait();
             await crossChainMessenger.waitForMessageStatus(tx.hash,
                 MessageStatus.RELAYED)
+
+            toast({
+                title: 'Deposit confirmed.',
+                description: "Your deposit was confirmed",
+                status: 'success',
+                isClosable: false,
+            })
 
             setIsLoading(false);
         } catch (e) {
@@ -217,13 +248,36 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const handleWithdrawMainCurrency = async (amount: string) => {
         if (!library || !crossChainMessenger) {
             console.log('no lib or messenger')
+            toast({
+                title: 'Error.',
+                description: "Wallet not connected.",
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+            })
             return;
         }
 
         try {
+
+            toast({
+                title: 'Withdraw.',
+                description: "Initialising withdrawal transaction",
+                status: 'info',
+                duration: 9000,
+                isClosable: true,
+            })
             const withdrawTx = await crossChainMessenger.withdrawETH(
                 ethers.utils.parseEther(amount)
             );
+
+            toast({
+                title: 'Withdraw.',
+                description: "Withdraw tx sent.",
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+            })
 
             await withdrawTx.wait();
 
@@ -231,11 +285,26 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
         } catch (e) {
             console.log(`Withdraw SYS failed. Error - ${e}`)
+
+            toast({
+                title: 'Withdraw.',
+                description: "Error.",
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+            })
         }
     }
 
     const handleDepositMainCurrency = async (amount: string) => {
         if (!library) {
+            toast({
+                title: 'Error.',
+                description: "Wallet not connected.",
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+            })
             return;
         }
 
@@ -244,23 +313,65 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
                 setIsLoading(true);
 
+                toast({
+                    title: 'Deposit.',
+                    description: "Initialising deposit transaction",
+                    status: 'info',
+                    duration: 9000,
+                    isClosable: true,
+                })
+
                 const depositTx = await crossChainMessenger.depositETH(
                     ethers.utils.parseEther(amount)
                 );
 
+                const _confirmationToast = toast({
+                    title: 'Deposit confirmation.',
+                    description: "Waiting for deposit confirmation",
+                    status: 'info',
+                    isClosable: false,
+                })
+
                 const confirmation = await crossChainMessenger.waitForMessageReceipt(depositTx);
 
+
+                toast.close(_confirmationToast);
                 if (confirmation.receiptStatus === 1) {
-                    console.log('OK')
+
+
+
+                    toast({
+                        title: 'Deposit success.',
+                        description: "Your deposit confirmed",
+                        status: 'success',
+                        duration: 9000,
+                        isClosable: true,
+                    })
 
                     setIsLoading(false);
                 } else {
-                    console.log('Error');
+
+                    toast({
+                        title: 'Deposit error.',
+                        description: "Deposit failed.",
+                        status: 'error',
+                        duration: 9000,
+                        isClosable: true,
+                    })
+
+                    console.log('Deposit error');
                     console.log(confirmation);
                     setIsLoading(false);
                 }
             } catch (e) {
                 setIsLoading(false);
+                toast({
+                    title: 'Deposit error.',
+                    description: "Deposit failed.",
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                })
                 console.log(e);
             }
 
@@ -271,6 +382,13 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     const handleWithdrawERC20Token = async (l1Token: string, l2Token: string, amount: BigNumber) => {
         if (!library || !crossChainMessenger) {
+            toast({
+                title: 'Error.',
+                description: "Wallet not connected.",
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+            })
             return false;
         }
 
@@ -279,16 +397,41 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
             console.log(l1Token, l2Token);
 
+            toast({
+                title: 'Withdraw.',
+                description: "Initialising withdrawal transaction",
+                status: 'info',
+                duration: 9000,
+                isClosable: true,
+            })
+
+
             const withDrawERC20Tx = await crossChainMessenger.withdrawERC20(
                 l1Token, l2Token, amount
             );
 
             await withDrawERC20Tx.wait();
 
+            toast({
+                title: 'Withdraw.',
+                description: "Withdraw tx sent.",
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+            })
+
             await updateWithdrawalLogs();
 
         } catch (e) {
             console.log(`Error when withdrawing ERC20 - ${e}`);
+
+            toast({
+                title: 'Withdraw.',
+                description: "Error.",
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+            })
 
             setIsLoading(false);
         }
@@ -478,6 +621,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
                             <TabPanels>
                                 <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
+
+
                                     <DepositPart
                                         onClickDepositButton={(amount: string) => {
                                             handleDepositMainCurrency(amount);
@@ -496,6 +641,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
                                         L1StandardBridgeAddress="0x39CadECd381928F1330D1B2c13c8CAC358Dce65A"
                                     />
+
                                 </TabPanel>
 
                                 <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
