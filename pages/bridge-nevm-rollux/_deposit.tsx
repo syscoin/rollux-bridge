@@ -195,12 +195,12 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             await preCheckNetwork(TanenbaumChain.chainId, chainId as number);
 
             setIsLoading(true);
-            onClickApproveERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseEther(amountToSwap));
+            onClickApproveERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals));
 
 
 
         }
-    }, [selectedTokenAddress, selectedTokenAddressL2, preCheckNetwork, chainId, setIsLoading, onClickApproveERC20, amountToSwap]);
+    }, [selectedTokenAddress, selectedTokenAddressL2, preCheckNetwork, chainId, setIsLoading, onClickApproveERC20, amountToSwap, selectedTokenDecimals]);
 
     const handleERC20Deposit = async () => {
         if (selectedTokenAddress && selectedTokenAddressL2) {
@@ -208,14 +208,14 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             await preCheckNetwork(TanenbaumChain.chainId, chainId as number);
 
             setIsLoading(true);
-            onClickDepositERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseEther(amountToSwap));
+            onClickDepositERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals));
         }
     }
 
 
     return (
         <Flex flexDir="column">
-            <FormControl isInvalid={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}>
+            <FormControl isInvalid={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}>
                 <Flex justifyContent="space-between">
                     <FormLabel fontWeight="700">
                         From Syscoin NEVM
