@@ -1,6 +1,5 @@
 import {
     ChakraProvider,
-    extendTheme,
     Flex, Heading,
     Highlight, Tab,
     TabList,
@@ -10,6 +9,7 @@ import {
     useDisclosure,
     VStack
 } from '@chakra-ui/react';
+import { chakraTheme } from 'components/chakraTheme';
 import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
 import { useMetamask } from "@contexts/Metamask/Provider";
 import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
@@ -22,7 +22,6 @@ import { ConnectionWarning } from 'components/ConnectionWarning';
 import { BigNumber, Contract, ethers } from "ethers";
 import { RolluxHeader } from 'components/RolluxHeader';
 import { NextPage } from "next";
-import { Roboto } from 'next/font/google';
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -35,8 +34,6 @@ import ProveMessageStep from 'components/BridgeL1L2/WIthdraw/Steps/ProveMessageS
 import { useLocalStorage } from 'usehooks-ts';
 import RelayMessageStep from 'components/BridgeL1L2/WIthdraw/Steps/RelayMessageStep';
 import { PendingMessage } from 'components/BridgeL1L2/WIthdraw/Steps/PendingMessage';
-import { StringifyOptions } from 'querystring';
-
 
 type BridgeNevmRolluxProps = {}
 
@@ -45,56 +42,6 @@ enum CurrentDisplayView {
     withdraw
 }
 
-const roboto = Roboto({
-    weight: ['400', '700'],
-    subsets: ['latin']
-})
-
-const chakraTheme = extendTheme({
-    fonts: {
-        body: roboto.style.fontFamily,
-        heading: roboto.style.fontFamily,
-    },
-    colors: {
-        brand: {
-            primary: '#DBEF88',
-            primaryGradient: 'linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)',
-            secondaryGradient: 'linear-gradient(90deg, #E0E0E0 4.05%, #DBEF88 95.38%)'
-        }
-    },
-    components: {
-        Button: {
-            variants: {
-                primary: {
-                    bg: 'brand.primaryGradient',
-                    _hover: {
-                        _disabled: {
-                            bg: 'brand.primaryGradient'
-                        }
-                    }
-                },
-                secondary: {
-                    bg: 'brand.secondaryGradient',
-                    _hover: {
-                        _disabled: {
-                            bg: 'brand.secondaryGradient'
-                        }
-                    }
-                }
-            }
-        }
-    },
-    styles: {
-        global: {
-            'html': {
-                height: '100%'
-            },
-            'body': {
-                minHeight: '100%',
-            }
-        }
-    }
-})
 
 export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const router = useRouter();
@@ -384,7 +331,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 new ethers.utils.Interface(L2StandardBridgeABI),
                 new ethers.providers.StaticJsonRpcProvider(RolluxChain.rpcUrl)
             )
-
 
             const filter = L2BridgeContract.filters['WithdrawalInitiated'](null, null, account)
 

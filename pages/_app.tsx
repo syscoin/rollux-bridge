@@ -36,6 +36,11 @@ const dappConfig: Config = {
 function MyApp({ Component, pageProps }: AppProps) {
   const { pathname } = useRouter()
 
+  const removeMuiHeader = [
+    '/bridge-nevm-rollux',
+    '/bridge-nevm-rollux/withdrawals'
+  ]
+
   return (
     <QueryClientProvider client={queryClient}>
       <PaliWalletContextProvider>
@@ -44,7 +49,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <DAppProvider config={dappConfig}>
               <NetworkValidator>
                 <ThemeProvider theme={theme}>
-                  {pathname === '/bridge-nevm-rollux' ? null : <Header />}
+                  {removeMuiHeader.includes(pathname) ? null : <Header />}
                 </ThemeProvider>
                 <Component {...pageProps} />
               </NetworkValidator>
