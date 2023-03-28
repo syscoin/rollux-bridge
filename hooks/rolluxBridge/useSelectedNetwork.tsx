@@ -1,20 +1,36 @@
 import contractsDev from "blockchain/NevmRolluxBridge/config/contracts";
 import { useEthers, useSigner } from "@usedapp/core";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { CrossChainMessenger } from "@eth-optimism/sdk";
 import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
-import { networks } from "blockchain/NevmRolluxBridge/config/networks";
+import { ChainIdsToNetworksMap, networks, NetworkSwitchMap, SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks";
 
-enum selectedNetworkEnum {
-    'test',
-    'main'
-}
 
 
 export const useSelectedNetwork = () => {
-    const selectedNetwork = selectedNetworkEnum.test;
-    const { chainId } = useEthers();
+    const [selectedNetwork, setSelectedNetwork] = useState<SelectedNetworkType>(SelectedNetworkType.Unsupported);
+    const { chainId, switchNetwork } = useEthers();
     const [atWhichLayer, setAtWhichLayer] = useState<1 | 2 | undefined>(undefined);
+
+    const changeNetworks = async (newNetwork: SelectedNetworkType, currentLayer: number) => {
+        if (newNetwork === SelectedNetworkType.Unsupported) {
+            throw new Error("Unable to change to unsupported network.");
+        }
+
+        const targetNetwork: { L1: number, L2: number } | undefined = NetworkSwitchMap[newNetwork];
+
+        if (!targetNetwork) {
+            return;
+        }
+
+        const targetChainID: number = currentLayer === 1 ? targetNetwork.L1 : targetNetwork.L2;
+        console.log(targetNetwork);
+        await switchNetwork(targetChainID);
+        // @ts-ignore
+        setAtWhichLayer(currentLayer);
+    }
+
+
 
 
     // hardcoded variables for now while we have only testnet
@@ -28,14 +44,38 @@ export const useSelectedNetwork = () => {
     useEffect(() => {
         if (!chainId) {
             setAtWhichLayer(undefined)
+            setSelectedNetwork(SelectedNetworkType.Unsupported);
         } else {
-            // todo add more for mainnet/testnet
-            setAtWhichLayer(chainId === 57000 ? 2 : 1);
+
+            let _layer: number | undefined = undefined;
+
+            Object.keys(NetworkSwitchMap).find((value: any) => {
+
+                if (_layer !== undefined) {
+                    return;
+                }
+
+                _layer = chainId === NetworkSwitchMap[value as SelectedNetworkType].L1 ? 1 : 2;
+            })
+
+            setAtWhichLayer(_layer)
+            console.log('Here');
+            setSelectedNetwork(ChainIdsToNetworksMap[chainId]);
         }
     }, [chainId])
 
 
 
-    return { selectedNetwork, contractsL1, contractsL2, atWhichLayer, rpcL1, rpcL2, l1ChainId, l2ChainId }
+    return {
+        selectedNetwork,
+        contractsL1,
+        contractsL2,
+        atWhichLayer,
+        rpcL1,
+        rpcL2,
+        l1ChainId,
+        l2ChainId,
+        changeNetworks
+    }
 }
 

@@ -50,12 +50,10 @@ function MyApp({ Component, pageProps }: AppProps) {
           <MetamaskProvider>
             <ConnectedWalletProvider>
               <DAppProvider config={dappConfig}>
-                <NetworkValidator>
-                  <ThemeProvider theme={theme}>
-                    {removeMuiHeader.includes(pathname) ? null : <Header />}
-                  </ThemeProvider>
-                  <Component {...pageProps} />
-                </NetworkValidator>
+                <ThemeProvider theme={theme}>
+                  {removeMuiHeader.includes(pathname) ? null : <Header />}
+                </ThemeProvider>
+                <Component {...pageProps} />
               </DAppProvider>
             </ConnectedWalletProvider>
           </MetamaskProvider>

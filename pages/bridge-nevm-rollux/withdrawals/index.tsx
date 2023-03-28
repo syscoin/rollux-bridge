@@ -6,12 +6,16 @@ import Head from "next/head";
 import { RolluxHeader } from "components/RolluxHeader";
 import useWithdrawals from "hooks/rolluxBridge/useWithdrawals";
 import { useEthers } from "@usedapp/core";
+import { useSelectedNetwork } from "hooks/rolluxBridge/useSelectedNetwork";
 
 
 export const WithdrawalsIndex: NextPage<{}> = ({ }) => {
 
     const { account } = useEthers();
     const { withdrawals } = useWithdrawals(account);
+    const { selectedNetwork } = useSelectedNetwork();
+
+    console.log(selectedNetwork);
 
     return (
         <ChakraProvider theme={chakraTheme}>

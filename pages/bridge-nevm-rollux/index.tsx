@@ -131,8 +131,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             return undefined;
         }
 
-        console.log(network, secondNetwork);
-
         const l1Contracts = network.layer === 1 ? network : secondNetwork;
         const l2Contracts = secondNetwork.layer === 2 ? secondNetwork : network;
 
@@ -472,11 +470,18 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     }, [account, activateBrowserWallet, connectedWalletCtxt.nevm.account]);
 
     useEffect(() => {
+
+        if (!account) {
+            console.log('No account connected');
+
+            return;
+        }
+
         getCrossChainMessenger(signer, currentDisplay).then((messenger) => {
             console.log(messenger);
             setCrossChainMessenger(messenger);
         })
-    }, [signer, currentDisplay])
+    }, [signer, account, currentDisplay])
 
 
 

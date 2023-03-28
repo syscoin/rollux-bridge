@@ -3,6 +3,7 @@ import { useEthers, shortenAddress } from "@usedapp/core";
 import { SyscoinLogo } from "./Icons/syscoin"
 import { AccountBar } from "./HeaderElements/AccountBar"
 import React, { FC } from "react";
+import NetworkSwitcher from "./HeaderElements/NetworkSwitcher";
 
 export const Header: FC = () => {
 
