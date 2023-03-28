@@ -19,9 +19,6 @@ import { ErrorFallback } from "components/Common/ErrorFallback";
 
 const queryClient = new QueryClient();
 
-
-
-
 const dappConfig: Config = {
   readOnlyChainId: 5700,
   readOnlyUrls: {
