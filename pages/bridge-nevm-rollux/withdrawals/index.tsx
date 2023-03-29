@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { NextPage } from "next";
 import { Badge, Box, ChakraProvider, Highlight, Flex, Container, Heading, Link } from "@chakra-ui/react";
 import { chakraTheme } from "components/chakraTheme"
@@ -11,20 +11,36 @@ import {
     Table,
     Thead,
     Tbody,
-    Tfoot,
     Tr,
     Th,
-    Td,
-    TableCaption,
     TableContainer,
 } from '@chakra-ui/react'
+import { MessageStatus } from "@eth-optimism/sdk";
+import HistoryRow from "components/BridgeL1L2/HistoryRow";
+import { DetailedEventRecord } from "@usedapp/core/dist/esm/src/model";
+import { ethers } from "ethers";
 
 
 export const WithdrawalsIndex: NextPage<{}> = ({ }) => {
 
     const { account } = useEthers();
-    const { withdrawals } = useWithdrawals(account);
+    const { listAll } = useWithdrawals(account);
     const { selectedNetwork } = useSelectedNetwork();
+
+    const [withdrawals, setWithdrawals] = useState<{
+        withdrawal: DetailedEventRecord<ethers.Contract, "WithdrawalInitiated">,
+        status: MessageStatus | null
+    }[]>([]);
+
+    useEffect(() => {
+        if (listAll) {
+            listAll.then(data => {
+                if (data.length) {
+                    setWithdrawals(data);
+                }
+            })
+        }
+    }, [listAll])
 
     console.log(selectedNetwork);
 
@@ -64,6 +80,7 @@ export const WithdrawalsIndex: NextPage<{}> = ({ }) => {
                 border={`1px solid ${chakraTheme.colors.brand.primary}`}
                 justifyContent="center"
                 maxWidth={'990px'}
+                marginTop={'10px'}
                 backgroundColor={'white'}
             >
                 <Box padding={3}
@@ -98,82 +115,19 @@ export const WithdrawalsIndex: NextPage<{}> = ({ }) => {
                             </Tr>
                         </Thead>
                         <Tbody>
-                            <Tr>
-                                <Td>
-                                    17 March 2023 at 22:50 EET
-                                </Td>
-                                <Td>
-                                    Withdraw
-                                </Td>
-                                <Td>
-                                    0.05 SYS
-                                </Td>
-                                <Td>
-                                    <Link href="#" bgColor={'Highlight'}>
-                                        0x8c17...b192
-                                    </Link>
-                                </Td>
-                                <Td>
-                                    <Badge colorScheme={'green'}>Success</Badge>
-                                </Td>
-                            </Tr>
-                            <Tr>
-                                <Td>
-                                    17 March 2023 at 22:50 EET
-                                </Td>
-                                <Td>
-                                    Withdraw
-                                </Td>
-                                <Td>
-                                    0.05 SYS
-                                </Td>
-                                <Td>
-                                    <Link href="#" bgColor={'Highlight'}>
-                                        0x8c17...b192
-                                    </Link>
-                                </Td>
-                                <Td>
-                                    <Badge colorScheme={'green'}>Success</Badge>
-                                </Td>
-                            </Tr>
-                            <Tr>
-                                <Td>
-                                    17 March 2023 at 22:50 EET
-                                </Td>
-                                <Td>
-                                    Withdraw
-                                </Td>
-                                <Td>
-                                    0.05 SYS
-                                </Td>
-                                <Td>
-                                    <Link href="#" bgColor={'Highlight'}>
-                                        0x8c17...b192
-                                    </Link>
-                                </Td>
-                                <Td>
-                                    <Badge colorScheme={'green'}>Success</Badge>
-                                </Td>
-                            </Tr>
-                            <Tr>
-                                <Td>
-                                    17 March 2023 at 22:50 EET
-                                </Td>
-                                <Td>
-                                    Withdraw
-                                </Td>
-                                <Td>
-                                    0.05 SYS
-                                </Td>
-                                <Td>
-                                    <Link href="#" bgColor={'Highlight'}>
-                                        0x8c17...b192
-                                    </Link>
-                                </Td>
-                                <Td>
-                                    <Badge colorScheme={'green'}>Success</Badge>
-                                </Td>
-                            </Tr>
+                            {withdrawals?.map((value) => {
+                                return (
+                                    <HistoryRow
+                                        key={value.withdrawal.transactionHash}
+                                        amount={"-"}
+                                        actionStatus={value.status ?? MessageStatus.UNCONFIRMED_L1_TO_L2_MESSAGE}
+                                        time={new Date}
+                                        type={'Withdraw'}
+                                        transactionHash={value.withdrawal.transactionHash}
+                                        onClickAction={() => { }}
+                                    />
+                                )
+                            })}
                         </Tbody>
                     </Table>
                 </TableContainer>
