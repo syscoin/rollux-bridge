@@ -12,6 +12,7 @@
   "dependencies": {
     "@chakra-ui/icons": "^2.0.17",
     "@chakra-ui/react": "^2.5.1",
+    "@download/blockies": "^1.0.3",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@eth-optimism/sdk": "2.0.1",
@@ -25,6 +26,7 @@
     "axios": "^0.27.2",
     "bitcoin-proof": "^2.0.0",
     "bitcoinjs-lib": "^6.0.1",
+    "ethereum-blockies": "^0.1.1",
     "ethers": "legacy-v5",
     "firebase": "^9.8.2",
     "firebase-admin": "^10.2.0",

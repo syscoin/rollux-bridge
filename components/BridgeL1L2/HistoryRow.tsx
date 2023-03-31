@@ -12,7 +12,7 @@ export type HistoryRowProps = {
     onClickAction: () => void
 }
 
-export const HistoryRow: FC<HistoryRowProps> = ({ time, type, amount, transactionHash, actionStatus, onCLickAction }) => {
+export const HistoryRow: FC<HistoryRowProps> = ({ time, type, amount, transactionHash, actionStatus, onClickAction }) => {
     return (
         <Tr>
             <Td>

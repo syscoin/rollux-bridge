@@ -7,7 +7,7 @@ import { SelectedNetworkType } from 'blockchain/NevmRolluxBridge/config/networks
 export const NetworkSwitcher: FC<{}> = () => {
 
     const { selectedNetwork, atWhichLayer, changeNetworks } = useSelectedNetwork();
-    console.log(`Layer ${atWhichLayer} / ${selectedNetwork}`);
+    // console.log(`Layer ${atWhichLayer} / ${selectedNetwork}`);
     return (
         <>
             <Select width={{

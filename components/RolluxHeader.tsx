@@ -10,7 +10,7 @@ export const RolluxHeader: React.FC = () => {
 
   return (
     <Flex
-      gap={{ base: '16px', lg: '60px' }}
+      gap={{ base: '16px', lg: '60px', sm: '10px', xs: '10px' }}
       w="100%"
       justifyContent="center"
       p="4"

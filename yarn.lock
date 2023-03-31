@@ -1584,6 +1584,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@download/blockies@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@download/blockies@npm:1.0.3"
+  checksum: aa26de81ee550f6608bf6f5f31c873866c9006a11a69e4475b7bc59332931d85e4f13b1759e6ac2fff90dbd0957aff545c1c14425609178b10fb6beb8556bedb
+  languageName: node
+  linkType: hard
+
 "@emotion/babel-plugin@npm:^11.10.6":
   version: 11.10.6
   resolution: "@emotion/babel-plugin@npm:11.10.6"
@@ -8254,6 +8261,13 @@ __metadata:
     rlp: ^2.2.3
     safe-buffer: ^5.1.2
   checksum: 943023fe0c47b52b11f5afec49ac941464ebd65849868390c092d9748ac21d4ac5ec265b85687fa0901c1acec5f3989d8be6d63c5fa4ce484d2d3d15011a80c5
+  languageName: node
+  linkType: hard
+
+"ethereum-blockies@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "ethereum-blockies@npm:0.1.1"
+  checksum: 96d63f2214302335b9ccf2895151839610b52e20140744574d826ce39b3a663b7a9329631b78d609ba65e5cb4bcc784672a23ef3ee9e608ed4d8443019bf74f8
   languageName: node
   linkType: hard
 
@@ -15042,6 +15056,7 @@ __metadata:
   dependencies:
     "@chakra-ui/icons": ^2.0.17
     "@chakra-ui/react": ^2.5.1
+    "@download/blockies": ^1.0.3
     "@emotion/react": ^11.10.6
     "@emotion/styled": ^11.10.6
     "@eth-optimism/sdk": 2.0.1
@@ -15060,6 +15075,7 @@ __metadata:
     bitcoinjs-lib: ^6.0.1
     eslint: 8.15.0
     eslint-config-next: 12.1.6
+    ethereum-blockies: ^0.1.1
     ethers: legacy-v5
     firebase: ^9.8.2
     firebase-admin: ^10.2.0

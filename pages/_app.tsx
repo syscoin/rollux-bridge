@@ -37,7 +37,8 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   const removeMuiHeader = [
     '/bridge-nevm-rollux',
-    '/bridge-nevm-rollux/withdrawals'
+    '/bridge-nevm-rollux/withdrawals',
+    '/bridge-nevm-rollux/create-token'
   ]
 
   return (

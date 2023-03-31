@@ -12,6 +12,12 @@ export const useSelectedNetwork = () => {
     const { chainId, switchNetwork } = useEthers();
     const [atWhichLayer, setAtWhichLayer] = useState<1 | 2 | undefined>(undefined);
 
+    const getExplorerLink = (network: SelectedNetworkType, layer: number, entity: string, hash: string): string => {
+        if (network === SelectedNetworkType.Unsupported) return '';
+
+        return `${networks[`L${layer}${network === SelectedNetworkType.Testnet ? 'Dev' : ''}`].explorerUrl}/${entity}/${hash}`;
+    }
+
     const changeNetworks = async (newNetwork: SelectedNetworkType, currentLayer: number) => {
         if (newNetwork === SelectedNetworkType.Unsupported) {
             throw new Error("Unable to change to unsupported network.");
@@ -24,7 +30,6 @@ export const useSelectedNetwork = () => {
         }
 
         const targetChainID: number = currentLayer === 1 ? targetNetwork.L1 : targetNetwork.L2;
-        console.log(targetNetwork);
         await switchNetwork(targetChainID);
         // @ts-ignore
         setAtWhichLayer(currentLayer);
@@ -59,7 +64,6 @@ export const useSelectedNetwork = () => {
             })
 
             setAtWhichLayer(_layer)
-            console.log('Here');
             setSelectedNetwork(ChainIdsToNetworksMap[chainId]);
         }
     }, [chainId])
@@ -75,7 +79,8 @@ export const useSelectedNetwork = () => {
         rpcL2,
         l1ChainId,
         l2ChainId,
-        changeNetworks
+        changeNetworks,
+        getExplorerLink
     }
 }
 

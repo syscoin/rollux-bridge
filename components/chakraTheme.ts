@@ -20,6 +20,19 @@ export const chakraTheme = extendTheme({
     },
     components: {
         Button: {
+            baseStyle: {
+                _hover: {
+                    // add hover styles here
+                    transform: "translateY(-2px)",
+                    boxShadow: "rgba(0, 0, 0, 0.2) 0px 3px 3px",
+                },
+                _focus: {
+                    // add focus styles here
+                    outline: "none",
+                    transform: "translateY(-2px)",
+                    boxShadow: "rgba(0, 0, 0, 0.2) 0px 5px 5px",
+                },
+            },
             variants: {
                 primary: {
                     bg: 'brand.primaryGradient',
