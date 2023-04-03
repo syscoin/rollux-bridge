@@ -229,7 +229,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 </Flex>
                 <HStack bg="#f4fadb" borderRadius="6px" minH="48px" px="19px" border={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? '2px solid' : 'none'} borderColor="red.400">
                     <NumberInput variant="unstyled" size="lg" onChange={(valueAsString) => {
-                        if (valueAsString.length > 0) {
+                        if (valueAsString.length > 0 && parseFloat(valueAsString) > 0) {
                             setAmountToSwap(valueAsString)
                         } else {
                             setAmountToSwap('0.00');
