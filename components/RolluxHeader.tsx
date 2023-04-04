@@ -1,4 +1,4 @@
-import { Button, Flex, Img, useBreakpointValue } from "@chakra-ui/react"
+import { Button, Flex, HStack, Img, useBreakpointValue } from "@chakra-ui/react"
 import { ConnectButton } from "./ConnectButton"
 import NetworkSwitcher from "./HeaderElements/NetworkSwitcher"
 
@@ -17,10 +17,13 @@ export const RolluxHeader: React.FC = () => {
       flexWrap="nowrap"
       bg={{ base: '#28282F', xl: 'transparent' }}
     >
-      <Img src={src} />
+      <HStack spacing={4}>
+        <Img src={src} />
 
-      <ConnectButton variant="secondary" />
-      <NetworkSwitcher />
+        <ConnectButton variant="secondary" />
+        <NetworkSwitcher />
+      </HStack>
+
     </Flex>
   )
 }
