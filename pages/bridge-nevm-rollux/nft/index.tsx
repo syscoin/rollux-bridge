@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { NextPage } from "next"
 import { RolluxPageWrapper } from "components/Common/RolluxPageWrapper"
 import { SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks"
@@ -7,16 +7,42 @@ import InputNFT from "components/NFT/InputNFT"
 import { Box, CardBody, Flex, Card, Heading, Button } from "@chakra-ui/react"
 import { ArrowRight } from "@mui/icons-material"
 import PreviewNFT from "components/NFT/PreviewNFT"
-import { useEthers } from "@usedapp/core"
+import { CallResult, useCall, useEthers } from "@usedapp/core"
 import ConnectedWalletButton from "components/Common/ConnectedWalletButton"
+import { ApproveNFT } from "components/BridgeL1L2/NFT/ApproveNFT"
+import { ethers } from "ethers"
+import ERC721Abi from "blockchain/NevmRolluxBridge/abi/ERC721"
+import NFTSwapDirection from "blockchain/NevmRolluxBridge/enums/NFTSwapDirection"
+import SwapDirection from "components/NFT/SwapDirection"
 
 export type NFTPageIndexProps = {
 
 }
 
+
+
 export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
     const { selectedNetwork } = useSelectedNetwork();
     const { account } = useEthers();
+
+    const [nftAddress, setNftAddress] = useState<string>('');
+    const [tokenId, setTokenId] = useState<number>(0);
+
+    const [direction, setDirection] = useState<NFTSwapDirection>(NFTSwapDirection.L1_TO_L2);
+
+    const { value, error } = useCall(
+        (nftAddress && tokenId >= 0) && {
+            contract: new ethers.Contract(
+                nftAddress,
+                new ethers.utils.Interface(ERC721Abi)
+            ),
+            method: 'getApproved',
+            args: [tokenId]
+        }
+    ) ?? {}
+
+    console.log(value);
+
     return (
         <RolluxPageWrapper
             title="Create token for bridge"
@@ -39,17 +65,29 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                     </CardBody>
                 </Box>
             </Card>
+
+            <Flex alignItems={'center'} justifyContent={'center'} mb={3} mt={3}>
+                <SwapDirection currentDirection={direction}
+                    onDirectionChanged={(direction) => setDirection(direction)}
+                />
+            </Flex>
             <Flex direction={'row'} alignItems={'center'} gap={2}>
-                <InputNFT />
+                <InputNFT
+                    onChangeContractAddress={(address) => setNftAddress(address)}
+                    onChangeTokenId={(tokenId) => setTokenId(tokenId)}
+                />
                 <Box w={'10%'} alignItems={'center'} justifyContent={'center'} textAlign={'center'}>
                     <ArrowRight />
                 </Box>
                 <PreviewNFT />
             </Flex>
             <ConnectedWalletButton>
-                <Button>
-                    Approve NFT
-                </Button>
+                <ApproveNFT
+                    allowance={0}
+                    onClickApprove={() => { }}
+                >
+                    Approved
+                </ApproveNFT>
             </ConnectedWalletButton>
         </RolluxPageWrapper>
     )
