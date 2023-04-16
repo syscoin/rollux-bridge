@@ -14,6 +14,11 @@ import { LogDescription } from "ethers/lib/utils";
 
 const OPMintableFactory = new ethers.Contract('0x4200000000000000000000000000000000000012', new ethers.utils.Interface(OPMintableFactoryABI.abi));
 
+export enum TokenStandard {
+    ERC20,
+    ERC721
+}
+
 export const CreateTokenIndex: NextPage<{}> = () => {
 
     const [l1Address, setL1Address] = useState<string>('');
@@ -22,8 +27,8 @@ export const CreateTokenIndex: NextPage<{}> = () => {
     const [tokenDecimals, setTokenDecimals] = useState<number>();
     const [tokenSymbol, setTokenSymbol] = useState<string>('');
     const { switchNetwork } = useEthers();
+    const [tokenStandard, setTokenStandard] = useState<TokenStandard | undefined>(undefined);
 
-    const toast = useToast();
 
     const { rpcL1, selectedNetwork, l2ChainId, getExplorerLink } = useSelectedNetwork();
 
@@ -71,6 +76,8 @@ export const CreateTokenIndex: NextPage<{}> = () => {
 
             if (errorText) setErrorText('');
         } catch (e) {
+
+
             setErrorText("Please check your token contract or address. Make sure its compatible with ERC20 standard.");
             setTokenDecimals(undefined);
             setTokenName('');
@@ -111,7 +118,7 @@ export const CreateTokenIndex: NextPage<{}> = () => {
 
             <Box marginBottom={3}>
                 <Heading size={'md'} mb={8} textAlign={'center'}>
-                    Easily bridge your L1 ERC20 token to L2 in just a few clicks!
+                    Easily bridge your L1 ERC20/ERC721 token to L2 in just a few clicks!
                 </Heading>
             </Box>
 
@@ -121,7 +128,7 @@ export const CreateTokenIndex: NextPage<{}> = () => {
                         {errorText}
                     </Heading>
                 </>}
-                <Input placeholder="L1 ERC20 token address"
+                <Input placeholder="L1 ERC20/ERC721 token address"
                     isInvalid={errorText.length > 0}
 
                     onChange={e => handleL1TokenInput(e.target.value)} />

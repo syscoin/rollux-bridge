@@ -5,7 +5,7 @@ export type ApproveNFTProps = {
     approved: boolean,
     onClickApprove: () => void,
     isButtonLoading: boolean,
-    children: React.ReactFragment
+    children: React.ReactNode
 }
 
 export const ApproveNFT: FC<ApproveNFTProps> = ({ approved, onClickApprove, children, isButtonLoading }) => {

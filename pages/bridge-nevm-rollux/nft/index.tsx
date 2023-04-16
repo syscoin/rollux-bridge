@@ -56,7 +56,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
     );
 
     const { value: approvedData, error: approvedError } = useCall(
-        (nftAddress && tokenId !== undefined) && {
+        (nftAddress && tokenId !== undefined && ethers.utils.isAddress(nftAddress)) && {
             contract: new ethers.Contract(
                 nftAddress,
                 new ethers.utils.Interface(ERC721Abi)
@@ -138,10 +138,17 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                         handleApproval()
                     }}
                 >
-                    Approved
+                    <Button
+                        variant="primary"
+                        mt={4}
+                        px="32.5px"
+                        w={'100%'}
+                    >
+                        Send NFT
+                    </Button>
                 </ApproveNFT>
             </ConnectedWalletButton>
-        </RolluxPageWrapper>
+        </RolluxPageWrapper >
     )
 }
 
