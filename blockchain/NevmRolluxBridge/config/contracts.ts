@@ -10,6 +10,7 @@ const contractsDev = {
         BondManager: ethers.constants.AddressZero,
         OptimismPortal: '0x61200B9fcBB421aFD0Bb5A732fe48ec98482E39C',
         L2OutputOracle: '0x63D297aa3feCbf6eEdE0aCd15B0308B9C8379afb',
+        L1ERC721Bridge: '0x5eE6E08Cb652775f6B48CA8357a1d240b50018Aa',
     },
     l2_dev: {
         L2ToL1MessagePasser: '0x4200000000000000000000000000000000000016',

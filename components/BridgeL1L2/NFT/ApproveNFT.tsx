@@ -2,19 +2,22 @@ import { Button } from "@chakra-ui/react";
 import React, { FC } from "react"
 
 export type ApproveNFTProps = {
-    allowance: number,
+    approved: boolean,
     onClickApprove: () => void,
+    isButtonLoading: boolean,
     children: React.ReactFragment
 }
 
-export const ApproveNFT: FC<ApproveNFTProps> = ({ allowance, onClickApprove, children }) => {
-    if (allowance >= 1) {
+export const ApproveNFT: FC<ApproveNFTProps> = ({ approved, onClickApprove, children, isButtonLoading }) => {
+    if (approved) {
         return <>{children}</>;
     }
 
     return (
         <Button
             variant="primary"
+            isLoading={isButtonLoading}
+            loadingText={'Approving NFT'}
             mt={4}
             px="32.5px"
             w={'100%'}

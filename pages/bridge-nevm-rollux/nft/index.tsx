@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { NextPage } from "next"
 import { RolluxPageWrapper } from "components/Common/RolluxPageWrapper"
 import { SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks"
@@ -7,7 +7,7 @@ import InputNFT from "components/NFT/InputNFT"
 import { Box, CardBody, Flex, Card, Heading, Button } from "@chakra-ui/react"
 import { ArrowRight } from "@mui/icons-material"
 import PreviewNFT from "components/NFT/PreviewNFT"
-import { CallResult, useCall, useEthers } from "@usedapp/core"
+import { CallResult, useCall, useContractFunction, useEthers } from "@usedapp/core"
 import ConnectedWalletButton from "components/Common/ConnectedWalletButton"
 import { ApproveNFT } from "components/BridgeL1L2/NFT/ApproveNFT"
 import { ethers } from "ethers"
@@ -22,16 +22,41 @@ export type NFTPageIndexProps = {
 
 
 export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
-    const { selectedNetwork } = useSelectedNetwork();
-    const { account } = useEthers();
+    const { selectedNetwork, contractsL1, contractsL2, l1ChainId, l2ChainId } = useSelectedNetwork();
+    const { account, switchNetwork } = useEthers();
 
     const [nftAddress, setNftAddress] = useState<string>('');
-    const [tokenId, setTokenId] = useState<number>(0);
+    const [tokenId, setTokenId] = useState<number | undefined>(undefined);
 
     const [direction, setDirection] = useState<NFTSwapDirection>(NFTSwapDirection.L1_TO_L2);
+    const [isApproved, setIsApproved] = useState<boolean>(false);
 
-    const { value, error } = useCall(
-        (nftAddress && tokenId >= 0) && {
+    const bridgeContractAddress: string | undefined = useMemo(() => {
+        if (direction === NFTSwapDirection.L1_TO_L2) {
+            // if direction from l1 to l2 we'll use l1 bridge
+
+            return contractsL1.L1ERC721Bridge;
+        }
+
+        if (direction === NFTSwapDirection.L2_TO_L1) {
+            // if l2
+            return contractsL2.L2ERC721Bridge;
+        }
+
+        return undefined;
+    }, [direction, contractsL1, contractsL2]);
+
+
+    const { send: sendApproval, state: approvalTxState } = useContractFunction(
+        (nftAddress && tokenId !== undefined ? new ethers.Contract(
+            nftAddress,
+            new ethers.utils.Interface(ERC721Abi)
+        ) : undefined),
+        'approve'
+    );
+
+    const { value: approvedData, error: approvedError } = useCall(
+        (nftAddress && tokenId !== undefined) && {
             contract: new ethers.Contract(
                 nftAddress,
                 new ethers.utils.Interface(ERC721Abi)
@@ -41,7 +66,31 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
         }
     ) ?? {}
 
-    console.log(value);
+    useEffect(() => {
+        if (!approvedError && bridgeContractAddress) {
+            if (approvedData?.operator === bridgeContractAddress) {
+                setIsApproved(true)
+            } else {
+                setIsApproved(false);
+            }
+        }
+    }, [approvedData, approvedError, bridgeContractAddress])
+
+    const handleApproval = async () => {
+
+        if (!bridgeContractAddress || undefined === tokenId) {
+            return; // do nothing , prevent using unitialized function
+        }
+
+        const requiredChainId: number = direction === NFTSwapDirection.L1_TO_L2 ?
+            l1ChainId : l2ChainId;
+
+        await switchNetwork(requiredChainId);
+
+        await sendApproval(bridgeContractAddress, tokenId);
+
+    }
+
 
     return (
         <RolluxPageWrapper
@@ -74,7 +123,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
             <Flex direction={'row'} alignItems={'center'} gap={2}>
                 <InputNFT
                     onChangeContractAddress={(address) => setNftAddress(address)}
-                    onChangeTokenId={(tokenId) => setTokenId(tokenId)}
+                    onChangeTokenId={(tokenId) => setTokenId(tokenId.toString().length > 0 ? tokenId : undefined)}
                 />
                 <Box w={'10%'} alignItems={'center'} justifyContent={'center'} textAlign={'center'}>
                     <ArrowRight />
@@ -83,8 +132,11 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
             </Flex>
             <ConnectedWalletButton>
                 <ApproveNFT
-                    allowance={0}
-                    onClickApprove={() => { }}
+                    isButtonLoading={['Mining', 'PendingSignature', 'CollectingSignaturePool'].includes(approvalTxState.status)}
+                    approved={isApproved}
+                    onClickApprove={() => {
+                        handleApproval()
+                    }}
                 >
                     Approved
                 </ApproveNFT>
