@@ -14,6 +14,7 @@ import { ethers } from "ethers"
 import ERC721Abi from "blockchain/NevmRolluxBridge/abi/ERC721"
 import NFTSwapDirection from "blockchain/NevmRolluxBridge/enums/NFTSwapDirection"
 import SwapDirection from "components/NFT/SwapDirection"
+import L1ERC721Bridge from "blockchain/NevmRolluxBridge/abi/L1ERC721Bridge"
 
 export type NFTPageIndexProps = {
 
@@ -53,7 +54,16 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
             new ethers.utils.Interface(ERC721Abi)
         ) : undefined),
         'approve'
-    );
+    ) ?? {};
+
+    const { send: sendDepositNFTL1, state: statusDepositNFTL1 } = useContractFunction(
+        (nftAddress && tokenId !== undefined && bridgeContractAddress !== undefined ?
+            new ethers.Contract(
+                bridgeContractAddress,
+                new ethers.utils.Interface(L1ERC721Bridge)
+            ) : undefined),
+        "depositERC721"
+    )
 
     const { value: approvedData, error: approvedError } = useCall(
         (nftAddress && tokenId !== undefined && ethers.utils.isAddress(nftAddress)) && {
@@ -88,6 +98,9 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
         await switchNetwork(requiredChainId);
 
         await sendApproval(bridgeContractAddress, tokenId);
+
+    }
+    const handleSendNFT = async () => {
 
     }
 
@@ -143,6 +156,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                         mt={4}
                         px="32.5px"
                         w={'100%'}
+                        onClick={() => }
                     >
                         Send NFT
                     </Button>
