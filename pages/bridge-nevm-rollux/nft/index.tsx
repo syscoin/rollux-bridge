@@ -156,7 +156,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                         mt={4}
                         px="32.5px"
                         w={'100%'}
-                        onClick={() => }
+                        onClick={() => { }}
                     >
                         Send NFT
                     </Button>

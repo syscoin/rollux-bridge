@@ -10,6 +10,7 @@ import OPMintableFactoryABI from '@eth-optimism/contracts-bedrock/artifacts/cont
 import { TransactionState } from "@usedapp/core";
 import { TransactionReceipt } from "@ethersproject/abstract-provider";
 import { LogDescription } from "ethers/lib/utils";
+import ERC721Abi from "blockchain/NevmRolluxBridge/abi/ERC721"
 
 
 const OPMintableFactory = new ethers.Contract('0x4200000000000000000000000000000000000012', new ethers.utils.Interface(OPMintableFactoryABI.abi));
@@ -63,22 +64,46 @@ export const CreateTokenIndex: NextPage<{}> = () => {
             rpcL1
         )
         const erc20Contract = new ethers.Contract(address, ERC20Interface, staticProvider);
+        const erc721Contract = new ethers.Contract(address, new ethers.utils.Interface(ERC721Abi), staticProvider);
 
         try {
-            const _decimals: number = await erc20Contract.decimals();
-            const _name: string = await erc20Contract.name();
-            const _symbol: string = await erc20Contract.symbol();
+
+            try {
+                const _decimals: number = await erc20Contract.decimals();
+                const _name: string = await erc20Contract.name();
+                const _symbol: string = await erc20Contract.symbol();
 
 
-            setTokenDecimals(_decimals);
-            setTokenName(_name);
-            setTokenSymbol(_symbol);
+                setTokenDecimals(_decimals);
+                setTokenName(_name);
+                setTokenSymbol(_symbol);
+
+                setTokenStandard(TokenStandard.ERC20);
+            } catch (e) {
+
+                try {
+                    const _symbol = await erc721Contract.symbol();
+                    const _name = await erc721Contract.name();
+                    await erc721Contract.ownerOf(0);
+
+                    setTokenStandard(TokenStandard.ERC721);
+                    setTokenName(_name);
+                    setTokenSymbol(_symbol);
+
+                } catch (e) {
+                    console.log("Not an erc721");
+                    console.log(e);
+                }
+
+            } finally {
+                console.log("Finally");
+            }
 
             if (errorText) setErrorText('');
         } catch (e) {
 
 
-            setErrorText("Please check your token contract or address. Make sure its compatible with ERC20 standard.");
+            setErrorText("Please check your token contract or address. Make sure its compatible with ERC20/ERC721 standard.");
             setTokenDecimals(undefined);
             setTokenName('');
             setTokenSymbol('');
@@ -133,10 +158,11 @@ export const CreateTokenIndex: NextPage<{}> = () => {
 
                     onChange={e => handleL1TokenInput(e.target.value)} />
 
-                {(l1Address && tokenDecimals && tokenName && tokenSymbol) && <>
+
+                {(l1Address && tokenDecimals && tokenName && tokenSymbol && tokenStandard === TokenStandard.ERC20) && <>
                     <Box marginTop={3}>
                         <Heading size={'md'} marginTop={3} marginBottom={3}>
-                            Token details
+                            Token details ERC20
                         </Heading>
 
                         <VStack
@@ -206,6 +232,80 @@ export const CreateTokenIndex: NextPage<{}> = () => {
                                 </Alert>
                             </>}
                         </>}
+
+
+
+                    </Box>
+                </>}
+
+                {(l1Address && tokenName && tokenSymbol && tokenStandard === TokenStandard.ERC721) && <>
+                    <Box marginTop={3}>
+                        <Heading size={'md'} marginTop={3} marginBottom={3}>
+                            Token details ERC721
+                        </Heading>
+
+                        <VStack
+                            divider={<StackDivider borderColor={'grey.400'} />}
+                            spacing={4}
+                            align={'stretch'}
+                        >
+                            <Box padding={4}>
+                                <Text>
+                                    Token name: {tokenName}
+                                </Text>
+                            </Box>
+                            <Box padding={4}>
+                                <Text>
+                                    Token symbol: {tokenSymbol}
+                                </Text>
+                            </Box>
+                        </VStack>
+
+                        <Alert padding={3} status={'warning'} marginTop={3} borderRadius={5}>
+                            <AlertIcon />
+                            <AlertDescription>
+                                In case if you want to support custom ERC721 functionality,
+                                <br />
+                                please consider <Link href="https://github.com/syscoin/optimism-tutorial/tree/main/standard-bridge-custom-token" target={'_blank'} textColor={'blue.400'}>custom token</Link> deployment.
+                            </AlertDescription>
+
+                        </Alert>
+
+
+                        {!deployState.receipt && <>
+                            <Flex align={'center'} justify={'center'}>
+                                {["PendingSignature", "Mining"].includes(deployState.status) && <Spinner
+                                    thickness='4px'
+                                    speed='0.65s'
+                                    emptyColor='gray.200'
+                                    color='green.500'
+                                    size='xl'
+                                />}
+
+                                {['None', 'Exception', 'Success'].includes(deployState.status) && <Button variant={'primary'} width={'35vw'} onClick={() => deployToken()}
+                                >
+                                    Deploy L2 token
+                                </Button>
+                                }
+                            </Flex>
+
+                        </>}
+
+
+                        {deployState.receipt && <>
+
+                            <Alert status={'success'} marginTop={5} padding={5} borderRadius={'10px'}>
+                                <AlertIcon />
+                                <AlertDescription>
+                                    Token deployed to <Link fontFamily={'mono'} target={'_blank'} href={
+                                        getExplorerLink(selectedNetwork, 2, 'address', extractDeployedTokenAddress(deployState.receipt) ?? ethers.constants.AddressZero)
+                                    }>
+                                        {shortenIfAddress(extractDeployedTokenAddress(deployState.receipt))}
+                                    </Link>
+                                </AlertDescription>
+                            </Alert>
+                        </>}
+
 
 
 
