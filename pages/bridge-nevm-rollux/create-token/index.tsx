@@ -261,7 +261,7 @@ export const CreateTokenIndex: NextPage<{}> = () => {
                             </Box>
                         </VStack>
 
-                        <Alert padding={3} status={'warning'} marginTop={3} borderRadius={5}>
+                        <Alert padding={3} mb={4} status={'warning'} marginTop={3} borderRadius={5}>
                             <AlertIcon />
                             <AlertDescription>
                                 In case if you want to support custom ERC721 functionality,
