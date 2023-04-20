@@ -23,7 +23,7 @@ const dappConfig: Config = {
   readOnlyChainId: 5700,
   readOnlyUrls: {
     [5700]: 'https://rpc.tanenbaum.io',
-    [57000]: 'https://rpc-bedrock.rollux.com/',
+    [57000]: 'https://rpc-tanenbaum.rollux.com/',
   },
   multicallAddresses: {
     [5700]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697', // multicall 2 address.
