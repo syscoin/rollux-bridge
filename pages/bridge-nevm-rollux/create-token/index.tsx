@@ -12,6 +12,7 @@ import { TransactionReceipt } from "@ethersproject/abstract-provider";
 import { LogDescription } from "ethers/lib/utils";
 import ERC721Abi from "blockchain/NevmRolluxBridge/abi/ERC721"
 import OPMintableERC721Factory from "blockchain/NevmRolluxBridge/abi/OPMintableERC721Factory"
+import { SwitchNetworkButton } from "components/Common/SwitchNetworkButton";
 
 
 const OPMintableFactory = new ethers.Contract('0x4200000000000000000000000000000000000012', new ethers.utils.Interface(OPMintableFactoryABI.abi));
@@ -30,6 +31,7 @@ export const CreateTokenIndex: NextPage<{}> = () => {
     const [tokenSymbol, setTokenSymbol] = useState<string>('');
     const { switchNetwork } = useEthers();
     const [tokenStandard, setTokenStandard] = useState<TokenStandard | undefined>(undefined);
+    const [isTokenDeployed, setIsTokenDeployed] = useState<boolean>(false);
 
 
     const { rpcL1, selectedNetwork, l2ChainId, getExplorerLink, contractsL1, contractsL2 } = useSelectedNetwork();
@@ -52,8 +54,6 @@ export const CreateTokenIndex: NextPage<{}> = () => {
     const deployToken = async () => {
         if (!l1Address || !tokenName || !tokenSymbol) return;
 
-        await switchNetwork(l2ChainId);
-
         runDeploy(
             l1Address,
             tokenName,
@@ -61,16 +61,17 @@ export const CreateTokenIndex: NextPage<{}> = () => {
         )
     }
 
+
+
     const deployERC721Token = async () => {
         if (!l1Address || !tokenName || !tokenSymbol) return;
-
-        await switchNetwork(l2ChainId);
 
         runERC721Deploy(
             l1Address,
             tokenName,
             tokenSymbol
         )
+
     }
 
     const handleL1TokenInput = async (address: string) => {
@@ -100,6 +101,7 @@ export const CreateTokenIndex: NextPage<{}> = () => {
                 setTokenDecimals(_decimals);
                 setTokenName(_name);
                 setTokenSymbol(_symbol);
+                setIsTokenDeployed(false);
 
                 setTokenStandard(TokenStandard.ERC20);
             } catch (e) {
@@ -112,6 +114,8 @@ export const CreateTokenIndex: NextPage<{}> = () => {
                     setTokenStandard(TokenStandard.ERC721);
                     setTokenName(_name);
                     setTokenSymbol(_symbol);
+
+                    setIsTokenDeployed(false);
 
                 } catch (e) {
                     console.log("Not an erc721");
@@ -140,6 +144,16 @@ export const CreateTokenIndex: NextPage<{}> = () => {
             }, 5000);
         }
     }, [errorText])
+
+    useEffect(() => {
+        if (deployERC721State.status === 'Success') {
+            setIsTokenDeployed(true);
+        }
+
+        if (deployState.status === 'Success') {
+            setIsTokenDeployed(true);
+        }
+    }, [deployERC721State, deployState])
 
 
     const extractDeployedTokenAddress = (receipt: TransactionReceipt): string | null => {
@@ -171,9 +185,6 @@ export const CreateTokenIndex: NextPage<{}> = () => {
                 'Please select correct network' : null
             }
         >
-
-
-
             <Box marginBottom={3}>
                 <Heading size={'md'} mb={8} textAlign={'center'}>
                     Easily bridge your L1 ERC20/ERC721 token to L2 in just a few clicks!
@@ -231,26 +242,34 @@ export const CreateTokenIndex: NextPage<{}> = () => {
                         </Alert>}
 
                         {tokenDecimals === 18 && <>
-                            {!deployState.receipt && <>
-                                <Flex align={'center'} justify={'center'}>
-                                    {["PendingSignature", "Mining"].includes(deployState.status) && <Spinner
-                                        thickness='4px'
-                                        speed='0.65s'
-                                        emptyColor='gray.200'
-                                        color='green.500'
-                                        size='xl'
-                                    />}
 
-                                    {['None', 'Exception', 'Success'].includes(deployState.status) && <Button variant={'primary'} width={'35vw'} onClick={() => deployToken()}
-                                    >
-                                        Deploy L2 token
-                                    </Button>
-                                    }
-                                </Flex>
+                            {!isTokenDeployed && <>
+                                <SwitchNetworkButton
+                                    onClickSwitch={async () => await switchNetwork(l2ChainId)}
+                                    requiredChainId={l2ChainId}
+                                >
 
+                                    {!deployState.receipt && <>
+                                        <Flex align={'center'} justify={'center'}>
+                                            {["PendingSignature", "Mining"].includes(deployState.status) && <Spinner
+                                                thickness='4px'
+                                                speed='0.65s'
+                                                emptyColor='gray.200'
+                                                color='green.500'
+                                                size='xl'
+                                            />}
+
+                                            {['None', 'Exception', 'Success'].includes(deployState.status) && <Button variant={'primary'} width={'35vw'} onClick={() => deployToken()}
+                                            >
+                                                Deploy L2 token
+                                            </Button>
+                                            }
+                                        </Flex>
+
+                                    </>}
+
+                                </SwitchNetworkButton>
                             </>}
-
-
                             {deployState.receipt && <>
 
                                 <Alert status={'success'} marginTop={5} padding={5} borderRadius={'10px'}>
@@ -305,24 +324,33 @@ export const CreateTokenIndex: NextPage<{}> = () => {
                         </Alert>
 
 
-                        {!deployState.receipt && <>
-                            <Flex align={'center'} justify={'center'}>
-                                {["PendingSignature", "Mining"].includes(deployERC721State.status) && <Spinner
-                                    thickness='4px'
-                                    speed='0.65s'
-                                    emptyColor='gray.200'
-                                    color='green.500'
-                                    size='xl'
-                                />}
+                        {!isTokenDeployed && <>
+                            <SwitchNetworkButton
+                                onClickSwitch={async () => await switchNetwork(l2ChainId)}
+                                requiredChainId={l2ChainId}
+                            >
+                                {!deployState.receipt && <>
+                                    <Flex align={'center'} justify={'center'}>
+                                        {["PendingSignature", "Mining"].includes(deployERC721State.status) && <Spinner
+                                            thickness='4px'
+                                            speed='0.65s'
+                                            emptyColor='gray.200'
+                                            color='green.500'
+                                            size='xl'
+                                        />}
 
-                                {['None', 'Exception', 'Success'].includes(deployERC721State.status) && <Button variant={'primary'} width={'35vw'} onClick={() => deployERC721Token()}
-                                >
-                                    Deploy L2 NFT token
-                                </Button>
-                                }
-                            </Flex>
+                                        {['None', 'Exception', 'Success'].includes(deployERC721State.status) && <Button variant={'primary'} width={'35vw'} onClick={() => deployERC721Token()}
+                                        >
+                                            Deploy L2 NFT token
+                                        </Button>
+                                        }
+                                    </Flex>
 
+                                </>}
+
+                            </SwitchNetworkButton>
                         </>}
+
 
 
                         {deployERC721State.receipt && <>
