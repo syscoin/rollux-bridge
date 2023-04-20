@@ -11,6 +11,7 @@ import { TransactionState } from "@usedapp/core";
 import { TransactionReceipt } from "@ethersproject/abstract-provider";
 import { LogDescription } from "ethers/lib/utils";
 import ERC721Abi from "blockchain/NevmRolluxBridge/abi/ERC721"
+import OPMintableERC721Factory from "blockchain/NevmRolluxBridge/abi/OPMintableERC721Factory"
 
 
 const OPMintableFactory = new ethers.Contract('0x4200000000000000000000000000000000000012', new ethers.utils.Interface(OPMintableFactoryABI.abi));
@@ -31,12 +32,22 @@ export const CreateTokenIndex: NextPage<{}> = () => {
     const [tokenStandard, setTokenStandard] = useState<TokenStandard | undefined>(undefined);
 
 
-    const { rpcL1, selectedNetwork, l2ChainId, getExplorerLink } = useSelectedNetwork();
+    const { rpcL1, selectedNetwork, l2ChainId, getExplorerLink, contractsL1, contractsL2 } = useSelectedNetwork();
 
     const { send: runDeploy, state: deployState } = useContractFunction(
         OPMintableFactory,
         'createOptimismMintableERC20'
     );
+
+    const { send: runERC721Deploy, state: deployERC721State } = useContractFunction(
+        (contractsL2.OptimismMintableERC721Factory) ? new ethers.Contract(
+            contractsL2.OptimismMintableERC721Factory,
+            new ethers.utils.Interface(OPMintableERC721Factory)
+        ) : undefined,
+        'createOptimismMintableERC721'
+    )
+
+
 
     const deployToken = async () => {
         if (!l1Address || !tokenName || !tokenSymbol) return;
@@ -44,6 +55,18 @@ export const CreateTokenIndex: NextPage<{}> = () => {
         await switchNetwork(l2ChainId);
 
         runDeploy(
+            l1Address,
+            tokenName,
+            tokenSymbol
+        )
+    }
+
+    const deployERC721Token = async () => {
+        if (!l1Address || !tokenName || !tokenSymbol) return;
+
+        await switchNetwork(l2ChainId);
+
+        runERC721Deploy(
             l1Address,
             tokenName,
             tokenSymbol
@@ -125,6 +148,16 @@ export const CreateTokenIndex: NextPage<{}> = () => {
         }
 
         const info: LogDescription = OPMintableFactory.interface.parseLog(receipt.logs[1])
+
+        return info.args?.localToken;
+    }
+
+    const extractDeployedERC721TokenAddress = (receipt: TransactionReceipt): string | null => {
+        if (!receipt || !receipt.logs[0]) {
+            return null;
+        }
+
+        const info: LogDescription = (new ethers.utils.Interface(OPMintableERC721Factory)).parseLog(receipt.logs[0])
 
         return info.args?.localToken;
     }
@@ -274,7 +307,7 @@ export const CreateTokenIndex: NextPage<{}> = () => {
 
                         {!deployState.receipt && <>
                             <Flex align={'center'} justify={'center'}>
-                                {["PendingSignature", "Mining"].includes(deployState.status) && <Spinner
+                                {["PendingSignature", "Mining"].includes(deployERC721State.status) && <Spinner
                                     thickness='4px'
                                     speed='0.65s'
                                     emptyColor='gray.200'
@@ -282,9 +315,9 @@ export const CreateTokenIndex: NextPage<{}> = () => {
                                     size='xl'
                                 />}
 
-                                {['None', 'Exception', 'Success'].includes(deployState.status) && <Button variant={'primary'} width={'35vw'} onClick={() => deployToken()}
+                                {['None', 'Exception', 'Success'].includes(deployERC721State.status) && <Button variant={'primary'} width={'35vw'} onClick={() => deployERC721Token()}
                                 >
-                                    Deploy L2 token
+                                    Deploy L2 NFT token
                                 </Button>
                                 }
                             </Flex>
@@ -292,15 +325,15 @@ export const CreateTokenIndex: NextPage<{}> = () => {
                         </>}
 
 
-                        {deployState.receipt && <>
+                        {deployERC721State.receipt && <>
 
                             <Alert status={'success'} marginTop={5} padding={5} borderRadius={'10px'}>
                                 <AlertIcon />
                                 <AlertDescription>
                                     Token deployed to <Link fontFamily={'mono'} target={'_blank'} href={
-                                        getExplorerLink(selectedNetwork, 2, 'address', extractDeployedTokenAddress(deployState.receipt) ?? ethers.constants.AddressZero)
+                                        getExplorerLink(selectedNetwork, 2, 'address', extractDeployedERC721TokenAddress(deployERC721State.receipt) ?? ethers.constants.AddressZero)
                                     }>
-                                        {shortenIfAddress(extractDeployedTokenAddress(deployState.receipt))}
+                                        {shortenIfAddress(extractDeployedERC721TokenAddress(deployERC721State.receipt))}
                                     </Link>
                                 </AlertDescription>
                             </Alert>
