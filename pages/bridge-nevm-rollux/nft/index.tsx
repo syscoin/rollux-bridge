@@ -16,6 +16,7 @@ import NFTSwapDirection from "blockchain/NevmRolluxBridge/enums/NFTSwapDirection
 import SwapDirection from "components/NFT/SwapDirection"
 import L1ERC721Bridge from "blockchain/NevmRolluxBridge/abi/L1ERC721Bridge"
 import useFetchNFTMetadata from "hooks/rolluxBridge/useFetchNFTMetdata"
+import useFetchNFTImage from "hooks/rolluxBridge/useFetchNFTImage"
 
 export type NFTPageIndexProps = {
 
@@ -46,6 +47,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
     ) ?? {}
 
     const nftMetadata = useFetchNFTMetadata({ url: tokenUriData });
+    const { image, isLoading, error } = useFetchNFTImage(nftMetadata?.image)
 
     const bridgeContractAddress: string | undefined = useMemo(() => {
         if (direction === NFTSwapDirection.L1_TO_L2) {
@@ -158,7 +160,12 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                 <Box w={'10%'} alignItems={'center'} justifyContent={'center'} textAlign={'center'}>
                     <ArrowRight />
                 </Box>
-                <PreviewNFT />
+                <PreviewNFT
+                    isLoading={(nftAddress && nftMetadata && image && !isLoading) ? true : false}
+                    title={nftMetadata?.title ?? ''}
+                    image={image ?? ''}
+                    tokenId={tokenId ?? 0}
+                />
             </Flex>
             <ConnectedWalletButton>
                 <ApproveNFT

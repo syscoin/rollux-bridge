@@ -5,7 +5,10 @@ export type fetchNFTMetdataProps = {
     url: string,
 }
 
-export const useFetchNFTMetadata = ({ url }: fetchNFTMetdataProps) => {
+export const useFetchNFTMetadata = ({ url }: fetchNFTMetdataProps): {
+    image: string,
+    title: string,
+} | null => {
     const [metadata, setMetadata] = useState(null);
 
     useEffect(() => {
