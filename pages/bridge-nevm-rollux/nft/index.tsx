@@ -15,6 +15,7 @@ import ERC721Abi from "blockchain/NevmRolluxBridge/abi/ERC721"
 import NFTSwapDirection from "blockchain/NevmRolluxBridge/enums/NFTSwapDirection"
 import SwapDirection from "components/NFT/SwapDirection"
 import L1ERC721Bridge from "blockchain/NevmRolluxBridge/abi/L1ERC721Bridge"
+import useFetchNFTMetadata from "hooks/rolluxBridge/useFetchNFTMetdata"
 
 export type NFTPageIndexProps = {
 
@@ -32,6 +33,20 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
     const [direction, setDirection] = useState<NFTSwapDirection>(NFTSwapDirection.L1_TO_L2);
     const [isApproved, setIsApproved] = useState<boolean>(false);
 
+
+    const { value: tokenUriData, error: tokenUriDataError } = useCall(
+        (nftAddress && tokenId !== undefined && ethers.utils.isAddress(nftAddress)) && {
+            contract: new ethers.Contract(
+                nftAddress,
+                new ethers.utils.Interface(ERC721Abi)
+            ),
+            method: 'tokenURI',
+            args: [tokenId]
+        }
+    ) ?? {}
+
+    const nftMetadata = useFetchNFTMetadata({ url: tokenUriData });
+
     const bridgeContractAddress: string | undefined = useMemo(() => {
         if (direction === NFTSwapDirection.L1_TO_L2) {
             // if direction from l1 to l2 we'll use l1 bridge
@@ -46,6 +61,8 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
 
         return undefined;
     }, [direction, contractsL1, contractsL2]);
+
+
 
 
     const { send: sendApproval, state: approvalTxState } = useContractFunction(
