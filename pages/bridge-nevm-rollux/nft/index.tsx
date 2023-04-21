@@ -15,8 +15,8 @@ import ERC721Abi from "blockchain/NevmRolluxBridge/abi/ERC721"
 import NFTSwapDirection from "blockchain/NevmRolluxBridge/enums/NFTSwapDirection"
 import SwapDirection from "components/NFT/SwapDirection"
 import L1ERC721Bridge from "blockchain/NevmRolluxBridge/abi/L1ERC721Bridge"
-import useFetchNFTMetadata from "hooks/rolluxBridge/useFetchNFTMetdata"
-import useFetchNFTImage from "hooks/rolluxBridge/useFetchNFTImage"
+import useFetchNFTMetadata from "hooks/rolluxBridge/useFetchNFTMetadata"
+import { useComputeNFTImageUrl } from "hooks/rolluxBridge/useComputeNFTImageUrl"
 
 export type NFTPageIndexProps = {
 
@@ -26,7 +26,7 @@ export type NFTPageIndexProps = {
 
 export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
     const { selectedNetwork, contractsL1, contractsL2, l1ChainId, l2ChainId } = useSelectedNetwork();
-    const { account, switchNetwork } = useEthers();
+    const { switchNetwork } = useEthers();
 
     const [nftAddress, setNftAddress] = useState<string>('');
     const [tokenId, setTokenId] = useState<number | undefined>(undefined);
@@ -46,8 +46,8 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
         }
     ) ?? {}
 
-    const nftMetadata = useFetchNFTMetadata({ url: tokenUriData });
-    const { image, isLoading, error } = useFetchNFTImage(nftMetadata?.image)
+    const nftMetadata = useFetchNFTMetadata({ url: tokenUriData ? tokenUriData[0] : null });
+    const nftImageUrl = useComputeNFTImageUrl({ url: nftMetadata?.image ?? null })
 
     const bridgeContractAddress: string | undefined = useMemo(() => {
         if (direction === NFTSwapDirection.L1_TO_L2) {
@@ -161,9 +161,9 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                     <ArrowRight />
                 </Box>
                 <PreviewNFT
-                    isLoading={(nftAddress && nftMetadata && image && !isLoading) ? true : false}
-                    title={nftMetadata?.title ?? ''}
-                    image={image ?? ''}
+                    isLoading={(nftAddress && nftMetadata && nftImageUrl) ? true : false}
+                    title={nftMetadata?.name ?? ''}
+                    image={nftImageUrl}
                     tokenId={tokenId ?? 0}
                 />
             </Flex>
