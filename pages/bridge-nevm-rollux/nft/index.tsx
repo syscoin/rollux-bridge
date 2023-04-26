@@ -89,7 +89,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                 bridgeContractAddress,
                 new ethers.utils.Interface(L1ERC721Bridge)
             ) : undefined),
-        "depositERC721"
+        "bridgeERC721"
     )
 
     const { value: approvedData, error: approvedError } = useCall(
@@ -128,9 +128,18 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
 
     }
     const handleSendNFT = async () => {
-        sendDepositNFTL1(
-
-        );
+        if (direction === NFTSwapDirection.L1_TO_L2
+            && nftAddress
+            && oppositeLayerToken
+        ) {
+            sendDepositNFTL1(
+                nftAddress,
+                oppositeLayerToken.bridgedTo,
+                tokenId,
+                1234,
+                ethers.utils.hexlify(ethers.utils.toUtf8Bytes("rollux-bridge"))
+            )
+        }
     }
 
 
@@ -205,7 +214,9 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                         mt={4}
                         px="32.5px"
                         w={'100%'}
-                        onClick={() => { }}
+                        onClick={() => {
+                            handleSendNFT()
+                        }}
                     >
                         Send NFT
                     </Button>
