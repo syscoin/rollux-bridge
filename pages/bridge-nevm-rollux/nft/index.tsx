@@ -4,7 +4,7 @@ import { RolluxPageWrapper } from "components/Common/RolluxPageWrapper"
 import { SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks"
 import { useSelectedNetwork } from "hooks/rolluxBridge/useSelectedNetwork"
 import InputNFT from "components/NFT/InputNFT"
-import { Box, CardBody, Flex, Card, Heading, Button } from "@chakra-ui/react"
+import { Box, CardBody, Flex, Card, Heading, Button, Alert, AlertDescription } from "@chakra-ui/react"
 import { ArrowRight } from "@mui/icons-material"
 import PreviewNFT from "components/NFT/PreviewNFT"
 import { CallResult, useCall, useContractFunction, useEthers } from "@usedapp/core"
@@ -17,6 +17,7 @@ import SwapDirection from "components/NFT/SwapDirection"
 import L1ERC721Bridge from "blockchain/NevmRolluxBridge/abi/L1ERC721Bridge"
 import useFetchNFTMetadata from "hooks/rolluxBridge/useFetchNFTMetadata"
 import { useComputeNFTImageUrl } from "hooks/rolluxBridge/useComputeNFTImageUrl"
+import { useNFTTokenlist } from "hooks/rolluxBridge/useNFTTokenlist"
 
 export type NFTPageIndexProps = {
 
@@ -26,7 +27,7 @@ export type NFTPageIndexProps = {
 
 export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
     const { selectedNetwork, contractsL1, contractsL2, l1ChainId, l2ChainId } = useSelectedNetwork();
-    const { switchNetwork } = useEthers();
+    const { switchNetwork, chainId } = useEthers();
 
     const [nftAddress, setNftAddress] = useState<string>('');
     const [tokenId, setTokenId] = useState<number | undefined>(undefined);
@@ -34,6 +35,13 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
     const [direction, setDirection] = useState<NFTSwapDirection>(NFTSwapDirection.L1_TO_L2);
     const [isApproved, setIsApproved] = useState<boolean>(false);
 
+    const { oppositeLayerToken } = useNFTTokenlist({
+        queryToken: nftAddress,
+        atChainId: chainId
+    });
+
+
+    console.log(oppositeLayerToken, nftAddress);
 
     const { value: tokenUriData, error: tokenUriDataError } = useCall(
         (nftAddress && tokenId !== undefined && ethers.utils.isAddress(nftAddress)) && {
@@ -68,7 +76,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
 
 
     const { send: sendApproval, state: approvalTxState } = useContractFunction(
-        (nftAddress && tokenId !== undefined ? new ethers.Contract(
+        ((nftAddress && ethers.utils.isAddress(nftAddress)) && tokenId !== undefined ? new ethers.Contract(
             nftAddress,
             new ethers.utils.Interface(ERC721Abi)
         ) : undefined),
@@ -76,7 +84,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
     ) ?? {};
 
     const { send: sendDepositNFTL1, state: statusDepositNFTL1 } = useContractFunction(
-        (nftAddress && tokenId !== undefined && bridgeContractAddress !== undefined ?
+        ((nftAddress && ethers.utils.isAddress(nftAddress)) && tokenId !== undefined && bridgeContractAddress !== undefined ?
             new ethers.Contract(
                 bridgeContractAddress,
                 new ethers.utils.Interface(L1ERC721Bridge)
@@ -120,7 +128,9 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
 
     }
     const handleSendNFT = async () => {
+        sendDepositNFTL1(
 
+        );
     }
 
 
@@ -152,6 +162,21 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                     onDirectionChanged={(direction) => setDirection(direction)}
                 />
             </Flex>
+            {(nftAddress.length > 0 && ethers.utils.isAddress(nftAddress) && oppositeLayerToken === undefined) && <>
+                <Alert status="error">
+                    <AlertDescription>
+                        Given token not found in token list.
+                    </AlertDescription>
+                </Alert>
+            </>}
+
+            {(nftAddress.length > 1 && !ethers.utils.isAddress(nftAddress)) && <>
+                <Alert status="warning">
+                    <AlertDescription>
+                        Invalid NFT contract address.
+                    </AlertDescription>
+                </Alert>
+            </>}
             <Flex direction={'row'} alignItems={'center'} gap={2}>
                 <InputNFT
                     onChangeContractAddress={(address) => setNftAddress(address)}
