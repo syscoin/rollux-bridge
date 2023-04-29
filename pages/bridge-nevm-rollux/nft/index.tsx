@@ -15,9 +15,12 @@ import ERC721Abi from "blockchain/NevmRolluxBridge/abi/ERC721"
 import NFTSwapDirection from "blockchain/NevmRolluxBridge/enums/NFTSwapDirection"
 import SwapDirection from "components/NFT/SwapDirection"
 import L1ERC721Bridge from "blockchain/NevmRolluxBridge/abi/L1ERC721Bridge"
+import L2ERC721BridgeABI from "blockchain/NevmRolluxBridge/abi/L2ERC721Bridge"
 import useFetchNFTMetadata from "hooks/rolluxBridge/useFetchNFTMetadata"
 import { useComputeNFTImageUrl } from "hooks/rolluxBridge/useComputeNFTImageUrl"
 import { useNFTTokenlist } from "hooks/rolluxBridge/useNFTTokenlist"
+import { useCrossChainMessenger } from "hooks/rolluxBridge/useCrossChainMessenger"
+import { MessageDirection, MessageStatus } from "@eth-optimism/sdk"
 
 export type NFTPageIndexProps = {
 
@@ -27,7 +30,7 @@ export type NFTPageIndexProps = {
 
 export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
     const { selectedNetwork, contractsL1, contractsL2, l1ChainId, l2ChainId } = useSelectedNetwork();
-    const { switchNetwork, chainId } = useEthers();
+    const { switchNetwork, chainId, account } = useEthers();
 
     const [nftAddress, setNftAddress] = useState<string>('');
     const [tokenId, setTokenId] = useState<number | undefined>(undefined);
@@ -40,8 +43,18 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
         atChainId: chainId
     });
 
+    const messenger = useCrossChainMessenger();
 
-    console.log(oppositeLayerToken, nftAddress);
+
+    useEffect(() => {
+        if (messenger) {
+
+
+            messenger.getMessageStatus('0xa8ac9c7cf5a702595e991d88bb72967576e885b97e8191d08c909f6fbb825556').then(s => console.log(s));
+        }
+
+
+    }, [contractsL2.L2ERC721Bridge, messenger])
 
     const { value: tokenUriData, error: tokenUriDataError } = useCall(
         (nftAddress && tokenId !== undefined && ethers.utils.isAddress(nftAddress)) && {
@@ -131,12 +144,39 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
         if (direction === NFTSwapDirection.L1_TO_L2
             && nftAddress
             && oppositeLayerToken
+            && messenger
+            && account
         ) {
+            const l2BridgeIface = new ethers.utils.Interface(L2ERC721BridgeABI);
+
+            const gas = await messenger.estimateL2MessageGasLimit(
+                {
+                    direction: MessageDirection.L1_TO_L2,
+                    target: contractsL2.L2ERC721Bridge,
+                    message: l2BridgeIface.encodeFunctionData("finalizeBridgeERC721", [
+                        nftAddress,
+                        oppositeLayerToken.bridgedTo,
+                        account,
+                        account,
+                        tokenId,
+                        ethers.utils.hexlify(ethers.utils.toUtf8Bytes("rollux-bridge"))
+                    ])
+                }
+            );
+
+            console.log(gas);
+            console.log(nftAddress,
+                oppositeLayerToken.bridgedTo,
+                account,
+                account,
+                tokenId,
+                ethers.utils.hexlify(ethers.utils.toUtf8Bytes("rollux-bridge")))
+
             sendDepositNFTL1(
                 nftAddress,
                 oppositeLayerToken.bridgedTo,
                 tokenId,
-                1234,
+                gas,
                 ethers.utils.hexlify(ethers.utils.toUtf8Bytes("rollux-bridge"))
             )
         }

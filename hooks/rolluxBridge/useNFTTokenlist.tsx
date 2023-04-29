@@ -27,8 +27,7 @@ export const useNFTTokenlist = (props: useNFTTokenlistProps): { oppositeLayerTok
     const [selectedToken, setSelectedToken] = useState<NFTToken | undefined>(undefined);
 
     useEffect(() => {
-        if (!error) {
-            console.log(data);
+        if (!error && data) {
             setAllTokens(data.tokens)
         }
     }, [data, error])
