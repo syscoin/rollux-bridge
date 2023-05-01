@@ -50,7 +50,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
         if (messenger) {
 
 
-            messenger.getMessageStatus('0xa8ac9c7cf5a702595e991d88bb72967576e885b97e8191d08c909f6fbb825556').then(s => console.log(s));
+            messenger.getMessageStatus('0x543cffd4898de9e0bde7e36fc8c3c1df92a41ed89bea2346d44a62dd78e5ce28').then(s => console.log(s));
         }
 
 
@@ -161,7 +161,8 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                         tokenId,
                         ethers.utils.hexlify(ethers.utils.toUtf8Bytes("rollux-bridge"))
                     ])
-                }
+                },
+                { bufferPercent: 200 }
             );
 
             console.log(gas);
