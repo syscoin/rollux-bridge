@@ -109,7 +109,7 @@ export const CreateTokenIndex: NextPage<{}> = () => {
                 try {
                     const _symbol = await erc721Contract.symbol();
                     const _name = await erc721Contract.name();
-                    await erc721Contract.ownerOf(0);
+                    await erc721Contract.ownerOf(1);
 
                     setTokenStandard(TokenStandard.ERC721);
                     setTokenName(_name);
