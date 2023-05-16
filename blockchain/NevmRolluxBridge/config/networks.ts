@@ -28,28 +28,28 @@ export const ChainIdsToNetworksMap: { [key: number]: SelectedNetworkType } = {
     5700: SelectedNetworkType.Testnet,
     57000: SelectedNetworkType.Testnet,
     // mainnet todo fill correct chain Ids
-    1: SelectedNetworkType.Mainnet,
-    5: SelectedNetworkType.Mainnet
+    57: SelectedNetworkType.Mainnet,
+    570: SelectedNetworkType.Mainnet
 }
 
 
 
 export const networks: { [key: string]: NetworkData } = {
     L1: {
-        rpcAddress: 'https://rpc.tanenbaum.io',
+        rpcAddress: 'https://rpc.syscoin.org',
         name: 'L1',
-        explorerUrl: 'https://tanenbaum.io',
-        chainId: 5701,
+        explorerUrl: 'https://explorer.syscoin.org/',
+        chainId: 57,
         layer: 1,
-        contracts: contractsDev.l1_dev,
+        contracts: contractsDev.l1,
     },
     L2: {
-        rpcAddress: 'https://rpc-bedrock.rollux.com/',
+        rpcAddress: 'https://rpc.rollux.com',
         name: 'Rollux',
         explorerUrl: 'https://explorer.testnet.rollux.com',
-        chainId: 57001,
+        chainId: 570,
         layer: 2,
-        contracts: contractsDev.l2_dev,
+        contracts: contractsDev.l2,
     },
     L1Dev: {
         rpcAddress: 'https://rpc.tanenbaum.io',
@@ -76,8 +76,8 @@ export const NetworkSwitchMap: {
     }
 } = {
     [SelectedNetworkType.Mainnet]: {
-        L1: 1,
-        L2: 5,
+        L1: 57,
+        L2: 570,
     },
     [SelectedNetworkType.Testnet]: {
         L1: 5700,

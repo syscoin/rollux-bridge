@@ -1,7 +1,7 @@
 import { ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
 import { ThemeProvider } from "@mui/material";
 import { Config, DAppProvider } from "@usedapp/core";
-import { RolluxChain, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
+import { NEVMChain, RolluxChain, RolluxChainMainnet, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
 import { NetworkValidator } from "components/Common/NetworkValidator";
 import { Header } from "components/Header";
 import { RolluxHeader } from "components/RolluxHeader";
@@ -24,12 +24,15 @@ const dappConfig: Config = {
   readOnlyUrls: {
     [5700]: 'https://rpc.tanenbaum.io',
     [57000]: 'https://rpc-tanenbaum.rollux.com/',
+    [RolluxChainMainnet.chainId]: RolluxChainMainnet.rpcUrl || '',
+    [NEVMChain.chainId]: NEVMChain.rpcUrl || '',
   },
   multicallAddresses: {
     [5700]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697', // multicall 2 address.
-    [57000]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697'
+    [57000]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697',
+
   },
-  networks: [RolluxChain, TanenbaumChain]
+  networks: [RolluxChain, TanenbaumChain, NEVMChain, RolluxChainMainnet]
 }
 
 function MyApp({ Component, pageProps }: AppProps) {

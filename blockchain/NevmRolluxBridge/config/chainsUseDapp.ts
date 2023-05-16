@@ -1,5 +1,26 @@
 import { Chain } from "@usedapp/core";
 
+export const RolluxChainMainnet: Chain = {
+    chainId: 570,
+    chainName: "Rollux Mainnet",
+    isLocalChain: false,
+    isTestChain: false,
+    nativeCurrency: {
+        name: "rSyscoin",
+        symbol: "rSYS",
+        decimals: 18,
+    },
+    multicallAddress: '',
+    getExplorerAddressLink: (address: string) => {
+        return address;
+    },
+    getExplorerTransactionLink: (address: string) => {
+        return address;
+    },
+    rpcUrl: "https://rpc.rollux.com",
+    blockExplorerUrl: "https://explorer.syscoin.org/",
+}
+
 export const NEVMChain: Chain = {
     chainId: 57,
     chainName: "Syscoin NEVM",
