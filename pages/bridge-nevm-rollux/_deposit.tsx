@@ -5,6 +5,7 @@ import {
 } from '@chakra-ui/react';
 import { ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
 import { TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp';
+import { SelectedNetworkType } from 'blockchain/NevmRolluxBridge/config/networks';
 import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20TokenList';
 import TokenListToken from 'blockchain/NevmRolluxBridge/interfaces/TokenListToken';
 import { ConnectButton } from 'components/ConnectButton';
@@ -12,6 +13,7 @@ import { ConnectionWarning } from 'components/ConnectionWarning';
 import { BigNumber, Contract, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 import React, { FC, useEffect, useState, useCallback } from 'react';
+import { useSelectedNetwork } from "./../../hooks/rolluxBridge/useSelectedNetwork"
 
 export type DepositPartProps = {
     onClickDepositButton: (amount: string) => void;
@@ -29,9 +31,11 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
     const [amountToSwap, setAmountToSwap] = useState<string>('0.00');
 
+    const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork } = useSelectedNetwork();
+
     const { account, chainId, switchNetwork } = useEthers();
-    const balanceNativeToken = useEtherBalance(account, { chainId: TanenbaumChain.chainId });
-    const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: TanenbaumChain.chainId });
+    const balanceNativeToken = useEtherBalance(account, { chainId: l1ChainId });
+    const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: l1ChainId });
     const allowanceERC20Token = useTokenAllowance(selectedTokenAddress, account, L1StandardBridgeAddress, {
         chainId: TanenbaumChain.chainId
     });
@@ -50,7 +54,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
         try {
             const contract = new Contract(tokenAddress, ERC20Interface,
-                new ethers.providers.StaticJsonRpcProvider(TanenbaumChain.rpcUrl)
+                new ethers.providers.StaticJsonRpcProvider(rpcL1)
             );
 
             const balance = await contract.balanceOf(owner);
@@ -145,7 +149,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
         fetchERC20TokenList().then((tokens) => {
             const tokensL1: TokenListToken[] = tokens.filter((token) => {
-                if (token.chainId === 5700) {
+                if (token.chainId === l1ChainId) {
                     return true;
                 }
 
@@ -172,7 +176,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             }
 
             const tokensL2: TokenListToken[] = tokens.filter((token) => {
-                if (token.chainId === 57000) {
+                if (token.chainId === l2ChainId) {
                     return true;
                 }
 
@@ -187,12 +191,12 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             setAllERC20Tokens(tokens);
 
         })
-    }, [account]);
+    }, [account, l1ChainId, l2ChainId]);
 
     const handleApproval = useCallback(async () => {
         if (selectedTokenAddress && selectedTokenAddressL2) {
 
-            await preCheckNetwork(TanenbaumChain.chainId, chainId as number);
+            await preCheckNetwork(l1ChainId, chainId as number);
 
             setIsLoading(true);
             onClickApproveERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals));
@@ -200,12 +204,12 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
 
         }
-    }, [selectedTokenAddress, selectedTokenAddressL2, preCheckNetwork, chainId, setIsLoading, onClickApproveERC20, amountToSwap, selectedTokenDecimals]);
+    }, [selectedTokenAddress, l1ChainId, selectedTokenAddressL2, preCheckNetwork, chainId, setIsLoading, onClickApproveERC20, amountToSwap, selectedTokenDecimals]);
 
     const handleERC20Deposit = async () => {
         if (selectedTokenAddress && selectedTokenAddressL2) {
 
-            await preCheckNetwork(TanenbaumChain.chainId, chainId as number);
+            await preCheckNetwork(l1ChainId, chainId as number);
 
             setIsLoading(true);
             onClickDepositERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals));
@@ -364,19 +368,19 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     </>}
                 </>}
 
-                {('SYS' === currency && account && (chainId !== TanenbaumChain.chainId)) && <>
+                {('SYS' === currency && account && (chainId !== l1ChainId)) && <>
                     <Button
                         isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
                         variant="primary"
                         onClick={async () => {
-                            await switchNetwork(TanenbaumChain.chainId);
+                            await switchNetwork(l1ChainId);
                         }}
                     >
-                        Switch to Tanenbaum Chain
+                        Switch to {selectedNetwork === SelectedNetworkType.Mainnet ? 'Syscoin' : 'Tanenbaum'} Chain
                     </Button>
                 </>}
 
-                {('SYS' === currency && account && (chainId && chainId === TanenbaumChain.chainId)) && <>
+                {('SYS' === currency && account && (chainId && chainId === l1ChainId)) && <>
                     <Button
                         isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) || !parseFloat(amountToSwap)}
                         variant="primary"

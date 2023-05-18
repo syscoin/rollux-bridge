@@ -28,6 +28,8 @@ const dappConfig: Config = {
     [NEVMChain.chainId]: NEVMChain.rpcUrl || '',
   },
   multicallAddresses: {
+    [RolluxChainMainnet.chainId]: '0xbE3696FC425103e8fD629175917Dd328713F3072',
+    [NEVMChain.chainId]: '0x0c457A8E4bD35eA571956d6bb7443c5C661d7607',
     [5700]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697', // multicall 2 address.
     [57000]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697',
 

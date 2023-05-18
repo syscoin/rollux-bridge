@@ -14,7 +14,9 @@ export type NetworkData = {
 
 export const networksMap: { [key: string]: string } = {
     'L1Dev': 'RolluxBedrockDev',
-    'RolluxBedrockDev': 'L1Dev'
+    'RolluxBedrockDev': 'L1Dev',
+    'L1': 'Rollux',
+    'Rollux': 'L1',
 };
 
 export enum SelectedNetworkType {
