@@ -19,7 +19,7 @@ import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
 import { useEthers, useLogs, useSigner } from "@usedapp/core";
 import { RolluxChain, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
 import contractsDev from 'blockchain/NevmRolluxBridge/config/contracts';
-import { getNetworkByChainId, getNetworkByName, NetworkData, networks, networksMap } from "blockchain/NevmRolluxBridge/config/networks";
+import { getNetworkByChainId, getNetworkByName, NetworkData, networks, networksMap, SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks";
 import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
 import { ConnectionWarning } from 'components/ConnectionWarning';
 import { BigNumber, Contract, ethers } from "ethers";
@@ -37,6 +37,7 @@ import ProveMessageStep from 'components/BridgeL1L2/WIthdraw/Steps/ProveMessageS
 import { useLocalStorage } from 'usehooks-ts';
 import RelayMessageStep from 'components/BridgeL1L2/WIthdraw/Steps/RelayMessageStep';
 import { PendingMessage } from 'components/BridgeL1L2/WIthdraw/Steps/PendingMessage';
+import { useSelectedNetwork } from "./../../hooks/rolluxBridge/useSelectedNetwork"
 
 type BridgeNevmRolluxProps = {}
 
@@ -64,6 +65,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     // [{withdrawTx, proveTx}]
     const [proveTxns, setProveTxns] = useLocalStorage<{ withdrawTx: string, proveTx: string }[]>('prove-txns', []);
     const [relayTxns, setRelayTxns] = useLocalStorage<{ withdrawTx: string, relayTx: string }[]>('relay-txns', []);
+
+    const { contractsL1, contractsL2, l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork } = useSelectedNetwork();
 
 
     // todo refactor this 2 similar functions
@@ -491,9 +494,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             // check for withdrawals
 
             const L2BridgeContract = new Contract(
-                contractsDev.l2_dev.L2StandardBridge,
+                contractsL2.L2StandardBridge,
                 new ethers.utils.Interface(L2StandardBridgeABI),
-                new ethers.providers.StaticJsonRpcProvider(RolluxChain.rpcUrl)
+                new ethers.providers.StaticJsonRpcProvider(rpcL2)
             )
 
             const filter = L2BridgeContract.filters['WithdrawalInitiated'](null, null, account)
@@ -502,10 +505,10 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
             if (events.length > 0) {
                 const messengerL1 = crossChainMessengerFactory(
-                    networks.L1Dev,
-                    networks.L2Dev,
-                    new ethers.providers.StaticJsonRpcProvider(TanenbaumChain.rpcUrl),
-                    new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl),
+                    selectedNetwork === SelectedNetworkType.Testnet ? networks.L1Dev : networks.L1,
+                    selectedNetwork === SelectedNetworkType.Testnet ? networks.L2Dev : networks.L2,
+                    new ethers.providers.StaticJsonRpcProvider(rpcL1),
+                    new ethers.providers.JsonRpcProvider(rpcL2),
                     true
                 );
 
@@ -521,7 +524,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
 
         }
-    }, [currentDisplay, account])
+    }, [currentDisplay, account, rpcL1, rpcL2, selectedNetwork, contractsL2])
 
     useEffect(() => {
         const loadWithdrawalLogs = () => {
@@ -773,10 +776,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                             status: item.status,
                                                             txHash: item.txHash
                                                         })
-                                                        console.log({
-                                                            status: item.status,
-                                                            txHash: item.txHash
-                                                        })
+
 
                                                         withdrawOnOpen();
                                                     }}

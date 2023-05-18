@@ -11,6 +11,7 @@ import { ConnectButton } from 'components/ConnectButton';
 import { BigNumber, Contract, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 import React, { FC, useEffect, useState } from 'react';
+import { useSelectedNetwork } from "./../../hooks/rolluxBridge/useSelectedNetwork"
 
 export type WithdrawPartProps = {
     onClickWithdrawButton: (amount: string) => void;
@@ -27,9 +28,10 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
     const [amountToSwap, setAmountToSwap] = useState<string>('0.00');
     const { account, chainId, switchNetwork } = useEthers();
+    const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork } = useSelectedNetwork();
 
-    const balanceNativeToken = useEtherBalance(account, { chainId: RolluxChain.chainId });
-    const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: RolluxChain.chainId });
+    const balanceNativeToken = useEtherBalance(account, { chainId: l2ChainId });
+    const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: l2ChainId });
     const [allERC20Tokens, setAllERC20Tokens] = useState<TokenListToken[]>([]);
     const [l1ERC20Tokens, setL1ERC20Tokens] = useState<TokenListToken[]>([]);
     const [l2ERC20Tokens, setL2ERC20Tokens] = useState<TokenListToken[]>([]);
@@ -120,7 +122,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
         fetchERC20TokenList().then((tokens) => {
             const tokensL1: TokenListToken[] = tokens.filter((token) => {
-                if (token.chainId === 5700) {
+                if (token.chainId === l1ChainId) {
                     return true;
                 }
 
@@ -131,7 +133,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
 
             const tokensL2: TokenListToken[] = tokens.filter((token) => {
-                if (token.chainId === 57000) {
+                if (token.chainId === l2ChainId) {
                     return true;
                 }
 
@@ -144,13 +146,13 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
             setIsLoading(false);
         })
-    }, [setIsLoading, account]);
+    }, [setIsLoading, account, l1ChainId, l2ChainId]);
 
 
     const handleERC20Withdraw = async () => {
         if (selectedTokenAddress && selectedTokenAddressL2) {
 
-            await preCheckNetwork(RolluxChain.chainId, chainId as number);
+            await preCheckNetwork(l2ChainId, chainId as number);
 
             setIsLoading(true);
             onClickWithdrawERC20(selectedTokenAddressL2, selectedTokenAddress, ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals));
@@ -246,7 +248,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
             {selectedToken && (
                 <Flex flexDir="column" maxW="100%">
                     <Text fontWeight={700} mt={{ base: '24px', md: '44px' }}>
-                        You will get on NEVM
+                        You will get on L1
                     </Text>
 
                     <Wrap alignItems="center" mt="15px" spacing="27px" maxW="calc(100vw - 70px)">
@@ -287,30 +289,30 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                                 handleERC20Withdraw()
                             }}
                         >
-                            {chainId !== RolluxChain.chainId && 'Switch to Rollux'}
-                            {chainId === RolluxChain.chainId && 'Withdraw'}
+                            {chainId !== l2ChainId && 'Switch to Rollux'}
+                            {chainId === l2ChainId && 'Withdraw'}
                         </Button>
                     </>}
                 </>}
 
-                {('SYS' === currency && account && (chainId !== RolluxChain.chainId)) && <>
+                {('SYS' === currency && account && (chainId !== l2ChainId)) && <>
                     <Button
                         isDisabled={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}
                         variant="primary"
                         onClick={async () => {
-                            await switchNetwork(RolluxChain.chainId);
+                            await switchNetwork(l2ChainId);
                         }}
                     >
                         Switch to Rollux Chain
                     </Button>
                 </>}
 
-                {('SYS' === currency && account && (chainId && chainId === RolluxChain.chainId)) && <>
+                {('SYS' === currency && account && (chainId && chainId === l2ChainId)) && <>
                     <Button
                         isDisabled={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}
                         variant="primary"
                         onClick={async () => {
-                            await preCheckNetwork(RolluxChain.chainId, chainId as number);
+                            await preCheckNetwork(l2ChainId, chainId as number);
                             onClickWithdrawButton(amountToSwap);
                         }}
                     >
