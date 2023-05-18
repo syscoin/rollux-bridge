@@ -15,6 +15,7 @@ import OPMintableERC721Factory from "blockchain/NevmRolluxBridge/abi/OPMintableE
 import { SwitchNetworkButton } from "components/Common/SwitchNetworkButton";
 
 
+// todo refactor this. This part doesnt affect anything because this address is constant but better to have good code. 
 const OPMintableFactory = new ethers.Contract('0x4200000000000000000000000000000000000012', new ethers.utils.Interface(OPMintableFactoryABI.abi));
 
 export enum TokenStandard {
