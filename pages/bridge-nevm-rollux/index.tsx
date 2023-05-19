@@ -38,6 +38,7 @@ import { useLocalStorage } from 'usehooks-ts';
 import RelayMessageStep from 'components/BridgeL1L2/WIthdraw/Steps/RelayMessageStep';
 import { PendingMessage } from 'components/BridgeL1L2/WIthdraw/Steps/PendingMessage';
 import { useSelectedNetwork } from "./../../hooks/rolluxBridge/useSelectedNetwork"
+import { useCrossChainMessenger } from 'hooks/rolluxBridge/useCrossChainMessenger';
 
 type BridgeNevmRolluxProps = {}
 
@@ -67,6 +68,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const [relayTxns, setRelayTxns] = useLocalStorage<{ withdrawTx: string, relayTx: string }[]>('relay-txns', []);
 
     const { contractsL1, contractsL2, l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork } = useSelectedNetwork();
+    const hookedMessenger = useCrossChainMessenger();
 
 
     // todo refactor this 2 similar functions
@@ -101,7 +103,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     }
 
 
-    const getCrossChainMessenger = async (signer: ethers.providers.JsonRpcSigner | undefined, currentDisplay: CurrentDisplayView) => {
+    const getCrossChainMessenger = useCallback(async (signer: ethers.providers.JsonRpcSigner | undefined, currentDisplay: CurrentDisplayView) => {
         if (!signer) {
             console.warn("No Signer")
             return undefined;
@@ -155,13 +157,13 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         return crossChainMessengerFactory(
             l1Contracts,
             l2Contracts,
-            new ethers.providers.JsonRpcProvider(TanenbaumChain.rpcUrl),
+            new ethers.providers.JsonRpcProvider(rpcL1),
             signer,
             true
         )
 
 
-    };
+    }, [rpcL1]);
 
     const handleERC20Approval = async (l1Token: string, l2Token: string, amount: BigNumber) => {
         if (!library) {
@@ -481,10 +483,10 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         }
 
         getCrossChainMessenger(signer, currentDisplay).then((messenger) => {
-            console.log(messenger);
+
             setCrossChainMessenger(messenger);
         })
-    }, [signer, account, currentDisplay])
+    }, [signer, account, currentDisplay, getCrossChainMessenger])
 
 
 
@@ -494,7 +496,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             // check for withdrawals
 
             const L2BridgeContract = new Contract(
-                contractsL2.L2StandardBridge,
+                contractsL2?.L2StandardBridge,
                 new ethers.utils.Interface(L2StandardBridgeABI),
                 new ethers.providers.StaticJsonRpcProvider(rpcL2)
             )
@@ -641,6 +643,21 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                 >
                                     Withdraw
                                 </Tab>
+                                <Tab
+                                    onClick={(e) => {
+                                        e.preventDefault();
+
+
+                                    }}
+                                    px="36px"
+                                    borderRadius="6px"
+                                    _selected={{
+                                        color: '#000',
+                                        bg: 'brand.secondaryGradient',
+                                    }}
+                                >
+                                    NFT Bridge
+                                </Tab>
                             </TabList>
 
                             <TabPanels>
@@ -687,20 +704,29 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                     <ProveMessageStep
                                                         chainId={chainId || 1}
                                                         proveTxHash={getProveTxn(withdrawalModalData.txHash, proveTxns) ?? ''}
-                                                        requiredChainId={TanenbaumChain.chainId}
+                                                        requiredChainId={l1ChainId}
                                                         onClickProveMessage={async () => {
                                                             if (!signer) {
                                                                 return;
                                                             }
 
-                                                            const messengerL1 = crossChainMessengerFactory(
-                                                                networks.L1Dev,
-                                                                networks.L2Dev,
-                                                                signer,
-                                                                new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl),
-                                                                true
-                                                            );
-                                                            const _tx = await (new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl)).getTransaction(withdrawalModalData.txHash);
+                                                            if (!hookedMessenger) {
+                                                                console.warn('Failed to init cm. ')
+
+                                                                return;
+                                                            }
+
+                                                            // const messengerL1 = crossChainMessengerFactory(
+                                                            //     networks.L1Dev,
+                                                            //     networks.L2Dev,
+                                                            //     signer,
+                                                            //     new ethers.providers.JsonRpcProvider(rpcL2),
+                                                            //     true
+                                                            // );
+
+                                                            const messengerL1 = hookedMessenger;
+
+                                                            const _tx = await (new ethers.providers.JsonRpcProvider(rpcL2)).getTransaction(withdrawalModalData.txHash);
 
                                                             const proveTx = await messengerL1.proveMessage(_tx);
 
@@ -710,7 +736,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                             setProveTxns([...tmpProven]);
                                                         }}
                                                         onClickSwitchNetwork={async () => {
-                                                            await switchNetwork(TanenbaumChain.chainId)
+                                                            await switchNetwork(l1ChainId)
                                                         }}
                                                     />
                                                 </>}
@@ -719,19 +745,27 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                     <RelayMessageStep
                                                         chainId={chainId || 1}
                                                         relayTxHash={getRelayTxn(withdrawalModalData.txHash, relayTxns) ?? ''}
-                                                        requiredChainId={TanenbaumChain.chainId}
+                                                        requiredChainId={l1ChainId}
                                                         onClickRelayMessage={async () => {
                                                             if (!signer) {
                                                                 return;
                                                             }
 
-                                                            const messengerL1 = crossChainMessengerFactory(
-                                                                networks.L1Dev,
-                                                                networks.L2Dev,
-                                                                signer,
-                                                                new ethers.providers.JsonRpcProvider(RolluxChain.rpcUrl),
-                                                                true
-                                                            );
+                                                            if (!hookedMessenger) {
+                                                                console.warn('Failed to init cm. ')
+
+                                                                return;
+                                                            }
+
+                                                            // const messengerL1 = crossChainMessengerFactory(
+                                                            //     networks.L1Dev,
+                                                            //     networks.L2Dev,
+                                                            //     signer,
+                                                            //     new ethers.providers.JsonRpcProvider(rpcL2),
+                                                            //     true
+                                                            // );
+
+                                                            const messengerL1 = hookedMessenger;
 
                                                             const relayTx = await messengerL1.finalizeMessage(withdrawalModalData.txHash);
 
@@ -741,7 +775,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                             setRelayTxns([...tmpRelayed]);
                                                         }}
                                                         onClickSwitchNetwork={async () => {
-                                                            await switchNetwork(TanenbaumChain.chainId)
+                                                            await switchNetwork(l1ChainId)
                                                         }}
                                                     />
                                                 </>}
