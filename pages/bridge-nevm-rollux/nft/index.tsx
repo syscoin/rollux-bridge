@@ -203,7 +203,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                 setWithdraws([...logs]);
 
                 setPendingWithdraws(logs.filter((value) => {
-                    if ([MessageStatus.IN_CHALLENGE_PERIOD, MessageStatus.READY_FOR_RELAY, MessageStatus.READY_TO_PROVE].includes(value.status)) {
+                    if ([MessageStatus.READY_FOR_RELAY, MessageStatus.READY_TO_PROVE].includes(value.status)) {
                         return true;
                     }
                     return false;
