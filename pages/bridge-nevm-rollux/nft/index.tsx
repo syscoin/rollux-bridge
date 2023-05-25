@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { NextPage } from "next"
 import { RolluxPageWrapper } from "components/Common/RolluxPageWrapper"
 import { SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks"
 import { useSelectedNetwork } from "hooks/rolluxBridge/useSelectedNetwork"
 import InputNFT from "components/NFT/InputNFT"
-import { Box, CardBody, Flex, Card, Heading, Button, Alert, AlertDescription } from "@chakra-ui/react"
+import { Box, CardBody, Flex, Card, Heading, Button, Alert, AlertDescription, AlertDialog, AlertIcon } from "@chakra-ui/react"
 import { ArrowRight } from "@mui/icons-material"
 import PreviewNFT from "components/NFT/PreviewNFT"
 import { CallResult, useCall, useContractFunction, useEthers } from "@usedapp/core"
@@ -21,6 +21,7 @@ import { useComputeNFTImageUrl } from "hooks/rolluxBridge/useComputeNFTImageUrl"
 import { useNFTTokenlist } from "hooks/rolluxBridge/useNFTTokenlist"
 import { useCrossChainMessenger } from "hooks/rolluxBridge/useCrossChainMessenger"
 import { MessageDirection, MessageStatus } from "@eth-optimism/sdk"
+import ManageWithdrawals from "components/NFT/ManageWithdrawals"
 
 export type NFTPageIndexProps = {
 
@@ -29,7 +30,7 @@ export type NFTPageIndexProps = {
 
 
 export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
-    const { selectedNetwork, contractsL1, contractsL2, l1ChainId, l2ChainId } = useSelectedNetwork();
+    const { selectedNetwork, contractsL1, contractsL2, l1ChainId, l2ChainId, rpcL1, rpcL2 } = useSelectedNetwork();
     const { switchNetwork, chainId, account } = useEthers();
 
     const [nftAddress, setNftAddress] = useState<string>('');
@@ -38,23 +39,23 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
     const [direction, setDirection] = useState<NFTSwapDirection>(NFTSwapDirection.L1_TO_L2);
     const [isApproved, setIsApproved] = useState<boolean>(false);
 
+    const [withdraws, setWithdraws] = useState<{
+        status: MessageStatus,
+        txHash: string
+    }[]>([]);
+
+    const [pendingWithdraws, setPendingWithdraws] = useState<{
+        status: MessageStatus,
+        txHash: string
+    }[]>([]);
+
     const { oppositeLayerToken } = useNFTTokenlist({
         queryToken: nftAddress,
-        atChainId: chainId
+        atChainId: direction === NFTSwapDirection.L1_TO_L2 ? l1ChainId : l2ChainId
     });
 
     const messenger = useCrossChainMessenger();
 
-
-    useEffect(() => {
-        if (messenger) {
-
-
-            messenger.getMessageStatus('0x543cffd4898de9e0bde7e36fc8c3c1df92a41ed89bea2346d44a62dd78e5ce28').then(s => console.log(s));
-        }
-
-
-    }, [contractsL2.L2ERC721Bridge, messenger])
 
     const { value: tokenUriData, error: tokenUriDataError } = useCall(
         (nftAddress && tokenId !== undefined && ethers.utils.isAddress(nftAddress)) && {
@@ -141,45 +142,101 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
 
     }
     const handleSendNFT = async () => {
-        if (direction === NFTSwapDirection.L1_TO_L2
+        //direction === NFTSwapDirection.L1_TO_L2
+        if (true
             && nftAddress
             && oppositeLayerToken
             && messenger
             && account
         ) {
-            const l2BridgeIface = new ethers.utils.Interface(L2ERC721BridgeABI);
-
-            const gas = await messenger.estimateL2MessageGasLimit(
-                {
-                    direction: MessageDirection.L1_TO_L2,
-                    target: contractsL2.L2ERC721Bridge,
-                    message: l2BridgeIface.encodeFunctionData("finalizeBridgeERC721", [
-                        nftAddress,
-                        oppositeLayerToken.bridgedTo,
-                        account,
-                        account,
-                        tokenId,
-                        ethers.utils.hexlify(ethers.utils.toUtf8Bytes("rollux-bridge"))
-                    ])
-                },
-                { bufferPercent: 200 }
-            );
-
-            console.log(gas);
-            console.log(nftAddress,
-                oppositeLayerToken.bridgedTo,
-                account,
-                account,
-                tokenId,
-                ethers.utils.hexlify(ethers.utils.toUtf8Bytes("rollux-bridge")))
 
             sendDepositNFTL1(
                 nftAddress,
                 oppositeLayerToken.bridgedTo,
                 tokenId,
-                gas,
+                1_200_000,
                 ethers.utils.hexlify(ethers.utils.toUtf8Bytes("rollux-bridge"))
             )
+        }
+    }
+
+
+
+
+    const widthdrawalsLogs = useCallback(async () => {
+        if (direction === NFTSwapDirection.L2_TO_L1 && account && messenger) {
+            // check for withdrawals
+
+            const L2BridgeContract = bridgeContractAddress ? new ethers.Contract(
+                bridgeContractAddress,
+                new ethers.utils.Interface(L1ERC721Bridge),
+                new ethers.providers.StaticJsonRpcProvider(rpcL2)
+            ) : undefined;
+
+            if (!L2BridgeContract) return [];
+
+
+            const filter = L2BridgeContract.filters['ERC721BridgeInitiated'](null, null, account)
+
+            const events = await L2BridgeContract.queryFilter(filter);
+
+            if (events.length > 0) {
+                const checks = await Promise.all(events.map(async (value) => {
+                    const status = await messenger.getMessageStatus(value.transactionHash)
+
+                    return { status: status, txHash: value.transactionHash };
+                }))
+                return checks;
+            }
+
+            return [];
+
+
+        }
+    }, [direction, account, messenger, bridgeContractAddress, rpcL2])
+
+    useEffect(() => {
+        if (direction === NFTSwapDirection.L2_TO_L1) {
+            widthdrawalsLogs().then(logs => {
+                if (!logs) return;
+
+                setWithdraws([...logs]);
+
+                setPendingWithdraws(logs.filter((value) => {
+                    if ([MessageStatus.IN_CHALLENGE_PERIOD, MessageStatus.READY_FOR_RELAY, MessageStatus.READY_TO_PROVE].includes(value.status)) {
+                        return true;
+                    }
+                    return false;
+                }))
+            });
+        }
+    }, [direction, widthdrawalsLogs])
+
+
+    const handleSwitchDirection = (direction: NFTSwapDirection) => {
+        setDirection(direction)
+        setWithdraws([]);
+        setPendingWithdraws([]);
+        setTokenId(undefined);
+        setNftAddress('');
+    }
+
+
+    const handleProveMessage = async (txId: string) => {
+        if (!messenger) return;
+        try {
+            await messenger.proveMessage(txId);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    const handleFinalizeMessage = async (txId: string) => {
+        if (!messenger) return;
+        try {
+            await messenger.finalizeMessage(txId);
+        } catch (e) {
+            console.log(e);
         }
     }
 
@@ -209,7 +266,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
 
             <Flex alignItems={'center'} justifyContent={'center'} mb={3} mt={3}>
                 <SwapDirection currentDirection={direction}
-                    onDirectionChanged={(direction) => setDirection(direction)}
+                    onDirectionChanged={handleSwitchDirection}
                 />
             </Flex>
             {(nftAddress.length > 0 && ethers.utils.isAddress(nftAddress) && oppositeLayerToken === undefined) && <>
@@ -227,8 +284,17 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                     </AlertDescription>
                 </Alert>
             </>}
+
+            <ManageWithdrawals
+                pendingWithdrawals={pendingWithdraws}
+                onClickFinalizeMessage={handleFinalizeMessage}
+                onClickProveMessage={handleProveMessage}
+            />
+
             <Flex direction={'row'} alignItems={'center'} gap={2}>
                 <InputNFT
+                    contractAddressValue={nftAddress}
+                    tokenIdValue={tokenId}
                     onChangeContractAddress={(address) => setNftAddress(address)}
                     onChangeTokenId={(tokenId) => setTokenId(tokenId.toString().length > 0 ? tokenId : undefined)}
                 />
@@ -255,6 +321,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                         mt={4}
                         px="32.5px"
                         w={'100%'}
+                        isLoading={['Mining', 'PendingSignature', 'CollectingSignaturePool'].includes(statusDepositNFTL1.status)}
                         onClick={() => {
                             handleSendNFT()
                         }}

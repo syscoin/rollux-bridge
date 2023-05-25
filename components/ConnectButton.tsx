@@ -13,7 +13,8 @@ import NextLink from "next/link"
 import { createIcon } from '@download/blockies';
 
 
-interface ConnectButtonProps extends ButtonProps { }
+interface ConnectButtonProps extends ButtonProps {
+}
 
 export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
   const connectedWalletCtxt = useConnectedWallet();
@@ -23,6 +24,7 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
   const [avatar, setAvatar] = useState<string>('');
 
   const { isOpen, onClose, onOpen } = useDisclosure()
+
 
   const getAvatar = (address: string) => {
     if (!address) return '';

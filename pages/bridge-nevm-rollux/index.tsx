@@ -656,7 +656,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                         bg: 'brand.secondaryGradient',
                                     }}
                                 >
-                                    NFT Bridge
+                                    Other Providers
                                 </Tab>
                             </TabList>
 
@@ -832,6 +832,10 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                         setIsLoading={setIsLoading}
                                         L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
                                     />
+                                </TabPanel>
+
+                                <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
+                                    Chainge
                                 </TabPanel>
                             </TabPanels>
                         </Tabs>

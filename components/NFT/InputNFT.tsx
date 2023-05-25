@@ -4,9 +4,11 @@ import React, { FC } from "react"
 export type InputNFTProps = {
     onChangeContractAddress: (address: string) => void;
     onChangeTokenId: (tokenId: number) => void;
+    contractAddressValue?: string | undefined,
+    tokenIdValue?: number | undefined
 }
 
-export const InputNFT: FC<InputNFTProps> = ({ onChangeContractAddress, onChangeTokenId }) => {
+export const InputNFT: FC<InputNFTProps> = ({ onChangeContractAddress, onChangeTokenId, contractAddressValue, tokenIdValue }) => {
     return (<>
         <Card w={'45%'}>
             <CardBody>
@@ -14,13 +16,13 @@ export const InputNFT: FC<InputNFTProps> = ({ onChangeContractAddress, onChangeT
                     <FormLabel>
                         Contract Address
                     </FormLabel>
-                    <Input type={'text'} onChange={(e) => onChangeContractAddress(e.target.value)} />
+                    <Input value={contractAddressValue ?? ''} type={'text'} onChange={(e) => onChangeContractAddress(e.target.value)} />
                 </FormControl>
                 <FormControl>
                     <FormLabel>
                         Token ID
                     </FormLabel>
-                    <NumberInput onChange={(value) => onChangeTokenId(Number(value))}>
+                    <NumberInput value={tokenIdValue ?? ''} onChange={(value) => onChangeTokenId(Number(value))}>
                         <NumberInputField placeholder='1394' />
                     </NumberInput>
                 </FormControl>
