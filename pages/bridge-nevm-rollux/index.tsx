@@ -2,7 +2,7 @@ import {
     Card,
     CardBody,
     ChakraProvider,
-    Flex, Heading,
+    Flex, Grid, Heading,
     Highlight, Spinner, Tab,
     TabList,
     TabPanel,
@@ -39,6 +39,7 @@ import RelayMessageStep from 'components/BridgeL1L2/WIthdraw/Steps/RelayMessageS
 import { PendingMessage } from 'components/BridgeL1L2/WIthdraw/Steps/PendingMessage';
 import { useSelectedNetwork } from "./../../hooks/rolluxBridge/useSelectedNetwork"
 import { useCrossChainMessenger } from 'hooks/rolluxBridge/useCrossChainMessenger';
+import Coinify from 'components/BridgeL1L2/Coinify/Coinify';
 
 type BridgeNevmRolluxProps = {}
 
@@ -835,7 +836,10 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                 </TabPanel>
 
                                 <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
-                                    Chainge
+                                    <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+                                        <Coinify imageUrl="https://developer.coinify.com/apidoc/trade/images/logo.png" modalUrl="https://trade-ui.sandbox.coinify.com/widget?partnerId=5ddbc638-0763-4ad5-a3ea-adb382b085df&partnerName=SYS%20Labs&primaryColor=rgba%28148%2C180%2C71%2C0.8%29&defaultCryptoCurrency=SYS&noSignup=TRUE&cryptoCurrencies=SYS" />
+                                        <Coinify imageUrl="https://www.gitbook.com/cdn-cgi/image/width=40,dpr=2,height=40,fit=contain,format=auto/https%3A%2F%2F1049070767-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252F-McUCySCgASfq_bcmHQc%252Ficon%252FTN3oKc2xOiq4g1fbbG52%252Fphoto_2021-11-11_10-12-48.jpg%3Falt%3Dmedia%26token%3D0b3bbd34-a7f2-4946-a463-9fe6609c1553" modalUrl="http://url-to-your-second-modal.com" />
+                                    </Grid>
                                 </TabPanel>
                             </TabPanels>
                         </Tabs>

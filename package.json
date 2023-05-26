@@ -10,6 +10,7 @@
     "firebase:dev": "firebase emulators:start"
   },
   "dependencies": {
+    "@chainge/sdk": "^1.0.7",
     "@chakra-ui/icons": "^2.0.17",
     "@chakra-ui/react": "^2.5.1",
     "@download/blockies": "^1.0.3",
