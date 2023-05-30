@@ -1,4 +1,5 @@
 import {
+    Box,
     Card,
     CardBody,
     ChakraProvider,
@@ -40,6 +41,7 @@ import { PendingMessage } from 'components/BridgeL1L2/WIthdraw/Steps/PendingMess
 import { useSelectedNetwork } from "./../../hooks/rolluxBridge/useSelectedNetwork"
 import { useCrossChainMessenger } from 'hooks/rolluxBridge/useCrossChainMessenger';
 import Coinify from 'components/BridgeL1L2/Coinify/Coinify';
+import Chainge from 'components/BridgeL1L2/Chainge/Chainge';
 
 type BridgeNevmRolluxProps = {}
 
@@ -623,10 +625,20 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                         m="0 auto"
                     >
                         <Tabs variant="soft-rounded" w="100%" onChange={(index) => setCurrentDisplay(index === 0 ? CurrentDisplayView.deposit : CurrentDisplayView.withdraw)}>
-                            <TabList justifyContent="center" bg="#f4fadb" w="max-content" m="0 auto" borderRadius="6px">
+
+                            <TabList
+                                display={{ base: 'flex', md: 'flex' }}
+                                overflowX={{ base: 'scroll', md: 'visible' }}
+                                justifyContent="center"
+                                bg="#f4fadb"
+                                m="0 auto"
+                                borderRadius="6px"
+                            >
                                 <Tab
                                     borderRadius="6px"
                                     px="36px"
+                                    minWidth={{ base: '100px', md: 'initial' }}
+                                    whiteSpace={{ base: 'nowrap', md: 'initial' }}
                                     _selected={{
                                         color: '#000',
                                         bg: 'brand.secondaryGradient',
@@ -637,6 +649,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                 <Tab
                                     px="36px"
                                     borderRadius="6px"
+                                    minWidth={{ base: '100px', md: 'initial' }}
+                                    whiteSpace={{ base: 'nowrap', md: 'initial' }}
                                     _selected={{
                                         color: '#000',
                                         bg: 'brand.secondaryGradient',
@@ -644,22 +658,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                 >
                                     Withdraw
                                 </Tab>
-                                <Tab
-                                    onClick={(e) => {
-                                        e.preventDefault();
-
-
-                                    }}
-                                    px="36px"
-                                    borderRadius="6px"
-                                    _selected={{
-                                        color: '#000',
-                                        bg: 'brand.secondaryGradient',
-                                    }}
-                                >
-                                    Other Providers
-                                </Tab>
                             </TabList>
+
+
 
                             <TabPanels>
                                 <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
@@ -833,13 +834,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                         setIsLoading={setIsLoading}
                                         L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
                                     />
-                                </TabPanel>
-
-                                <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
-                                    <Grid templateColumns="repeat(2, 1fr)" gap={6}>
-                                        <Coinify imageUrl="https://developer.coinify.com/apidoc/trade/images/logo.png" modalUrl="https://trade-ui.sandbox.coinify.com/widget?partnerId=5ddbc638-0763-4ad5-a3ea-adb382b085df&partnerName=SYS%20Labs&primaryColor=rgba%28148%2C180%2C71%2C0.8%29&defaultCryptoCurrency=SYS&noSignup=TRUE&cryptoCurrencies=SYS" />
-                                        <Coinify imageUrl="https://www.gitbook.com/cdn-cgi/image/width=40,dpr=2,height=40,fit=contain,format=auto/https%3A%2F%2F1049070767-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252F-McUCySCgASfq_bcmHQc%252Ficon%252FTN3oKc2xOiq4g1fbbG52%252Fphoto_2021-11-11_10-12-48.jpg%3Falt%3Dmedia%26token%3D0b3bbd34-a7f2-4946-a463-9fe6609c1553" modalUrl="http://url-to-your-second-modal.com" />
-                                    </Grid>
                                 </TabPanel>
                             </TabPanels>
                         </Tabs>
