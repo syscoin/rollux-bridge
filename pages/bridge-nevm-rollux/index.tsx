@@ -609,7 +609,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     mt={{ base: '9', xl: 0 }}
                     flexDir="column"
                     maxW="483px"
-                    w={{ base: '100%', md: '483px' }}
+                    w={'483px'}
                     gap="21px"
                 >
                     <Flex
@@ -624,21 +624,12 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                         flexDir="column"
                         m="0 auto"
                     >
-                        <Tabs variant="soft-rounded" w="100%" onChange={(index) => setCurrentDisplay(index === 0 ? CurrentDisplayView.deposit : CurrentDisplayView.withdraw)}>
+                        <Tabs variant="soft-rounded" onChange={(index) => setCurrentDisplay(index === 0 ? CurrentDisplayView.deposit : CurrentDisplayView.withdraw)}>
 
-                            <TabList
-                                display={{ base: 'flex', md: 'flex' }}
-                                overflowX={{ base: 'scroll', md: 'visible' }}
-                                justifyContent="center"
-                                bg="#f4fadb"
-                                m="0 auto"
-                                borderRadius="6px"
-                            >
+                            <TabList justifyContent="center" bg="#f4fadb" w="max-content" m="0 auto" borderRadius="6px">
                                 <Tab
                                     borderRadius="6px"
                                     px="36px"
-                                    minWidth={{ base: '100px', md: 'initial' }}
-                                    whiteSpace={{ base: 'nowrap', md: 'initial' }}
                                     _selected={{
                                         color: '#000',
                                         bg: 'brand.secondaryGradient',
@@ -649,8 +640,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                 <Tab
                                     px="36px"
                                     borderRadius="6px"
-                                    minWidth={{ base: '100px', md: 'initial' }}
-                                    whiteSpace={{ base: 'nowrap', md: 'initial' }}
                                     _selected={{
                                         color: '#000',
                                         bg: 'brand.secondaryGradient',
