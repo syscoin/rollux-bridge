@@ -42,13 +42,13 @@ import { useSelectedNetwork } from "./../../hooks/rolluxBridge/useSelectedNetwor
 import { useCrossChainMessenger } from 'hooks/rolluxBridge/useCrossChainMessenger';
 import Coinify from 'components/BridgeL1L2/Coinify/Coinify';
 import Chainge from 'components/BridgeL1L2/Chainge/Chainge';
+import SwitcherOtherProviders from 'components/BridgeL1L2/OtherProviders/SwitcherOtherProviders';
+import { CurrentDisplayView } from "components/BridgeL1L2/interfaces"
+import { OtherProvidersListing } from 'components/BridgeL1L2/OtherProviders/OtherProvidersListing';
 
 type BridgeNevmRolluxProps = {}
 
-enum CurrentDisplayView {
-    deposit,
-    withdraw
-}
+
 
 
 export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
@@ -72,6 +72,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     const { contractsL1, contractsL2, l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork } = useSelectedNetwork();
     const hookedMessenger = useCrossChainMessenger();
+
+    const [showOtherProviders, setShowOtherProviders] = useState<boolean>(false);
 
 
     // todo refactor this 2 similar functions
@@ -549,6 +551,11 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
 
 
+    const handleSwitchProvidrs = (enabled: boolean) => {
+        setShowOtherProviders(enabled);
+    }
+
+
     return (
 
         <ChakraProvider theme={chakraTheme}>
@@ -653,176 +660,192 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
                             <TabPanels>
                                 <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
+                                    <SwitcherOtherProviders onSwitch={handleSwitchProvidrs} />
+
+                                    {showOtherProviders === true ?
+                                        <OtherProvidersListing
+                                            currentView={currentDisplay}
+                                        />
+                                        :
+
+                                        <DepositPart
+                                            onClickDepositButton={(amount: string) => {
+                                                handleDepositMainCurrency(amount);
+                                            }}
+                                            onClickApproveERC20={(l1Token: string, l2Token: string, amount: BigNumber) => {
+                                                handleERC20Approval(l1Token, l2Token, amount);
+                                            }}
+
+                                            onClickDepositERC20={(l1Token: string, l2Token: string, amount: BigNumber) => {
+
+                                                console.log(l1Token, l2Token, amount);
+                                                handleERC20Deposit(l1Token, l2Token, amount);
+                                            }}
+
+                                            setIsLoading={setIsLoading}
+
+                                            L1StandardBridgeAddress="0x39CadECd381928F1330D1B2c13c8CAC358Dce65A"
+                                        />
+                                    }
 
 
-                                    <DepositPart
-                                        onClickDepositButton={(amount: string) => {
-                                            handleDepositMainCurrency(amount);
-                                        }}
-                                        onClickApproveERC20={(l1Token: string, l2Token: string, amount: BigNumber) => {
-                                            handleERC20Approval(l1Token, l2Token, amount);
-                                        }}
-
-                                        onClickDepositERC20={(l1Token: string, l2Token: string, amount: BigNumber) => {
-
-                                            console.log(l1Token, l2Token, amount);
-                                            handleERC20Deposit(l1Token, l2Token, amount);
-                                        }}
-
-                                        setIsLoading={setIsLoading}
-
-                                        L1StandardBridgeAddress="0x39CadECd381928F1330D1B2c13c8CAC358Dce65A"
-                                    />
 
                                 </TabPanel>
 
                                 <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
 
+                                    <SwitcherOtherProviders onSwitch={((enabled) => setShowOtherProviders(enabled))} />
 
-                                    {unfinishedWithdrawals.length > 0 && <>
+                                    {showOtherProviders === true ? <></> :
+                                        <>
+                                            {unfinishedWithdrawals.length > 0 && <>
 
-                                        {withdrawalModalData.txHash !== '' && <>
-                                            <ViewWithdrawalModal isOpen={withdrawIsOpen} onClose={widthdrawOnClose}
-                                                status={withdrawalModalData.status}
-                                                txnHash={withdrawalModalData.txHash}
-                                            >
-                                                {[MessageStatus.IN_CHALLENGE_PERIOD, MessageStatus.STATE_ROOT_NOT_PUBLISHED, MessageStatus.UNCONFIRMED_L1_TO_L2_MESSAGE].includes(withdrawalModalData.status) && <>
-                                                    <PendingMessage status={withdrawalModalData.status} waitTime={0} />
+                                                {withdrawalModalData.txHash !== '' && <>
+                                                    <ViewWithdrawalModal isOpen={withdrawIsOpen} onClose={widthdrawOnClose}
+                                                        status={withdrawalModalData.status}
+                                                        txnHash={withdrawalModalData.txHash}
+                                                    >
+                                                        {[MessageStatus.IN_CHALLENGE_PERIOD, MessageStatus.STATE_ROOT_NOT_PUBLISHED, MessageStatus.UNCONFIRMED_L1_TO_L2_MESSAGE].includes(withdrawalModalData.status) && <>
+                                                            <PendingMessage status={withdrawalModalData.status} waitTime={0} />
+                                                        </>}
+
+
+                                                        {withdrawalModalData.status === MessageStatus.READY_TO_PROVE && <>
+                                                            <ProveMessageStep
+                                                                chainId={chainId || 1}
+                                                                proveTxHash={getProveTxn(withdrawalModalData.txHash, proveTxns) ?? ''}
+                                                                requiredChainId={l1ChainId}
+                                                                onClickProveMessage={async () => {
+                                                                    if (!signer) {
+                                                                        return;
+                                                                    }
+
+                                                                    if (!hookedMessenger) {
+                                                                        console.warn('Failed to init cm. ')
+
+                                                                        return;
+                                                                    }
+
+                                                                    // const messengerL1 = crossChainMessengerFactory(
+                                                                    //     networks.L1Dev,
+                                                                    //     networks.L2Dev,
+                                                                    //     signer,
+                                                                    //     new ethers.providers.JsonRpcProvider(rpcL2),
+                                                                    //     true
+                                                                    // );
+
+                                                                    const messengerL1 = hookedMessenger;
+
+                                                                    const _tx = await (new ethers.providers.JsonRpcProvider(rpcL2)).getTransaction(withdrawalModalData.txHash);
+
+                                                                    const proveTx = await messengerL1.proveMessage(_tx);
+
+                                                                    const tmpProven = [...proveTxns]
+                                                                    tmpProven.push({ withdrawTx: withdrawalModalData.txHash, proveTx: proveTx.hash });
+
+                                                                    setProveTxns([...tmpProven]);
+                                                                }}
+                                                                onClickSwitchNetwork={async () => {
+                                                                    await switchNetwork(l1ChainId)
+                                                                }}
+                                                            />
+                                                        </>}
+
+                                                        {withdrawalModalData.status === MessageStatus.READY_FOR_RELAY && <>
+                                                            <RelayMessageStep
+                                                                chainId={chainId || 1}
+                                                                relayTxHash={getRelayTxn(withdrawalModalData.txHash, relayTxns) ?? ''}
+                                                                requiredChainId={l1ChainId}
+                                                                onClickRelayMessage={async () => {
+                                                                    if (!signer) {
+                                                                        return;
+                                                                    }
+
+                                                                    if (!hookedMessenger) {
+                                                                        console.warn('Failed to init cm. ')
+
+                                                                        return;
+                                                                    }
+
+                                                                    // const messengerL1 = crossChainMessengerFactory(
+                                                                    //     networks.L1Dev,
+                                                                    //     networks.L2Dev,
+                                                                    //     signer,
+                                                                    //     new ethers.providers.JsonRpcProvider(rpcL2),
+                                                                    //     true
+                                                                    // );
+
+                                                                    const messengerL1 = hookedMessenger;
+
+                                                                    const relayTx = await messengerL1.finalizeMessage(withdrawalModalData.txHash);
+
+                                                                    const tmpRelayed = [...relayTxns]
+                                                                    tmpRelayed.push({ withdrawTx: withdrawalModalData.txHash, relayTx: relayTx.hash });
+
+                                                                    setRelayTxns([...tmpRelayed]);
+                                                                }}
+                                                                onClickSwitchNetwork={async () => {
+                                                                    await switchNetwork(l1ChainId)
+                                                                }}
+                                                            />
+                                                        </>}
+
+
+                                                    </ViewWithdrawalModal>
                                                 </>}
 
 
-                                                {withdrawalModalData.status === MessageStatus.READY_TO_PROVE && <>
-                                                    <ProveMessageStep
-                                                        chainId={chainId || 1}
-                                                        proveTxHash={getProveTxn(withdrawalModalData.txHash, proveTxns) ?? ''}
-                                                        requiredChainId={l1ChainId}
-                                                        onClickProveMessage={async () => {
-                                                            if (!signer) {
-                                                                return;
-                                                            }
-
-                                                            if (!hookedMessenger) {
-                                                                console.warn('Failed to init cm. ')
-
-                                                                return;
-                                                            }
-
-                                                            // const messengerL1 = crossChainMessengerFactory(
-                                                            //     networks.L1Dev,
-                                                            //     networks.L2Dev,
-                                                            //     signer,
-                                                            //     new ethers.providers.JsonRpcProvider(rpcL2),
-                                                            //     true
-                                                            // );
-
-                                                            const messengerL1 = hookedMessenger;
-
-                                                            const _tx = await (new ethers.providers.JsonRpcProvider(rpcL2)).getTransaction(withdrawalModalData.txHash);
-
-                                                            const proveTx = await messengerL1.proveMessage(_tx);
-
-                                                            const tmpProven = [...proveTxns]
-                                                            tmpProven.push({ withdrawTx: withdrawalModalData.txHash, proveTx: proveTx.hash });
-
-                                                            setProveTxns([...tmpProven]);
-                                                        }}
-                                                        onClickSwitchNetwork={async () => {
-                                                            await switchNetwork(l1ChainId)
-                                                        }}
-                                                    />
-                                                </>}
-
-                                                {withdrawalModalData.status === MessageStatus.READY_FOR_RELAY && <>
-                                                    <RelayMessageStep
-                                                        chainId={chainId || 1}
-                                                        relayTxHash={getRelayTxn(withdrawalModalData.txHash, relayTxns) ?? ''}
-                                                        requiredChainId={l1ChainId}
-                                                        onClickRelayMessage={async () => {
-                                                            if (!signer) {
-                                                                return;
-                                                            }
-
-                                                            if (!hookedMessenger) {
-                                                                console.warn('Failed to init cm. ')
-
-                                                                return;
-                                                            }
-
-                                                            // const messengerL1 = crossChainMessengerFactory(
-                                                            //     networks.L1Dev,
-                                                            //     networks.L2Dev,
-                                                            //     signer,
-                                                            //     new ethers.providers.JsonRpcProvider(rpcL2),
-                                                            //     true
-                                                            // );
-
-                                                            const messengerL1 = hookedMessenger;
-
-                                                            const relayTx = await messengerL1.finalizeMessage(withdrawalModalData.txHash);
-
-                                                            const tmpRelayed = [...relayTxns]
-                                                            tmpRelayed.push({ withdrawTx: withdrawalModalData.txHash, relayTx: relayTx.hash });
-
-                                                            setRelayTxns([...tmpRelayed]);
-                                                        }}
-                                                        onClickSwitchNetwork={async () => {
-                                                            await switchNetwork(l1ChainId)
-                                                        }}
-                                                    />
-                                                </>}
+                                                <Flex
+                                                    px={{ base: '8px', md: '20px' }}
+                                                    py={{ base: '8px', md: '16px' }}
+                                                    flex={1}
+                                                    bg="white"
+                                                    boxShadow={`7px 7px ${chakraTheme.colors.brand.primary}`}
+                                                    borderRadius="12px"
+                                                    border={`1px solid ${chakraTheme.colors.brand.primary}`}
+                                                    justifyContent="center"
+                                                    flexDir="column"
+                                                    m="0 0 30px 0"
+                                                    maxW="380px"
+                                                    maxH={"400px"}
+                                                    overflow={"scroll-y"}
+                                                >
+                                                    <Heading size="s" sx={{ marginBottom: 5 }}>
+                                                        You have unfinished withdrawals
+                                                    </Heading>
+                                                    {unfinishedWithdrawals.map((item) => {
+                                                        return <UnfinishedWithdrawalItem key={item.txHash} status={item.status} txHash={item.txHash}
+                                                            onClickView={() => {
+                                                                setWithdrawalModalData({
+                                                                    status: item.status,
+                                                                    txHash: item.txHash
+                                                                })
 
 
-                                            </ViewWithdrawalModal>
-                                        </>}
+                                                                withdrawOnOpen();
+                                                            }}
+                                                        />
+                                                    })}
+                                                </Flex>
 
-
-                                        <Flex
-                                            px={{ base: '8px', md: '20px' }}
-                                            py={{ base: '8px', md: '16px' }}
-                                            flex={1}
-                                            bg="white"
-                                            boxShadow={`7px 7px ${chakraTheme.colors.brand.primary}`}
-                                            borderRadius="12px"
-                                            border={`1px solid ${chakraTheme.colors.brand.primary}`}
-                                            justifyContent="center"
-                                            flexDir="column"
-                                            m="0 0 30px 0"
-                                            maxW="380px"
-                                            maxH={"400px"}
-                                            overflow={"scroll-y"}
-                                        >
-                                            <Heading size="s" sx={{ marginBottom: 5 }}>
-                                                You have unfinished withdrawals
-                                            </Heading>
-                                            {unfinishedWithdrawals.map((item) => {
-                                                return <UnfinishedWithdrawalItem key={item.txHash} status={item.status} txHash={item.txHash}
-                                                    onClickView={() => {
-                                                        setWithdrawalModalData({
-                                                            status: item.status,
-                                                            txHash: item.txHash
-                                                        })
-
-
-                                                        withdrawOnOpen();
-                                                    }}
-                                                />
-                                            })}
-                                        </Flex>
-
-                                    </>}
+                                            </>}
 
 
 
-                                    <WithdrawPart
-                                        onClickWithdrawButton={(amount) => {
-                                            handleWithdrawMainCurrency(amount);
-                                        }}
-                                        onClickWithdrawERC20={(_l1Token, _l2Token, amount) => {
-                                            handleWithdrawERC20Token(_l1Token, _l2Token, amount);
-                                        }}
-                                        setIsLoading={setIsLoading}
-                                        L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
-                                    />
+                                            <WithdrawPart
+                                                onClickWithdrawButton={(amount) => {
+                                                    handleWithdrawMainCurrency(amount);
+                                                }}
+                                                onClickWithdrawERC20={(_l1Token, _l2Token, amount) => {
+                                                    handleWithdrawERC20Token(_l1Token, _l2Token, amount);
+                                                }}
+                                                setIsLoading={setIsLoading}
+                                                L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
+                                            />
+                                        </>
+                                    }
+
+
                                 </TabPanel>
                             </TabPanels>
                         </Tabs>

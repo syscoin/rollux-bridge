@@ -1,4 +1,3 @@
-import React from "react";
 import { OtherBridgeProvider } from "./types";
 
 export const providers: OtherBridgeProvider[] = [
@@ -11,6 +10,7 @@ export const providers: OtherBridgeProvider[] = [
         supportsCrypto: true,
         supportsFiat: false,
         enabled: true,
+        component: ReactComponentHere,
         askOpenInNewTab: false,
     }
 ]
