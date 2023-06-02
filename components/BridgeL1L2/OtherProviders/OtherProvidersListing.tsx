@@ -1,4 +1,6 @@
-import { Flex, FormControl, FormLabel, Switch } from '@chakra-ui/react'
+import { Box, Flex, Tab, TabList, Tabs, Text } from '@chakra-ui/react'
+import { borderBottom, borderRadius } from '@mui/material/node_modules/@mui/system'
+import { useOtherProviders } from 'blockchain/NevmRolluxBridge/bridgeProviders/useOtherProviders'
 import React, { FC, useState } from 'react'
 import { CurrentDisplayView } from '../interfaces'
 import { OtherProviderBridgeMode } from './types'
@@ -9,29 +11,31 @@ export type OtherProvidersListingProps = {
 
 export const OtherProvidersListing: FC<OtherProvidersListingProps> = ({ currentView }) => {
     const [bridgeMode, setBridgeMode] = useState<OtherProviderBridgeMode>(OtherProviderBridgeMode.crypto)
+    const providers = useOtherProviders(currentView, bridgeMode);
+
+    const handleTabsChange = (index: number) => {
+        setBridgeMode(index === 0 ? OtherProviderBridgeMode.crypto : OtherProviderBridgeMode.fiat);
+    };
 
     return (<>
-        <Flex direction={'row'} justifyContent={'center'} alignItems={'center'} alignSelf={'center'}>
-            <FormControl display="flex" alignItems="center" justifyContent="center">
-                <FormLabel>
-                    Crypto
-                </FormLabel>
-            </FormControl>
-            <FormControl display="flex" alignItems="center" justifyContent="center">
-                <Switch size={'md'} alignSelf={'center'} onChange={(event) => {
+        <Box maxW="483px" mb={3}>
+            <Tabs onChange={handleTabsChange} variant="enclosed" isLazy>
+                <TabList display="flex" justifyContent="center">
+                    <Tab flex={1} sx={{ bg: 'brand.secondaryGradient' }} _selected={{ color: "black.500", bg: "brand.primaryGradient", borderColor: "gray.500" }}>Crypto</Tab>
+                    <Tab flex={1} sx={{ bg: 'brand.secondaryGradient' }} _selected={{ color: "black.500", bg: "brand.primaryGradient", borderColor: "gray.500" }}>Fiat</Tab>
+                </TabList>
+            </Tabs>
+        </Box>
+        <Flex flex={1} direction={'row'} maxW="483px" justifyContent={'center'}>
+            {providers.map((value, index) => {
+                const ComponentToRender = value.component;
 
-                    setBridgeMode(event.target.checked === true ? OtherProviderBridgeMode.fiat : OtherProviderBridgeMode.crypto);
-                }} />
-            </FormControl>
-            <FormControl display="flex" alignItems="center" justifyContent="center">
-                <FormLabel>
-                    Fiat
-                </FormLabel>
-            </FormControl>
-        </Flex >
+                if (null === ComponentToRender) return;
 
-        <Flex>
-            {bridgeMode} {OtherProviderBridgeMode[bridgeMode]}
+                return (<div key={index}>
+                    <ComponentToRender payload={{}} mode={currentView} bridgeDetails={value} />
+                </div>);
+            })}
         </Flex>
     </>)
 }

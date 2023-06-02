@@ -696,7 +696,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
                                     <SwitcherOtherProviders onSwitch={((enabled) => setShowOtherProviders(enabled))} />
 
-                                    {showOtherProviders === true ? <></> :
+                                    {showOtherProviders === true ? <OtherProvidersListing
+                                        currentView={currentDisplay}
+                                    /> :
                                         <>
                                             {unfinishedWithdrawals.length > 0 && <>
 
