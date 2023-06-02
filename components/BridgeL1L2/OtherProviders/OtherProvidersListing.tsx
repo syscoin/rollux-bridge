@@ -1,5 +1,4 @@
 import { Box, Flex, Tab, TabList, Tabs, Text } from '@chakra-ui/react'
-import { borderBottom, borderRadius } from '@mui/material/node_modules/@mui/system'
 import { useOtherProviders } from 'blockchain/NevmRolluxBridge/bridgeProviders/useOtherProviders'
 import React, { FC, useState } from 'react'
 import { CurrentDisplayView } from '../interfaces'
