@@ -1,6 +1,6 @@
 import { ChaingeProvider } from "components/BridgeL1L2/OtherProviders/Providers/ChaingeProvider";
 import { CoinifyProvider } from "components/BridgeL1L2/OtherProviders/Providers/CoinifyProvider";
-import { OtherBridgeProvider } from "./types";
+import { BridgedNetwork, FiatMethod, OtherBridgeProvider } from "./types";
 
 export const providers: OtherBridgeProvider[] = [
     {
@@ -16,6 +16,13 @@ export const providers: OtherBridgeProvider[] = [
         askOpenInNewTab: false,
         supportsDeposits: true,
         supportsWithdrawals: true,
+        supportedInputs: [
+            BridgedNetwork.ETH,
+            BridgedNetwork.BSC,
+            BridgedNetwork.ARB,
+            BridgedNetwork.ETC,
+            BridgedNetwork.MATIC,
+        ]
     },
     {
         label: 'Coinify',
@@ -30,5 +37,12 @@ export const providers: OtherBridgeProvider[] = [
         askOpenInNewTab: false,
         supportsDeposits: true,
         supportsWithdrawals: true,
+        supportedInputs: [
+            FiatMethod.USD,
+            FiatMethod.EUR,
+            FiatMethod.CNY,
+            FiatMethod.PLN,
+            FiatMethod.JPY,
+        ]
     }
 ]

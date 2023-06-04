@@ -1,6 +1,24 @@
 import { CurrentDisplayView } from "components/BridgeL1L2/interfaces"
 import React from "react"
 
+export enum FiatMethod {
+    USD,
+    EUR,
+    CNY,
+    JPY,
+    PLN
+}
+
+export enum BridgedNetwork {
+    ETH,
+    BSC,
+    MATIC,
+    ARB,
+    ETC
+}
+
+export type FiatOrBridged = FiatMethod | BridgedNetwork;
+
 export type OtherBridgeComponentBaseProps = {
     bridgeDetails: OtherBridgeProvider,
     mode: CurrentDisplayView,
@@ -20,6 +38,7 @@ export interface OtherBridgeProvider {
     askOpenInNewTab: boolean,
     supportsDeposits: boolean,
     supportsWithdrawals: boolean,
+    supportedInputs: FiatOrBridged[]
 }
 
 export type OtherBridgeProviderComponentProps<T> = {
