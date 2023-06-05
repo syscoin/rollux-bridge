@@ -8,6 +8,7 @@ import { TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp
 import { SelectedNetworkType } from 'blockchain/NevmRolluxBridge/config/networks';
 import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20TokenList';
 import TokenListToken from 'blockchain/NevmRolluxBridge/interfaces/TokenListToken';
+import { OtherProvidersMenuSelector } from 'components/BridgeL1L2/OtherProviders/OtherProvidersMenuSelector';
 import { ConnectButton } from 'components/ConnectButton';
 import { ConnectionWarning } from 'components/ConnectionWarning';
 import { BigNumber, Contract, ethers } from 'ethers';
@@ -222,7 +223,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             <FormControl isInvalid={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}>
                 <Flex justifyContent="space-between">
                     <FormLabel fontWeight="700">
-                        From Syscoin NEVM
+                        From <OtherProvidersMenuSelector onSelect={(provider) => console.log('provider')} />
                     </FormLabel>
 
                     {
