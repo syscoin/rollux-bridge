@@ -660,7 +660,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
                             <TabPanels>
                                 <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
-                                    <SwitcherOtherProviders onSwitch={handleSwitchProvidrs} />
+                                    {/* <SwitcherOtherProviders onSwitch={handleSwitchProvidrs} /> */}
 
                                     {showOtherProviders === true ?
                                         <OtherProvidersListing
@@ -694,7 +694,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
                                 <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
 
-                                    <SwitcherOtherProviders onSwitch={((enabled) => setShowOtherProviders(enabled))} />
+                                    {/* <SwitcherOtherProviders onSwitch={((enabled) => setShowOtherProviders(enabled))} /> */}
 
                                     {showOtherProviders === true ? <OtherProvidersListing
                                         currentView={currentDisplay}

@@ -222,9 +222,9 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
         <Flex flexDir="column">
             <FormControl isInvalid={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}>
                 <Flex justifyContent="space-between">
-                    <FormLabel fontWeight="700">
-                        From <OtherProvidersMenuSelector onSelect={(provider) => console.log('provider')} />
-                    </FormLabel>
+
+                    <OtherProvidersMenuSelector preSelectLabel={'From'} onSelect={(provider) => console.log('provider')} />
+
 
                     {
                         selectedToken && selectedToken?.symbol !== 'SYS' ?

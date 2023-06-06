@@ -1,13 +1,14 @@
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
+    Box,
     Button, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Image, Input, Menu,
     MenuButton, MenuItem, MenuList, NumberInput, NumberInputField, PlacementWithLogical, Text, useBreakpointValue, Wrap
 } from '@chakra-ui/react';
 import { ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
-import { RolluxChain, TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp';
 import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20TokenList';
 import TokenListToken from 'blockchain/NevmRolluxBridge/interfaces/TokenListToken';
 import { ConnectButton } from 'components/ConnectButton';
+import { OtherProvidersMenuSelector } from 'components/BridgeL1L2/OtherProviders/OtherProvidersMenuSelector';
 import { BigNumber, Contract, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 import React, { FC, useEffect, useState } from 'react';
@@ -247,9 +248,9 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
             {selectedToken && (
                 <Flex flexDir="column" maxW="100%">
-                    <Text fontWeight={700} mt={{ base: '24px', md: '44px' }}>
-                        You will get on L1
-                    </Text>
+                    <Box sx={{ mt: { base: '24px', md: '44px' } }}>
+                        <OtherProvidersMenuSelector preSelectLabel={'You will get on '} onSelect={(provider) => console.log('provider')} />
+                    </Box>
 
                     <Wrap alignItems="center" mt="15px" spacing="27px" maxW="calc(100vw - 70px)">
                         <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>{amountToSwap}</Text>

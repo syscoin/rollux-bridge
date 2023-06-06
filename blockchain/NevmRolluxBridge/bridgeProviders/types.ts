@@ -10,6 +10,7 @@ export enum FiatMethod {
 }
 
 export enum BridgedNetwork {
+    SYS,
     ETH,
     BSC,
     MATIC,
