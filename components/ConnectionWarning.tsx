@@ -7,3 +7,5 @@ export const ConnectionWarning: React.FC = () => {
     </Flex>
   )
 }
+
+export default ConnectionWarning;
