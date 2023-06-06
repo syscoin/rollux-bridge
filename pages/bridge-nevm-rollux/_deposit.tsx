@@ -21,10 +21,11 @@ export type DepositPartProps = {
     onClickApproveERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     onClickDepositERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    onSelectBridgeProvider: (provider: string) => void;
     L1StandardBridgeAddress: string,
 }
 
-export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClickApproveERC20, onClickDepositERC20, setIsLoading, L1StandardBridgeAddress }) => {
+export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClickApproveERC20, onClickDepositERC20, setIsLoading, L1StandardBridgeAddress, onSelectBridgeProvider }) => {
     const [currency, setCurrency] = useState<string>('SYS');
     const [selectedTokenAddress, setSelectedTokenAddress] = useState<string | undefined>(undefined);
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
@@ -223,8 +224,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             <FormControl isInvalid={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}>
                 <Flex justifyContent="space-between">
 
-                    <OtherProvidersMenuSelector preSelectLabel={'From'} onSelect={(provider) => console.log('provider')} />
-
+                    <OtherProvidersMenuSelector preSelectLabel={'From'} onSelect={onSelectBridgeProvider} />
 
                     {
                         selectedToken && selectedToken?.symbol !== 'SYS' ?

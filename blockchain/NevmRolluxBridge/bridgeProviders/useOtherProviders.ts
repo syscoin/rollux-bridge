@@ -2,12 +2,12 @@ import { CurrentDisplayView } from "components/BridgeL1L2/interfaces";
 import { OtherProviderBridgeMode } from "components/BridgeL1L2/OtherProviders/types";
 import { providers } from "./providers";
 import { useState, useEffect, useMemo } from "react";
-import { OtherBridgeProvider } from "./types";
+import { FiatOrBridged, OtherBridgeProvider } from "./types";
 
 
 export const useOtherProviders = (
     mode: CurrentDisplayView,
-    bridgeMode: OtherProviderBridgeMode
+    selectedCurrency: FiatOrBridged
 ) => {
     const [all, setAll] = useState<OtherBridgeProvider[]>([]);
 
@@ -16,34 +16,17 @@ export const useOtherProviders = (
     }, []);
 
     return useMemo(() => {
-        return all.filter((value, index) => {
-            if (value.enabled === false) return false;
-
-            if (mode === CurrentDisplayView.deposit
-                && value.supportsDeposits
-            ) {
-                return true;
+        return all.filter(provider => {
+            if (mode === CurrentDisplayView.deposit) {
+                return provider.supportsDeposits && provider.supportedInputs.includes(selectedCurrency)
+            } else if (mode === CurrentDisplayView.withdraw) {
+                return provider.supportsWithdrawals && provider.supportedOutputs.includes(selectedCurrency)
+            } else {
+                return false;
             }
-
-            if (mode === CurrentDisplayView.withdraw
-                && value.supportsWithdrawals
-            ) {
-                return true;
-            }
-        }).filter((value) => {
-            if (bridgeMode === OtherProviderBridgeMode.crypto &&
-                value.supportsCrypto === true
-            ) {
-                return true;
-            }
-
-            if (bridgeMode === OtherProviderBridgeMode.fiat &&
-                value.supportsFiat === true
-            ) {
-                return true;
-            }
-        })
-    }, [mode, bridgeMode, all])
+        }
+        )
+    }, [mode, selectedCurrency, all])
 }
 
 export default useOtherProviders;

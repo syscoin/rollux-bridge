@@ -17,10 +17,15 @@ export const providers: OtherBridgeProvider[] = [
         supportsDeposits: true,
         supportsWithdrawals: true,
         supportedInputs: [
+            BridgedNetwork.SYS,
             BridgedNetwork.ETH,
             BridgedNetwork.BSC,
-            BridgedNetwork.ARB,
-            BridgedNetwork.ETC,
+            BridgedNetwork.MATIC,
+        ],
+        supportedOutputs: [
+            BridgedNetwork.SYS,
+            BridgedNetwork.ETH,
+            BridgedNetwork.BSC,
             BridgedNetwork.MATIC,
         ]
     },
@@ -38,6 +43,13 @@ export const providers: OtherBridgeProvider[] = [
         supportsDeposits: true,
         supportsWithdrawals: true,
         supportedInputs: [
+            FiatMethod.USD,
+            FiatMethod.EUR,
+            FiatMethod.CNY,
+            FiatMethod.PLN,
+            FiatMethod.JPY,
+        ],
+        supportedOutputs: [
             FiatMethod.USD,
             FiatMethod.EUR,
             FiatMethod.CNY,

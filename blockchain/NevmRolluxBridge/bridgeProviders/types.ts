@@ -2,20 +2,18 @@ import { CurrentDisplayView } from "components/BridgeL1L2/interfaces"
 import React from "react"
 
 export enum FiatMethod {
-    USD,
-    EUR,
-    CNY,
-    JPY,
-    PLN
+    USD, // US Dollar
+    EUR, // Euro
+    CNY, // Chinese Yuan
+    JPY, // Japanese Yen
+    PLN // Polish Zloty
 }
 
 export enum BridgedNetwork {
-    SYS,
-    ETH,
-    BSC,
-    MATIC,
-    ARB,
-    ETC
+    SYS, // Syscoin
+    ETH, // Ethereum
+    BSC, // Binance Smart Chain
+    MATIC, // Polygon
 }
 
 export type FiatOrBridged = FiatMethod | BridgedNetwork;
@@ -39,7 +37,8 @@ export interface OtherBridgeProvider {
     askOpenInNewTab: boolean,
     supportsDeposits: boolean,
     supportsWithdrawals: boolean,
-    supportedInputs: FiatOrBridged[]
+    supportedInputs: FiatOrBridged[],
+    supportedOutputs: FiatOrBridged[],
 }
 
 export type OtherBridgeProviderComponentProps<T> = {

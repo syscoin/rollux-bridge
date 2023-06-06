@@ -1,7 +1,4 @@
 import {
-    Box,
-    Card,
-    CardBody,
     ChakraProvider,
     Flex, Grid, Heading,
     Highlight, Spinner, Tab,
@@ -17,9 +14,7 @@ import { chakraTheme } from 'components/chakraTheme';
 import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
 import { useMetamask } from "@contexts/Metamask/Provider";
 import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
-import { useEthers, useLogs, useSigner } from "@usedapp/core";
-import { RolluxChain, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
-import contractsDev from 'blockchain/NevmRolluxBridge/config/contracts';
+import { useEthers, useSigner } from "@usedapp/core";
 import { getNetworkByChainId, getNetworkByName, NetworkData, networks, networksMap, SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks";
 import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
 import { ConnectionWarning } from 'components/ConnectionWarning';
@@ -42,9 +37,9 @@ import { useSelectedNetwork } from "./../../hooks/rolluxBridge/useSelectedNetwor
 import { useCrossChainMessenger } from 'hooks/rolluxBridge/useCrossChainMessenger';
 import Coinify from 'components/BridgeL1L2/Coinify/Coinify';
 import Chainge from 'components/BridgeL1L2/Chainge/Chainge';
-import SwitcherOtherProviders from 'components/BridgeL1L2/OtherProviders/SwitcherOtherProviders';
 import { CurrentDisplayView } from "components/BridgeL1L2/interfaces"
 import { OtherProvidersListing } from 'components/BridgeL1L2/OtherProviders/OtherProvidersListing';
+import { FiatOrBridged } from 'blockchain/NevmRolluxBridge/bridgeProviders/types';
 
 type BridgeNevmRolluxProps = {}
 
@@ -669,6 +664,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                         :
 
                                         <DepositPart
+                                            onSelectBridgeProvider={(bridgeProvider: string) => {
+                                                console.log(bridgeProvider);
+                                            }}
                                             onClickDepositButton={(amount: string) => {
                                                 handleDepositMainCurrency(amount);
                                             }}
