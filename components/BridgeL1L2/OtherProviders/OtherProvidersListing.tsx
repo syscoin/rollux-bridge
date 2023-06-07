@@ -1,30 +1,38 @@
-import { Box, Flex, Tab, TabList, Tabs, Text } from '@chakra-ui/react'
+import { Alert, Box, Button, Flex, HStack, Tab, TabList, Tabs, Text } from '@chakra-ui/react'
+import { useEthers } from '@usedapp/core'
+import { FiatOrBridged } from 'blockchain/NevmRolluxBridge/bridgeProviders/types'
 import { useOtherProviders } from 'blockchain/NevmRolluxBridge/bridgeProviders/useOtherProviders'
-import React, { FC, useState } from 'react'
+import WarningInfoBlock from 'components/Common/WarningInfoBlock'
+import React, { FC, useEffect, useState } from 'react'
 import { CurrentDisplayView } from '../interfaces'
 import { OtherProviderBridgeMode } from './types'
 
 export type OtherProvidersListingProps = {
-    currentView: CurrentDisplayView
+    currentView: CurrentDisplayView,
+    selectedIOCurrency: string,
+    onClickUseStandardBridge: () => void,
 }
 
-export const OtherProvidersListing: FC<OtherProvidersListingProps> = ({ currentView }) => {
-    const [bridgeMode, setBridgeMode] = useState<OtherProviderBridgeMode>(OtherProviderBridgeMode.crypto)
-    const providers = useOtherProviders(currentView, bridgeMode);
+export const OtherProvidersListing: FC<OtherProvidersListingProps> = ({ currentView, selectedIOCurrency, onClickUseStandardBridge }) => {
+    const providers = useOtherProviders(currentView, selectedIOCurrency as FiatOrBridged);
+    const { account } = useEthers();
 
-    const handleTabsChange = (index: number) => {
-        setBridgeMode(index === 0 ? OtherProviderBridgeMode.crypto : OtherProviderBridgeMode.fiat);
-    };
+    const handleClickedUseStandardBridge = () => {
+        onClickUseStandardBridge();
+    }
+
+    if (!account) return (<>
+        <WarningInfoBlock warningText='We are sorry but You can not use this feature without connected wallet. Please click button below and connect Your wallet.'>
+            <Button variant={'primary'} onClick={handleClickedUseStandardBridge}>Back to Standard Bridge</Button>
+        </WarningInfoBlock>
+    </>);
 
     return (<>
-        <Box maxW="483px" mb={3}>
-            <Tabs onChange={handleTabsChange} variant="enclosed" isLazy>
-                <TabList display="flex" justifyContent="center">
-                    <Tab flex={1} sx={{ bg: 'brand.secondaryGradient' }} _selected={{ color: "black.500", bg: "brand.primaryGradient", borderColor: "gray.500" }}>Crypto</Tab>
-                    <Tab flex={1} sx={{ bg: 'brand.secondaryGradient' }} _selected={{ color: "black.500", bg: "brand.primaryGradient", borderColor: "gray.500" }}>Fiat</Tab>
-                </TabList>
-            </Tabs>
-        </Box>
+
+        <WarningInfoBlock warningText='Please note that the following providers are not affiliated with Rollux & Syscoin and we cannot guarantee their safety. Please use at your own risk.'>
+            <Button variant={'primary'} onClick={handleClickedUseStandardBridge}>Use Standard Bridge</Button>
+        </WarningInfoBlock>
+
         <Flex flex={1} direction={'row'} maxW="483px" justifyContent={'center'}>
             {providers.map((value, index) => {
                 const ComponentToRender = value.component;

@@ -9,6 +9,7 @@ import { SelectedNetworkType } from 'blockchain/NevmRolluxBridge/config/networks
 import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20TokenList';
 import TokenListToken from 'blockchain/NevmRolluxBridge/interfaces/TokenListToken';
 import { OtherProvidersMenuSelector } from 'components/BridgeL1L2/OtherProviders/OtherProvidersMenuSelector';
+import WarningInfoBlock from 'components/Common/WarningInfoBlock';
 import { ConnectButton } from 'components/ConnectButton';
 import { ConnectionWarning } from 'components/ConnectionWarning';
 import { BigNumber, Contract, ethers } from 'ethers';
@@ -21,11 +22,10 @@ export type DepositPartProps = {
     onClickApproveERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     onClickDepositERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-    onSelectBridgeProvider: (provider: string) => void;
-    L1StandardBridgeAddress: string,
+    onSelectBridgeProvider: (provider: string, force: boolean) => void;
 }
 
-export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClickApproveERC20, onClickDepositERC20, setIsLoading, L1StandardBridgeAddress, onSelectBridgeProvider }) => {
+export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClickApproveERC20, onClickDepositERC20, setIsLoading, onSelectBridgeProvider }) => {
     const [currency, setCurrency] = useState<string>('SYS');
     const [selectedTokenAddress, setSelectedTokenAddress] = useState<string | undefined>(undefined);
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
@@ -33,13 +33,13 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
     const [amountToSwap, setAmountToSwap] = useState<string>('0.00');
 
-    const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork } = useSelectedNetwork();
+    const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork, contractsL1 } = useSelectedNetwork();
 
     const { account, chainId, switchNetwork } = useEthers();
     const balanceNativeToken = useEtherBalance(account, { chainId: l1ChainId });
     const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: l1ChainId });
-    const allowanceERC20Token = useTokenAllowance(selectedTokenAddress, account, L1StandardBridgeAddress, {
-        chainId: TanenbaumChain.chainId
+    const allowanceERC20Token = useTokenAllowance(selectedTokenAddress, account, contractsL1.L1StandardBridge, {
+        chainId: l1ChainId
     });
     const [allERC20Tokens, setAllERC20Tokens] = useState<TokenListToken[]>([]);
     const [l1ERC20Tokens, setL1ERC20Tokens] = useState<TokenListToken[]>([]);
@@ -224,7 +224,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             <FormControl isInvalid={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}>
                 <Flex justifyContent="space-between">
 
-                    <OtherProvidersMenuSelector preSelectLabel={'From'} onSelect={onSelectBridgeProvider} />
+                    <OtherProvidersMenuSelector preSelectLabel={'From'} onSelect={(provider) => onSelectBridgeProvider(provider, false)} />
 
                     {
                         selectedToken && selectedToken?.symbol !== 'SYS' ?
@@ -304,11 +304,11 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
             {selectedToken && (
                 <Flex flexDir="column" maxW="100%">
-                    <Text fontWeight={700} mt={{ base: '24px', md: '44px' }}>
+                    <Text fontWeight={700} mt={{ base: '24px', md: '44px' }} ml={2}>
                         You will get on Rollux
                     </Text>
 
-                    <Wrap alignItems="center" mt="15px" spacing="27px" maxW="calc(100vw - 70px)">
+                    <Wrap alignItems="center" mt="15px" spacing="27px" maxW="calc(100vw - 70px)" ml={2}>
                         <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>{amountToSwap}</Text>
 
                         <HStack mt="44px" alignItems="center">
@@ -323,6 +323,17 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     </Wrap>
                 </Flex>
             )}
+
+            {(account && selectedToken && selectedToken.symbol === 'SYS') && (<>
+                <Flex flexDir={'column'} mt={4}>
+                    <WarningInfoBlock warningText='In case if You want to use other provider instead of Standard Bridge for deposit SYS please click button below.'>
+                        <Button variant={'primary'} onClick={() => onSelectBridgeProvider('SYS', true)}>
+                            Select other provider
+                        </Button>
+                    </WarningInfoBlock>
+                </Flex>
+
+            </>)}
 
             <Flex
                 mt={{ base: '32px', md: '44px' }}

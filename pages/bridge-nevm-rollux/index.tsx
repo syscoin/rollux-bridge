@@ -39,7 +39,7 @@ import Coinify from 'components/BridgeL1L2/Coinify/Coinify';
 import Chainge from 'components/BridgeL1L2/Chainge/Chainge';
 import { CurrentDisplayView } from "components/BridgeL1L2/interfaces"
 import { OtherProvidersListing } from 'components/BridgeL1L2/OtherProviders/OtherProvidersListing';
-import { FiatOrBridged } from 'blockchain/NevmRolluxBridge/bridgeProviders/types';
+import { BridgedNetwork, FiatOrBridged } from 'blockchain/NevmRolluxBridge/bridgeProviders/types';
 
 type BridgeNevmRolluxProps = {}
 
@@ -69,7 +69,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const hookedMessenger = useCrossChainMessenger();
 
     const [showOtherProviders, setShowOtherProviders] = useState<boolean>(false);
-
+    const [selectedIOCurrency, setSelectedIOCurrency] = useState<string>('SYS');
 
     // todo refactor this 2 similar functions
     const getProveTxn = (withdrawTxHash: string, data: { withdrawTx: string, proveTx: string }[]): string | null => {
@@ -546,10 +546,21 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
 
 
-    const handleSwitchProvidrs = (enabled: boolean) => {
-        setShowOtherProviders(enabled);
-    }
+    const handleSwitchProviders = (selectedIOCurrency: string, force: boolean) => {
 
+        if (force === true) {
+            setShowOtherProviders(true);
+            setSelectedIOCurrency(selectedIOCurrency);
+        } else {
+
+            if (selectedIOCurrency !== BridgedNetwork.SYS) {
+                // if its sys we just want to display message about ability to use third party provider
+                setShowOtherProviders(true)
+            }
+
+            setSelectedIOCurrency(selectedIOCurrency);
+        }
+    }
 
     return (
 
@@ -660,12 +671,17 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                     {showOtherProviders === true ?
                                         <OtherProvidersListing
                                             currentView={currentDisplay}
+                                            selectedIOCurrency={selectedIOCurrency}
+                                            onClickUseStandardBridge={() => {
+                                                setShowOtherProviders(false);
+                                                setSelectedIOCurrency(BridgedNetwork.SYS);
+                                            }}
                                         />
                                         :
 
                                         <DepositPart
-                                            onSelectBridgeProvider={(bridgeProvider: string) => {
-                                                console.log(bridgeProvider);
+                                            onSelectBridgeProvider={(bridgeProvider: string, force: boolean) => {
+                                                handleSwitchProviders(bridgeProvider, force);
                                             }}
                                             onClickDepositButton={(amount: string) => {
                                                 handleDepositMainCurrency(amount);
@@ -681,8 +697,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                             }}
 
                                             setIsLoading={setIsLoading}
-
-                                            L1StandardBridgeAddress="0x39CadECd381928F1330D1B2c13c8CAC358Dce65A"
                                         />
                                     }
 
@@ -695,7 +709,12 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                     {/* <SwitcherOtherProviders onSwitch={((enabled) => setShowOtherProviders(enabled))} /> */}
 
                                     {showOtherProviders === true ? <OtherProvidersListing
+                                        selectedIOCurrency={selectedIOCurrency}
                                         currentView={currentDisplay}
+                                        onClickUseStandardBridge={() => {
+                                            setShowOtherProviders(false);
+                                            setSelectedIOCurrency(BridgedNetwork.SYS);
+                                        }}
                                     /> :
                                         <>
                                             {unfinishedWithdrawals.length > 0 && <>
@@ -833,6 +852,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
 
                                             <WithdrawPart
+                                                onSelectBridgeProvider={(bridgeProvider: string, force: boolean) => {
+                                                    handleSwitchProviders(bridgeProvider, force);
+                                                }}
                                                 onClickWithdrawButton={(amount) => {
                                                     handleWithdrawMainCurrency(amount);
                                                 }}
@@ -840,7 +862,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                     handleWithdrawERC20Token(_l1Token, _l2Token, amount);
                                                 }}
                                                 setIsLoading={setIsLoading}
-                                                L1StandardBridgeAddress="0x77Cdc3891C91729dc9fdea7000ef78ea331cb34A"
+
                                             />
                                         </>
                                     }

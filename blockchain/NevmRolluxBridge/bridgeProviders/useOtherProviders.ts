@@ -13,7 +13,10 @@ export const useOtherProviders = (
 
     useEffect(() => {
         setAll([...providers])
+        console.log("providers", providers)
     }, []);
+
+    useEffect(() => { console.log(mode, selectedCurrency) }, [mode, selectedCurrency])
 
     return useMemo(() => {
         return all.filter(provider => {

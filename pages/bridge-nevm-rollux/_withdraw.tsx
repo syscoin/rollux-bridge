@@ -13,15 +13,16 @@ import { BigNumber, Contract, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 import React, { FC, useEffect, useState } from 'react';
 import { useSelectedNetwork } from "./../../hooks/rolluxBridge/useSelectedNetwork"
+import WarningInfoBlock from 'components/Common/WarningInfoBlock';
 
 export type WithdrawPartProps = {
     onClickWithdrawButton: (amount: string) => void;
     onClickWithdrawERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-    L1StandardBridgeAddress: string,
+    onSelectBridgeProvider: (provider: string, force: boolean) => void;
 }
 
-export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onClickWithdrawERC20, setIsLoading, L1StandardBridgeAddress }) => {
+export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onClickWithdrawERC20, setIsLoading, onSelectBridgeProvider }) => {
     const [currency, setCurrency] = useState<string>('SYS');
     const [selectedTokenAddress, setSelectedTokenAddress] = useState<string | undefined>(undefined);
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
@@ -41,6 +42,8 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
         l2ERC20Tokens?.find(token => token.symbol === currency) :
         { address: '', chainId: chainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }
 
+
+    const [outputNetwork, setOutputNetwork] = useState<string>('SYS');
 
     // balance hook
 
@@ -249,7 +252,10 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
             {selectedToken && (
                 <Flex flexDir="column" maxW="100%">
                     <Box sx={{ mt: { base: '24px', md: '44px' } }}>
-                        <OtherProvidersMenuSelector preSelectLabel={'You will get on '} onSelect={(provider) => console.log('provider')} />
+                        <OtherProvidersMenuSelector preSelectLabel={'You will get on '} onSelect={(provider) => {
+                            setOutputNetwork(provider);
+                            onSelectBridgeProvider(provider, false);
+                        }} />
                     </Box>
 
                     <Wrap alignItems="center" mt="15px" spacing="27px" maxW="calc(100vw - 70px)">
@@ -267,6 +273,17 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                     </Wrap>
                 </Flex>
             )}
+
+            {(account && selectedToken && outputNetwork === 'SYS') && (<>
+                <Flex flexDir={'column'} mt={4}>
+                    <WarningInfoBlock warningText='In case if You want to use other provider instead of Standard Bridge for withdraw SYS or tokens please click button below.'>
+                        <Button variant={'primary'} onClick={() => onSelectBridgeProvider('SYS', true)}>
+                            Select other provider
+                        </Button>
+                    </WarningInfoBlock>
+                </Flex>
+
+            </>)}
 
             <Flex
                 mt={{ base: '32px', md: '44px' }}

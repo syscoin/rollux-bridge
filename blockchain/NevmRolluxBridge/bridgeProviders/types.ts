@@ -2,18 +2,18 @@ import { CurrentDisplayView } from "components/BridgeL1L2/interfaces"
 import React from "react"
 
 export enum FiatMethod {
-    USD, // US Dollar
-    EUR, // Euro
-    CNY, // Chinese Yuan
-    JPY, // Japanese Yen
-    PLN // Polish Zloty
+    USD = 'USD', // US Dollar
+    EUR = 'EUR', // Euro
+    CNY = 'CNY', // Chinese Yuan
+    JPY = 'JPY', // Japanese Yen
+    PLN = 'PLN' // Polish Zloty
 }
 
 export enum BridgedNetwork {
-    SYS, // Syscoin
-    ETH, // Ethereum
-    BSC, // Binance Smart Chain
-    MATIC, // Polygon
+    SYS = 'SYS', // Syscoin
+    ETH = 'ETH', // Ethereum
+    BSC = 'BSC', // Binance Smart Chain
+    MATIC = 'MATIC', // Polygon
 }
 
 export type FiatOrBridged = FiatMethod | BridgedNetwork;

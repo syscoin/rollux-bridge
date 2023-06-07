@@ -10,10 +10,10 @@ export type ProviderCardProps = {
 
 export const ProviderCard: FC<ProviderCardProps> = ({ config, onButtonClick }) => {
     return (
-        <Card mt={4} w={['300px', 'sm', 'md', 'lg']} cursor="pointer">
+        <Card mt={4} w={['300px', 'sm', 'md', 'lg']} maxH={'200px'} cursor="pointer">
             <CardBody>
                 <Flex alignItems='center' direction='row' justifyContent='flex-start'>
-                    <Box boxSize="150px">
+                    <Box boxSize="50px">
                         <Image alt="logo" src={config.logoUrl ?? ''} fallbackSrc="https://via.placeholder.com/150" boxSize="100%" objectFit="contain" />
                     </Box>
                     <Text fontSize={'xl'} ml={4}>
@@ -21,6 +21,13 @@ export const ProviderCard: FC<ProviderCardProps> = ({ config, onButtonClick }) =
                     </Text>
                     <Spacer />
                     <IconButton onClick={onButtonClick} aria-label="External Link" icon={<ExternalLinkIcon />} />
+                </Flex>
+                <Flex alignItems={'start'} direction={'row'}>
+                    <Link isExternal href={config.url ?? ''}>
+                        <Text fontSize={'sm'} mt={2}>
+                            {config.url} <ExternalLinkIcon mx="2px" />
+                        </Text>
+                    </Link>
                 </Flex>
             </CardBody>
         </Card>
