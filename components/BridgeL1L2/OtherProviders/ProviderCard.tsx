@@ -23,7 +23,7 @@ export const ProviderCard: FC<ProviderCardProps> = ({ config, onButtonClick }) =
                     <IconButton onClick={onButtonClick} aria-label="External Link" icon={<ExternalLinkIcon />} />
                 </Flex>
                 <Flex alignItems={'start'} direction={'row'}>
-                    <Link isExternal href={config.url ?? ''}>
+                    <Link isExternal href={`https://${config.url}` ?? ''}>
                         <Text fontSize={'sm'} mt={2}>
                             {config.url} <ExternalLinkIcon mx="2px" />
                         </Text>
