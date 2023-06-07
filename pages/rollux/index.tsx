@@ -10,7 +10,7 @@ const RolluxTestnet: NextPage = () => {
           chainName: "Rollux Testnet Syscoin",
           nativeCurrency: {
             name: "Syscoin",
-            symbol: "rSYS",
+            symbol: "tSYS",
             decimals: 18,
           },
           rpcUrls: ["https://testnet.rollux.com:2814/"],

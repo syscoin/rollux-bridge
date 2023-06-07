@@ -183,7 +183,7 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
                 align={'flex-start'}>
 
                 <Button as={"a"} target={'_blank'} href="https://sysdomains.xyz/rollux-faucet" padding={4} width={'100%'} justifyContent={'flex-start'}>
-                  <ArrowForwardIcon /> Get RSYS
+                  <ArrowForwardIcon /> Get TSYS
                 </Button>
 
               </VStack>

@@ -6,8 +6,8 @@ export const RolluxChainMainnet: Chain = {
     isLocalChain: false,
     isTestChain: false,
     nativeCurrency: {
-        name: "rSyscoin",
-        symbol: "rSYS",
+        name: "tSyscoin",
+        symbol: "tSYS",
         decimals: 18,
     },
     multicallAddress: '',
