@@ -24,8 +24,8 @@ import { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
-import DepositPart from './_deposit';
-import WithdrawPart from './_withdraw';
+import DepositPart from '../../components/BridgeL1L2/Standard/_deposit';
+import WithdrawPart from '../../components/BridgeL1L2/Standard/_withdraw';
 import L2StandardBridgeABI from "blockchain/NevmRolluxBridge/abi/L2StandardBridge"
 import UnfinishedWithdrawalItem from 'components/BridgeL1L2/WIthdraw/UnfinishedWithdrawalItem';
 import ViewWithdrawalModal from 'components/BridgeL1L2/WIthdraw/ViewWithdrawalModal';

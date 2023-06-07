@@ -27,5 +27,3 @@ export const ConnectWalletBox: FC = () => {
         </Box>
     )
 }
-
-export default ConnectWalletBox;

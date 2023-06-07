@@ -1,83 +1,57 @@
-import { ChevronDownIcon, InfoIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
-    Button, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Icon, Image, Input, Menu,
-    MenuButton, MenuItem, MenuList, NumberInput, NumberInputField, PlacementWithLogical, Spinner, Text, useBreakpointValue, useToast, Wrap
+    Box,
+    Button, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Image, Input, Menu,
+    MenuButton, MenuItem, MenuList, NumberInput, NumberInputField, PlacementWithLogical, Text, useBreakpointValue, Wrap
 } from '@chakra-ui/react';
 import { ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
-import { TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp';
-import { SelectedNetworkType } from 'blockchain/NevmRolluxBridge/config/networks';
 import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20TokenList';
 import TokenListToken from 'blockchain/NevmRolluxBridge/interfaces/TokenListToken';
-import { OtherProvidersMenuSelector } from 'components/BridgeL1L2/OtherProviders/OtherProvidersMenuSelector';
-import WarningInfoBlock from 'components/Common/WarningInfoBlock';
 import { ConnectButton } from 'components/ConnectButton';
-import { ConnectionWarning } from 'components/ConnectionWarning';
+import { OtherProvidersMenuSelector } from 'components/BridgeL1L2/OtherProviders/OtherProvidersMenuSelector';
 import { BigNumber, Contract, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
-import React, { FC, useEffect, useState, useCallback } from 'react';
-import { useSelectedNetwork } from "./../../hooks/rolluxBridge/useSelectedNetwork"
+import React, { FC, useEffect, useState } from 'react';
+import { useSelectedNetwork } from 'hooks/rolluxBridge/useSelectedNetwork';
+import WarningInfoBlock from 'components/Common/WarningInfoBlock';
 
-export type DepositPartProps = {
-    onClickDepositButton: (amount: string) => void;
-    onClickApproveERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
-    onClickDepositERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
+export type WithdrawPartProps = {
+    onClickWithdrawButton: (amount: string) => void;
+    onClickWithdrawERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     onSelectBridgeProvider: (provider: string, force: boolean) => void;
 }
 
-export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClickApproveERC20, onClickDepositERC20, setIsLoading, onSelectBridgeProvider }) => {
+export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onClickWithdrawERC20, setIsLoading, onSelectBridgeProvider }) => {
     const [currency, setCurrency] = useState<string>('SYS');
     const [selectedTokenAddress, setSelectedTokenAddress] = useState<string | undefined>(undefined);
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
     const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
     const [amountToSwap, setAmountToSwap] = useState<string>('0.00');
-
-    const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork, contractsL1 } = useSelectedNetwork();
-
     const { account, chainId, switchNetwork } = useEthers();
-    const balanceNativeToken = useEtherBalance(account, { chainId: l1ChainId });
-    const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: l1ChainId });
-    const allowanceERC20Token = useTokenAllowance(selectedTokenAddress, account, contractsL1.L1StandardBridge, {
-        chainId: l1ChainId
-    });
+    const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork } = useSelectedNetwork();
+
+    const balanceNativeToken = useEtherBalance(account, { chainId: l2ChainId });
+    const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: l2ChainId });
     const [allERC20Tokens, setAllERC20Tokens] = useState<TokenListToken[]>([]);
     const [l1ERC20Tokens, setL1ERC20Tokens] = useState<TokenListToken[]>([]);
     const [l2ERC20Tokens, setL2ERC20Tokens] = useState<TokenListToken[]>([]);
 
-    const [tokenBalancesMap, setTokenBalancesMap] = useState<{ [key: string]: string }>({});
-
     const selectedToken = currency !== 'SYS' ?
-        l1ERC20Tokens?.find(token => token.symbol === currency) :
+        l2ERC20Tokens?.find(token => token.symbol === currency) :
         { address: '', chainId: chainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }
 
-    const viewTokenBalance = async (tokenAddress: string, decimals: number, owner: string): Promise<string> => {
-        let ret: string = '0.00';
 
-        try {
-            const contract = new Contract(tokenAddress, ERC20Interface,
-                new ethers.providers.StaticJsonRpcProvider(rpcL1)
-            );
-
-            const balance = await contract.balanceOf(owner);
-
-            return ethers.utils.formatUnits(balance, decimals);
-
-        } catch (e) {
-            // console.warn("Could not fetch balance for token.");
-
-            return ret;
-        }
-    }
-
+    const [outputNetwork, setOutputNetwork] = useState<string>('SYS');
 
     // balance hook
 
-    const preCheckNetwork = useCallback(async (neededNetwork: number, chainId: number) => {
+    const preCheckNetwork = async (neededNetwork: number, chainId: number) => {
         if (chainId !== neededNetwork) {
             await switchNetwork(neededNetwork);
         }
-    }, [switchNetwork])
+    }
 
 
     useEffect(() => {
@@ -119,7 +93,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
         let findToken: TokenListToken | undefined = undefined;
         let findTokenL2: TokenListToken | undefined = undefined;
 
-        l1ERC20Tokens.forEach((value) => {
+        l2ERC20Tokens.forEach((value) => {
             if (value.symbol === currency) {
                 findToken = value;
             }
@@ -132,7 +106,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             // @ts-ignore
             setSelectedTokenDecimals(findToken.decimals);
 
-            l2ERC20Tokens.forEach((value) => {
+            l1ERC20Tokens.forEach((value) => {
                 if (value.symbol === currency && typeof findTokenL2 === 'undefined') {
                     findTokenL2 = value;
                 }
@@ -148,6 +122,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
     /** load tokens hook */
     useEffect(() => {
+        setIsLoading(true);
 
         fetchERC20TokenList().then((tokens) => {
             const tokensL1: TokenListToken[] = tokens.filter((token) => {
@@ -161,22 +136,6 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             setL1ERC20Tokens(tokensL1);
 
 
-            if (account) {
-                /**
-                 * balances mapping
-                 */
-
-                const balancesInfo: { [key: string]: string } = {};
-
-                tokensL1.forEach((token) => {
-                    viewTokenBalance(token.address, token.decimals, account).then((balance: string) => {
-                        balancesInfo[token.symbol] = balance;
-                    })
-                })
-
-                setTokenBalancesMap(balancesInfo);
-            }
-
             const tokensL2: TokenListToken[] = tokens.filter((token) => {
                 if (token.chainId === l2ChainId) {
                     return true;
@@ -187,52 +146,40 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
             setL2ERC20Tokens(tokensL2);
 
-
-            // set all tokens
-
             setAllERC20Tokens(tokens);
 
+            setIsLoading(false);
         })
-    }, [account, l1ChainId, l2ChainId]);
+    }, [setIsLoading, account, l1ChainId, l2ChainId]);
 
-    const handleApproval = useCallback(async () => {
+
+    const handleERC20Withdraw = async () => {
         if (selectedTokenAddress && selectedTokenAddressL2) {
 
-            await preCheckNetwork(l1ChainId, chainId as number);
+            await preCheckNetwork(l2ChainId, chainId as number);
 
             setIsLoading(true);
-            onClickApproveERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals));
-
-
-
-        }
-    }, [selectedTokenAddress, l1ChainId, selectedTokenAddressL2, preCheckNetwork, chainId, setIsLoading, onClickApproveERC20, amountToSwap, selectedTokenDecimals]);
-
-    const handleERC20Deposit = async () => {
-        if (selectedTokenAddress && selectedTokenAddressL2) {
-
-            await preCheckNetwork(l1ChainId, chainId as number);
-
-            setIsLoading(true);
-            onClickDepositERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals));
+            onClickWithdrawERC20(selectedTokenAddressL2, selectedTokenAddress, ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals));
         }
     }
+
 
 
     return (
         <Flex flexDir="column">
             <FormControl isInvalid={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}>
                 <Flex justifyContent="space-between">
-
-                    <OtherProvidersMenuSelector preSelectLabel={'From'} onSelect={(provider) => onSelectBridgeProvider(provider, false)} />
+                    <FormLabel fontWeight="700">
+                        From Rollux
+                    </FormLabel>
 
                     {
                         selectedToken && selectedToken?.symbol !== 'SYS' ?
-                            <Text opacity={.5}>Available {tokenBalancesMap?.[selectedToken.symbol] || '0.00'}</Text> : selectedToken ?
+                            <Text opacity={.5}>Available {parseFloat(ethers.utils.formatUnits(balanceERC20Token || BigNumber.from('0'), selectedTokenDecimals)).toFixed(2) || '0.00'}</Text> : selectedToken ?
                                 <Text opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'}</Text> : <></>
                     }
                 </Flex>
-                <HStack bg="#f4fadb" borderRadius="6px" minH="48px" px="19px" border={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? '2px solid' : 'none'} borderColor="red.400">
+                <HStack bg="#f4fadb" borderRadius="6px" minH="48px" px="19px" border={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals)) ? '2px solid' : 'none'} borderColor="red.400">
                     <NumberInput variant="unstyled" size="lg" onChange={(valueAsString) => {
                         if (valueAsString.length > 0 && parseFloat(valueAsString) > 0) {
                             setAmountToSwap(valueAsString)
@@ -279,7 +226,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                                     <Text>SYS</Text>
                                 </HStack>
                             </MenuItem>
-                            {l1ERC20Tokens?.map((token) => (
+                            {l2ERC20Tokens?.map((token) => (
                                 <MenuItem
                                     key={token.address + token.name}
                                     onClick={() => setCurrency(token.symbol)}
@@ -304,11 +251,14 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
             {selectedToken && (
                 <Flex flexDir="column" maxW="100%">
-                    <Text fontWeight={700} mt={{ base: '24px', md: '44px' }} ml={2}>
-                        You will get on Rollux
-                    </Text>
+                    <Box sx={{ mt: { base: '24px', md: '44px' } }}>
+                        <OtherProvidersMenuSelector preSelectLabel={'You will get on '} onSelect={(provider) => {
+                            setOutputNetwork(provider);
+                            onSelectBridgeProvider(provider, false);
+                        }} />
+                    </Box>
 
-                    <Wrap alignItems="center" mt="15px" spacing="27px" maxW="calc(100vw - 70px)" ml={2}>
+                    <Wrap alignItems="center" mt="15px" spacing="27px" maxW="calc(100vw - 70px)">
                         <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>{amountToSwap}</Text>
 
                         <HStack mt="44px" alignItems="center">
@@ -324,9 +274,9 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 </Flex>
             )}
 
-            {(account && selectedToken && selectedToken.symbol === 'SYS') && (<>
+            {(account && selectedToken && outputNetwork === 'SYS') && (<>
                 <Flex flexDir={'column'} mt={4}>
-                    <WarningInfoBlock warningText='In case if You want to use other provider instead of Standard Bridge for deposit SYS please click button below.'>
+                    <WarningInfoBlock warningText='In case if You want to use other provider instead of Standard Bridge for withdraw SYS or tokens please click button below.'>
                         <Button variant={'primary'} onClick={() => onSelectBridgeProvider('SYS', true)}>
                             Select other provider
                         </Button>
@@ -340,72 +290,56 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 w="100%"
                 __css={{
                     button: {
-                        w: '100%'
-                    }
+                        w: '100%',
+                    },
                 }}
             >
                 {!account && (
                     <ConnectButton />
                 )}
 
-                {'SYS' !== currency && account && <>
+                {('SYS' !== currency && account) && <>
 
-                    <Flex flexDir={'row'} maxW={'100%'}>
-                        <InfoIcon color={'orange.500'} height={6} marginRight={3} />
-                        <Text size={'xl'}>
-                            Allowance {ethers.utils.formatUnits(allowanceERC20Token || '0', selectedTokenDecimals)}
-                        </Text>
-                    </Flex>
-
-                    {(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals))) && <>
+                    {((balanceERC20Token && balanceERC20Token.gte(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals)))) && <>
                         <Button
                             variant="primary"
                             onClick={() => {
-                                handleApproval();
+                                handleERC20Withdraw()
                             }}
                         >
-                            Approve
-                        </Button>
-                    </>}
-
-                    {(allowanceERC20Token?.gte(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals)) && parseFloat(amountToSwap) > 0) && <>
-                        <Button
-                            variant="primary"
-                            onClick={() => {
-                                handleERC20Deposit()
-                            }}
-                        >
-                            Deposit ERC20
+                            {chainId !== l2ChainId && 'Switch to Rollux'}
+                            {chainId === l2ChainId && 'Withdraw'}
                         </Button>
                     </>}
                 </>}
 
-                {('SYS' === currency && account && (chainId !== l1ChainId)) && <>
+                {('SYS' === currency && account && (chainId !== l2ChainId)) && <>
                     <Button
-                        isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
+                        isDisabled={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}
                         variant="primary"
                         onClick={async () => {
-                            await switchNetwork(l1ChainId);
+                            await switchNetwork(l2ChainId);
                         }}
                     >
-                        Switch to {selectedNetwork === SelectedNetworkType.Mainnet ? 'Syscoin' : 'Tanenbaum'} Chain
+                        Switch to Rollux Chain
                     </Button>
                 </>}
 
-                {('SYS' === currency && account && (chainId && chainId === l1ChainId)) && <>
+                {('SYS' === currency && account && (chainId && chainId === l2ChainId)) && <>
                     <Button
-                        isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) || !parseFloat(amountToSwap)}
+                        isDisabled={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}
                         variant="primary"
-                        onClick={() => {
-                            onClickDepositButton(amountToSwap);
+                        onClick={async () => {
+                            await preCheckNetwork(l2ChainId, chainId as number);
+                            onClickWithdrawButton(amountToSwap);
                         }}
                     >
-                        Deposit
+                        Withdraw
                     </Button>
                 </>}
             </Flex>
-        </Flex>
+        </Flex >
     )
 }
 
-export default DepositPart;
+export default WithdrawPart;
