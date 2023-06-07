@@ -13,6 +13,7 @@ import { LogDescription } from "ethers/lib/utils";
 import ERC721Abi from "blockchain/NevmRolluxBridge/abi/ERC721"
 import OPMintableERC721Factory from "blockchain/NevmRolluxBridge/abi/OPMintableERC721Factory"
 import { SwitchNetworkButton } from "components/Common/SwitchNetworkButton";
+import { useRouter } from "next/router";
 
 
 // todo refactor this. This part doesnt affect anything because this address is constant but better to have good code. 
@@ -33,6 +34,13 @@ export const CreateTokenIndex: NextPage<{}> = () => {
     const { switchNetwork } = useEthers();
     const [tokenStandard, setTokenStandard] = useState<TokenStandard | undefined>(undefined);
     const [isTokenDeployed, setIsTokenDeployed] = useState<boolean>(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        if (router.query.contract) {
+            setL1Address(router.query.contract as string);
+        }
+    }, [router.query.contract]);
 
 
     const { rpcL1, selectedNetwork, l2ChainId, getExplorerLink, contractsL1, contractsL2 } = useSelectedNetwork();
@@ -200,7 +208,7 @@ export const CreateTokenIndex: NextPage<{}> = () => {
                 </>}
                 <Input placeholder="L1 ERC20/ERC721 token address"
                     isInvalid={errorText.length > 0}
-
+                    value={l1Address}
                     onChange={e => handleL1TokenInput(e.target.value)} />
 
 

@@ -4,7 +4,7 @@ import { RolluxPageWrapper } from "components/Common/RolluxPageWrapper"
 import { SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks"
 import { useSelectedNetwork } from "hooks/rolluxBridge/useSelectedNetwork"
 import InputNFT from "components/NFT/InputNFT"
-import { Box, CardBody, Flex, Card, Heading, Button, Alert, AlertDescription, AlertDialog, AlertIcon } from "@chakra-ui/react"
+import { Box, CardBody, Flex, Card, Heading, Button, Alert, AlertDescription, AlertDialog, AlertIcon, HStack, Divider } from "@chakra-ui/react"
 import { ArrowRight } from "@mui/icons-material"
 import PreviewNFT from "components/NFT/PreviewNFT"
 import { CallResult, useCall, useContractFunction, useEthers } from "@usedapp/core"
@@ -22,6 +22,8 @@ import { useNFTTokenlist } from "hooks/rolluxBridge/useNFTTokenlist"
 import { useCrossChainMessenger } from "hooks/rolluxBridge/useCrossChainMessenger"
 import { MessageDirection, MessageStatus } from "@eth-optimism/sdk"
 import ManageWithdrawals from "components/NFT/ManageWithdrawals"
+import { useRouter } from "next/router"
+import { ArrowBackIcon } from "@chakra-ui/icons"
 
 export type NFTPageIndexProps = {
 
@@ -49,6 +51,8 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
         txHash: string
     }[]>([]);
 
+    const [redirectPath, setRedirectPath] = useState<string | undefined>(undefined);
+
     const { oppositeLayerToken } = useNFTTokenlist({
         queryToken: nftAddress,
         atChainId: direction === NFTSwapDirection.L1_TO_L2 ? l1ChainId : l2ChainId
@@ -56,6 +60,17 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
 
     const messenger = useCrossChainMessenger();
 
+    const router = useRouter();
+
+    useEffect(() => {
+        if (router.query.contract) {
+            setNftAddress(router.query.contract as string);
+        }
+
+        if (router.query.redirect) {
+            setRedirectPath(router.query.redirect as string);
+        }
+    }, [router.query.contract, router.query.redirect]);
 
     const { value: tokenUriData, error: tokenUriDataError } = useCall(
         (nftAddress && tokenId !== undefined && ethers.utils.isAddress(nftAddress)) && {
@@ -249,6 +264,23 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                 'Please select correct network' : null
             }
         >
+            {redirectPath && <>
+
+                <Button
+                    mb={3}
+
+                    onClick={() => {
+                        window.location.href = redirectPath;
+                    }}
+                    variant="primary"
+                    colorScheme="green"
+                    size="md"
+                    leftIcon={<ArrowBackIcon />}
+                >
+                    Back to the app
+                </Button>
+
+            </>}
             <Card mb={3}>
                 <Box
                     bgGradient="linear-gradient(90deg, #E0E0E0 4.05%, #DBEF88 95.38%)"
@@ -257,14 +289,20 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                     overflow="hidden"
                 >
                     <CardBody justifyContent={'center'} textAlign={'center'}>
-                        <Heading size={'lg'}>
-                            Rollux NFT Bridge
-                        </Heading>
+
+                        <HStack justifyContent={'center'}>
+
+                            <Heading size={'lg'}>
+                                Rollux NFT Bridge
+                            </Heading>
+                        </HStack>
+
                     </CardBody>
                 </Box>
             </Card>
 
             <Flex alignItems={'center'} justifyContent={'center'} mb={3} mt={3}>
+
                 <SwapDirection currentDirection={direction}
                     onDirectionChanged={handleSwitchDirection}
                 />
