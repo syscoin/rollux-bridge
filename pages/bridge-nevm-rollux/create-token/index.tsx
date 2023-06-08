@@ -37,7 +37,7 @@ export const CreateTokenIndex: NextPage<{}> = () => {
     const router = useRouter();
 
     useEffect(() => {
-        if (router.query.contract) {
+        if (router.query.contract && ethers.utils.isAddress(router.query.contract as string)) {
             setL1Address(router.query.contract as string);
         }
     }, [router.query.contract]);
