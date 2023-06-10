@@ -329,7 +329,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                 onClickProveMessage={handleProveMessage}
             />
 
-            <Flex direction={'row'} alignItems={'center'} gap={2}>
+            <Flex direction={{md: 'row', sm: 'column'}} alignItems={'center'} gap={2} >
                 <InputNFT
                     contractAddressValue={nftAddress}
                     tokenIdValue={tokenId}
