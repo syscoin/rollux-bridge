@@ -463,9 +463,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     }
 
     /**
-     * 
+     *
      * Hack for use useDapp
-     * 
+     *
      * todo : refactor whole app to useDapp instead of web3-react
      */
     useEffect(() => {
@@ -622,8 +622,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     mt={{ base: '9', xl: 0 }}
                     flexDir="column"
                     maxW="483px"
-                    w={'483px'}
                     gap="21px"
+                    className="main_container"
                 >
                     <Flex
                         px={{ base: '16px', md: '40px' }}
@@ -636,6 +636,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                         justifyContent="center"
                         flexDir="column"
                         m="0 auto"
+                        className="tabs_dw"
                     >
                         <Tabs variant="soft-rounded" onChange={(index) => setCurrentDisplay(index === 0 ? CurrentDisplayView.deposit : CurrentDisplayView.withdraw)}>
 
