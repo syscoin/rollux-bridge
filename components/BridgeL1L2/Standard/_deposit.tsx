@@ -15,6 +15,7 @@ import { BigNumber, Contract, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 import React, { FC, useEffect, useState, useCallback } from 'react';
 import { useSelectedNetwork } from "../../../hooks/rolluxBridge/useSelectedNetwork"
+import { DirectionSwitcherArrow } from '../DirectionSwitcherArrow';
 
 export type DepositPartProps = {
     onClickDepositButton: (amount: string) => void;
@@ -300,7 +301,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
                 <FormErrorMessage>Invalid amount</FormErrorMessage>
             </FormControl>
-
+            <DirectionSwitcherArrow onClick={() => console.log('Switch')} />
             {selectedToken && (
                 <Flex flexDir="column" maxW="100%">
                     <Text fontWeight={700} mt={{ base: '24px', md: '44px' }} ml={2}>

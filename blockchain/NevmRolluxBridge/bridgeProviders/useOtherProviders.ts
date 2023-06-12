@@ -2,8 +2,8 @@ import { CurrentDisplayView } from "components/BridgeL1L2/interfaces";
 import { OtherProviderBridgeMode } from "components/BridgeL1L2/OtherProviders/types";
 import { providers } from "./providers";
 import { useState, useEffect, useMemo } from "react";
-import { FiatOrBridged, OtherBridgeProvider } from "./types";
-
+import { BridgedNetwork, FiatOrBridged, OtherBridgeProvider } from "./types";
+import { getKeyValue } from "./helpers";
 
 export const useOtherProviders = (
     mode: CurrentDisplayView,
@@ -13,7 +13,7 @@ export const useOtherProviders = (
 
     useEffect(() => {
         setAll([...providers])
-        console.log("providers", providers)
+        // console.log("providers", providers)
     }, []);
 
     useEffect(() => { console.log(mode, selectedCurrency) }, [mode, selectedCurrency])
@@ -21,9 +21,19 @@ export const useOtherProviders = (
     return useMemo(() => {
         return all.filter(provider => {
             if (mode === CurrentDisplayView.deposit) {
-                return provider.supportsDeposits && provider.supportedInputs.includes(selectedCurrency)
+
+                let items = provider.supportsDeposits && Object.values(provider.supportedInputs).includes(
+                    // @ts-ignore
+                    getKeyValue(String(selectedCurrency))
+                );
+                return items;
             } else if (mode === CurrentDisplayView.withdraw) {
-                return provider.supportsWithdrawals && provider.supportedOutputs.includes(selectedCurrency)
+                let items = provider.supportsWithdrawals && Object.values(provider.supportedOutputs).includes(
+                    // @ts-ignore
+                    getKeyValue(String(selectedCurrency))
+                )
+
+                return items;
             } else {
                 return false;
             }

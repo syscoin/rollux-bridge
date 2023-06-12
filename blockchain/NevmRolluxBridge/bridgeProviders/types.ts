@@ -10,10 +10,10 @@ export enum FiatMethod {
 }
 
 export enum BridgedNetwork {
-    SYS = 'SYS', // Syscoin
-    ETH = 'ETH', // Ethereum
-    BSC = 'BSC', // Binance Smart Chain
-    MATIC = 'MATIC', // Polygon
+    SYS = 'Syscoin Mainnet', // Syscoin
+    ETH = 'Ethereum Mainnet', // Ethereum
+    BSC = 'Binance Smart Chain', // Binance Smart Chain
+    MATIC = 'Polygon', // Polygon
 }
 
 export type FiatOrBridged = FiatMethod | BridgedNetwork;

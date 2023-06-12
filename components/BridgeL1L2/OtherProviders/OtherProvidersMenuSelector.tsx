@@ -2,6 +2,7 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Divider, Box, MenuItem, Menu, MenuButton, MenuList, HStack, Image, Text, Input, useBreakpointValue, PlacementWithLogical } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { BridgedNetwork, FiatMethod } from '../../../blockchain/NevmRolluxBridge/bridgeProviders/types'; // replace this with the actual path to your enums
+import { getKeyValue } from 'blockchain/NevmRolluxBridge/bridgeProviders/helpers';
 
 export type OtherProvidersMenuSelectorProps = {
     onSelect: (provider: string) => void;
@@ -12,22 +13,25 @@ export type OtherProvidersMenuSelectorProps = {
 let cryptoKeys: string[] = Object.keys(BridgedNetwork).filter(k => isNaN(Number(k)));
 let fiatKeys: string[] = Object.keys(FiatMethod).filter(k => isNaN(Number(k)));
 
+
+
 export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = ({ onSelect, preSelectLabel }) => {
     const [selectedInput, setSelectedInput] = useState<string>('SYS');
     const [searchTerm, setSearchTerm] = useState<string>('');
 
-
     const filteredCryptoKeys = useMemo(() => cryptoKeys.filter(crypto =>
-        crypto.toLowerCase().includes(searchTerm.toLowerCase())
+        crypto.toLowerCase().includes(searchTerm.toLowerCase()) || getKeyValue(crypto).toLowerCase().includes(searchTerm.toLowerCase())
     ), [searchTerm]);
 
     const filteredFiatKeys = useMemo(() => fiatKeys.filter(fiat =>
-        fiat.toLowerCase().includes(searchTerm.toLowerCase())
+        fiat.toLowerCase().includes(searchTerm.toLowerCase()) || getKeyValue(fiat).toLowerCase().includes(searchTerm.toLowerCase())
     ), [searchTerm]);
+
+
 
     // Select a provider
     const handleSelect = (provider: string) => {
-        console.log(provider);
+        // console.log(provider);
         setSelectedInput(provider);
         onSelect(provider);
     };
@@ -52,7 +56,7 @@ export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = (
                         boxSize={boxSize}
                     />
                     <Text fontWeight="700">
-                        {preSelectLabel} {selectedInput}
+                        {preSelectLabel} {getKeyValue(selectedInput)}
                     </Text>
                     <ChevronDownIcon fontSize="xl" />
                 </HStack>
@@ -82,7 +86,7 @@ export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = (
                                 alt={`${crypto} logo`}
                                 boxSize={boxSize}
                             />
-                            <Text>{crypto}</Text>
+                            <Text>{getKeyValue(crypto)}</Text>
                         </HStack>
                     </MenuItem>
                 ))}
