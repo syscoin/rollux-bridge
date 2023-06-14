@@ -1,10 +1,10 @@
-import { ChevronDownIcon, InfoIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon, ChevronRightIcon, InfoIcon, RepeatClockIcon } from '@chakra-ui/icons';
 import {
-    Button, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Icon, Image, Input, Menu,
-    MenuButton, MenuItem, MenuList, NumberInput, NumberInputField, PlacementWithLogical, Spinner, Text, useBreakpointValue, useToast, Wrap
+    Button, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Icon, IconButton, Image, Input, Menu,
+    MenuButton, MenuItem, MenuList, NumberInput, NumberInputField, PlacementWithLogical, Skeleton, Spacer, Spinner, Text, useBreakpointValue, useToast, VStack, Wrap
 } from '@chakra-ui/react';
 import { ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
-import { TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp';
+import { NEVMChain, TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp';
 import { SelectedNetworkType } from 'blockchain/NevmRolluxBridge/config/networks';
 import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20TokenList';
 import TokenListToken from 'blockchain/NevmRolluxBridge/interfaces/TokenListToken';
@@ -15,7 +15,11 @@ import { BigNumber, Contract, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 import React, { FC, useEffect, useState, useCallback } from 'react';
 import { useSelectedNetwork } from "../../../hooks/rolluxBridge/useSelectedNetwork"
+import ReviewDeposit from '../Deposit/ReviewDeposit';
 import { DirectionSwitcherArrow } from '../DirectionSwitcherArrow';
+import { MaxBalance } from '../MaxBalance';
+import { useCrossChainMessenger } from "../../../hooks/rolluxBridge/useCrossChainMessenger";
+import { useEstimateTransaction } from 'hooks/rolluxBridge/useEstimateTransaction';
 
 export type DepositPartProps = {
     onClickDepositButton: (amount: string) => void;
@@ -23,9 +27,10 @@ export type DepositPartProps = {
     onClickDepositERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     onSelectBridgeProvider: (provider: string, force: boolean) => void;
+    onSwapDirection: () => void;
 }
 
-export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClickApproveERC20, onClickDepositERC20, setIsLoading, onSelectBridgeProvider }) => {
+export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClickApproveERC20, onClickDepositERC20, setIsLoading, onSelectBridgeProvider, onSwapDirection }) => {
     const [currency, setCurrency] = useState<string>('SYS');
     const [selectedTokenAddress, setSelectedTokenAddress] = useState<string | undefined>(undefined);
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
@@ -44,12 +49,53 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     const [allERC20Tokens, setAllERC20Tokens] = useState<TokenListToken[]>([]);
     const [l1ERC20Tokens, setL1ERC20Tokens] = useState<TokenListToken[]>([]);
     const [l2ERC20Tokens, setL2ERC20Tokens] = useState<TokenListToken[]>([]);
+    const [estimatedTxPrice, setEstimatedTxPrice] = useState<{
+        usdEstimate: number | undefined,
+        weiEstimate: number | undefined
+    }>({ usdEstimate: undefined, weiEstimate: undefined });
 
     const [tokenBalancesMap, setTokenBalancesMap] = useState<{ [key: string]: string }>({});
 
     const selectedToken = currency !== 'SYS' ?
         l1ERC20Tokens?.find(token => token.symbol === currency) :
         { address: '', chainId: chainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }
+
+    const messenger = useCrossChainMessenger();
+
+    const { calculateEstimate } = useEstimateTransaction();
+    useEffect(() => {
+        if (parseFloat(amountToSwap) == 0 || !messenger) {
+            return; // break here
+        }
+
+        setEstimatedTxPrice({
+            usdEstimate: undefined,
+            weiEstimate: undefined
+        })
+
+        const gasLimit = selectedTokenAddress !== undefined ?
+            messenger.estimateGas.depositERC20(
+                selectedTokenAddress ?? ethers.constants.AddressZero,
+                selectedTokenAddressL2 ?? ethers.constants.AddressZero,
+                ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals)
+            ) : messenger.estimateGas.depositETH(ethers.utils.parseUnits(amountToSwap, 18))
+
+        gasLimit.then(async (gasLimit) => {
+            const estimateResult = await calculateEstimate(
+                gasLimit,
+                1);
+
+            if (estimateResult === undefined) {
+                console.warn('Failed to estimate transaction price.');
+                return;
+            }
+
+            setEstimatedTxPrice(estimateResult);
+        });
+
+    }, [messenger, amountToSwap, selectedTokenDecimals, selectedTokenAddress, selectedTokenAddressL2, calculateEstimate]);
+
+
 
     const viewTokenBalance = async (tokenAddress: string, decimals: number, owner: string): Promise<string> => {
         let ret: string = '0.00';
@@ -225,15 +271,19 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 <Flex justifyContent="space-between">
 
                     <OtherProvidersMenuSelector preSelectLabel={'From'} onSelect={(provider) => onSelectBridgeProvider(provider, false)} />
-
+                    <Spacer />
                     {
                         selectedToken && selectedToken?.symbol !== 'SYS' ?
-                            <Text opacity={.5}>Available {tokenBalancesMap?.[selectedToken.symbol] || '0.00'}</Text> : selectedToken ?
-                                <Text opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'}</Text> : <></>
+                            <><Text textAlign={'right'} mr={3} opacity={.5}>Available {tokenBalancesMap?.[selectedToken.symbol] || '0.00'} </Text><MaxBalance onClick={() => {
+                                setAmountToSwap(tokenBalancesMap?.[selectedToken.symbol] || '0.00');
+                            }} /></> : selectedToken ?
+                                <><Text textAlign={'right'} mr={3} opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'} </Text><MaxBalance onClick={() => {
+                                    setAmountToSwap(balanceNativeToken ? formatEther(balanceNativeToken).toString() : '0.00');
+                                }} /></> : <></>
                     }
                 </Flex>
                 <HStack bg="#f4fadb" borderRadius="6px" minH="48px" px="19px" border={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? '2px solid' : 'none'} borderColor="red.400">
-                    <NumberInput variant="unstyled" size="lg" onChange={(valueAsString) => {
+                    <NumberInput w={'100%'} value={amountToSwap} variant="unstyled" size="lg" onChange={(valueAsString) => {
                         if (valueAsString.length > 0 && parseFloat(valueAsString) > 0) {
                             setAmountToSwap(valueAsString)
                         } else {
@@ -242,7 +292,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     }}>
                         <NumberInputField placeholder='0.00' />
                     </NumberInput>
-
+                    <Spacer />
                     <Menu isLazy lazyBehavior="unmount" placement="top-start" autoSelect={false}>
                         <MenuButton minW="fit-content">
                             <HStack>
@@ -301,7 +351,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
                 <FormErrorMessage>Invalid amount</FormErrorMessage>
             </FormControl>
-            <DirectionSwitcherArrow onClick={() => console.log('Switch')} />
+            <DirectionSwitcherArrow onClick={onSwapDirection} />
             {selectedToken && (
                 <Flex flexDir="column" maxW="100%">
                     <Text fontWeight={700} mt={{ base: '24px', md: '44px' }} ml={2}>
@@ -385,7 +435,10 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                         isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap)}
                         variant="primary"
                         onClick={async () => {
-                            await switchNetwork(l1ChainId);
+                            const switchTarget = selectedNetwork === SelectedNetworkType.Unsupported ?
+                                NEVMChain.chainId : l1ChainId;
+
+                            await switchNetwork(switchTarget);
                         }}
                     >
                         Switch to {selectedNetwork === SelectedNetworkType.Mainnet ? 'Syscoin' : 'Tanenbaum'} Chain
@@ -393,16 +446,49 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 </>}
 
                 {('SYS' === currency && account && (chainId && chainId === l1ChainId)) && <>
-                    <Button
+                    <ReviewDeposit
                         isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) || !parseFloat(amountToSwap)}
-                        variant="primary"
-                        onClick={() => {
-                            onClickDepositButton(amountToSwap);
-                        }}
                     >
-                        Deposit
-                    </Button>
+                        <Button
+                            width={'100%'}
+                            variant="primary"
+                            onClick={() => {
+                                onClickDepositButton(amountToSwap);
+                            }}
+                        >
+                            Deposit
+                        </Button>
+                    </ReviewDeposit>
+
                 </>}
+
+
+                {parseFloat(amountToSwap) > 0 && <>
+                    <HStack mt={4} spacing={4} justifyContent={'center'}>
+                        <Text color={'gray.500'}>
+                            <ChevronRightIcon /> Gas fee to transfer
+                        </Text>
+                        <Spacer />
+                        <Skeleton isLoaded={estimatedTxPrice.usdEstimate !== undefined && estimatedTxPrice.weiEstimate !== undefined}>
+                            <Text
+                                color={'gray.500'}>
+                                {estimatedTxPrice.weiEstimate?.toFixed(6)} SYS ( ~{estimatedTxPrice.usdEstimate?.toFixed(7)} $)
+                            </Text>
+                        </Skeleton>
+
+                    </HStack>
+                    <HStack mt={4} spacing={4} justifyContent={'center'}>
+                        <Text color={'gray.500'}>
+                            <RepeatClockIcon /> Time to transfer
+                        </Text>
+                        <Spacer />
+                        <Text
+                            color={'gray.500'}>
+                            ~ 2-5 minutes
+                        </Text>
+                    </HStack>
+                </>}
+
             </Flex>
         </Flex>
     )

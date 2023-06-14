@@ -14,15 +14,17 @@ import { formatEther } from 'ethers/lib/utils';
 import React, { FC, useEffect, useState } from 'react';
 import { useSelectedNetwork } from 'hooks/rolluxBridge/useSelectedNetwork';
 import WarningInfoBlock from 'components/Common/WarningInfoBlock';
+import { DirectionSwitcherArrow } from '../DirectionSwitcherArrow';
 
 export type WithdrawPartProps = {
     onClickWithdrawButton: (amount: string) => void;
     onClickWithdrawERC20: (l1Token: string, l2Token: string, amount: BigNumber) => void;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     onSelectBridgeProvider: (provider: string, force: boolean) => void;
+    onSwapDirection: () => void;
 }
 
-export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onClickWithdrawERC20, setIsLoading, onSelectBridgeProvider }) => {
+export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onClickWithdrawERC20, setIsLoading, onSelectBridgeProvider, onSwapDirection }) => {
     const [currency, setCurrency] = useState<string>('SYS');
     const [selectedTokenAddress, setSelectedTokenAddress] = useState<string | undefined>(undefined);
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
@@ -248,7 +250,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
                 <FormErrorMessage>Invalid amount</FormErrorMessage>
             </FormControl>
-
+            <DirectionSwitcherArrow onClick={onSwapDirection} />
             {selectedToken && (
                 <Flex flexDir="column" maxW="100%">
                     <Box sx={{ mt: { base: '24px', md: '44px' } }}>

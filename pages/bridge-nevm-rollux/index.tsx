@@ -71,6 +71,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const [showOtherProviders, setShowOtherProviders] = useState<boolean>(false);
     const [selectedIOCurrency, setSelectedIOCurrency] = useState<string>('SYS');
 
+    const [tablIndex, setTabIndex] = useState<number>(0);
+
     // todo refactor this 2 similar functions
     const getProveTxn = (withdrawTxHash: string, data: { withdrawTx: string, proveTx: string }[]): string | null => {
         try {
@@ -492,11 +494,11 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
 
     const widthdrawalsLogs = useCallback(async () => {
-        if (currentDisplay === CurrentDisplayView.withdraw && account) {
+        if (currentDisplay === CurrentDisplayView.withdraw && account && selectedNetwork !== SelectedNetworkType.Unsupported) {
             // check for withdrawals
 
             const L2BridgeContract = new Contract(
-                contractsL2?.L2StandardBridge,
+                contractsL2?.L2StandardBridge ?? ethers.constants.AddressZero,
                 new ethers.utils.Interface(L2StandardBridgeABI),
                 new ethers.providers.StaticJsonRpcProvider(rpcL2)
             )
@@ -621,7 +623,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     p={{ base: '16px' }}
                     mt={{ base: '9', xl: 0 }}
                     flexDir="column"
-                    maxW="483px"
+                    maxW={{ 'xs': '483px', base: '583px' }}
                     gap="21px"
                     className="main_container"
                 >
@@ -638,7 +640,15 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                         m="0 auto"
                         className="tabs_dw"
                     >
-                        <Tabs variant="soft-rounded" onChange={(index) => setCurrentDisplay(index === 0 ? CurrentDisplayView.deposit : CurrentDisplayView.withdraw)}>
+                        <Tabs
+                            variant="soft-rounded"
+                            onChange={(index) => {
+                                setCurrentDisplay(index === 0 ? CurrentDisplayView.deposit : CurrentDisplayView.withdraw)
+
+                                setTabIndex(index)
+                            }}
+                            index={tablIndex}
+                        >
 
                             <TabList justifyContent="center" bg="#f4fadb" w="max-content" m="0 auto" borderRadius="6px">
                                 <Tab
@@ -681,6 +691,10 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                         :
 
                                         <DepositPart
+                                            onSwapDirection={() => {
+                                                setTabIndex(1);
+                                                setCurrentDisplay(CurrentDisplayView.withdraw);
+                                            }}
                                             onSelectBridgeProvider={(bridgeProvider: string, force: boolean) => {
                                                 handleSwitchProviders(bridgeProvider, force);
                                             }}
@@ -853,6 +867,10 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
 
                                             <WithdrawPart
+                                                onSwapDirection={() => {
+                                                    setTabIndex(0);
+                                                    setCurrentDisplay(CurrentDisplayView.deposit);
+                                                }}
                                                 onSelectBridgeProvider={(bridgeProvider: string, force: boolean) => {
                                                     handleSwitchProviders(bridgeProvider, force);
                                                 }}
@@ -878,7 +896,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 </Flex>
             </VStack>
 
-        </ChakraProvider>
+        </ChakraProvider >
     )
 }
 
