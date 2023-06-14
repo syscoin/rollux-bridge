@@ -2,7 +2,7 @@ import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
     Box,
     Button, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Image, Input, Menu,
-    MenuButton, MenuItem, MenuList, NumberInput, NumberInputField, PlacementWithLogical, Text, useBreakpointValue, Wrap
+    MenuButton, MenuItem, MenuList, NumberInput, NumberInputField, PlacementWithLogical, Spacer, Text, useBreakpointValue, Wrap
 } from '@chakra-ui/react';
 import { ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
 import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20TokenList';
@@ -15,6 +15,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { useSelectedNetwork } from 'hooks/rolluxBridge/useSelectedNetwork';
 import WarningInfoBlock from 'components/Common/WarningInfoBlock';
 import { DirectionSwitcherArrow } from '../DirectionSwitcherArrow';
+import SelectTokenModal from './SelectTokenModal';
 
 export type WithdrawPartProps = {
     onClickWithdrawButton: (amount: string) => void;
@@ -42,7 +43,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
     const selectedToken = currency !== 'SYS' ?
         l2ERC20Tokens?.find(token => token.symbol === currency) :
-        { address: '', chainId: chainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }
+        { address: '', chainId: l2ChainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }
 
 
     const [outputNetwork, setOutputNetwork] = useState<string>('SYS');
@@ -192,7 +193,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                         <NumberInputField placeholder='0.00' />
                     </NumberInput>
 
-                    <Menu isLazy lazyBehavior="unmount" placement="top-start" autoSelect={false}>
+                    {/* <Menu isLazy lazyBehavior="unmount" placement="top-start" autoSelect={false}>
                         <MenuButton minW="fit-content">
                             <HStack>
                                 {
@@ -245,7 +246,18 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                                 </MenuItem>
                             ))}
                         </MenuList>
-                    </Menu>
+                    </Menu> */}
+                    <Spacer />
+                    <SelectTokenModal
+                        tokens={l2ERC20Tokens}
+                        onSelect={(token) => {
+                            console.log(token);
+                            setCurrency(token.symbol);
+                            setAmountToSwap('0.00');
+                        }}
+                        chainId={l2ChainId}
+                        selectedToken={selectedToken !== undefined ? selectedToken : { address: '', chainId: l1ChainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }}
+                    />
                 </HStack>
 
                 <FormErrorMessage>Invalid amount</FormErrorMessage>
