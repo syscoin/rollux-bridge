@@ -1,7 +1,6 @@
 import { ChevronDownIcon, ChevronRightIcon, InfoIcon, RepeatClockIcon } from '@chakra-ui/icons';
 import {
-    Button, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Icon, IconButton, Image, Input, Menu,
-    MenuButton, MenuItem, MenuList, NumberInput, NumberInputField, PlacementWithLogical, Skeleton, Spacer, Spinner, Text, useBreakpointValue, useToast, VStack, Wrap
+    Button, Flex, FormControl, Spacer, Skeleton, FormErrorMessage, FormLabel, HStack, Image, NumberInput, NumberInputField, Text, useBreakpointValue, useToast, VStack, Wrap
 } from '@chakra-ui/react';
 import { ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
 import { NEVMChain, TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp';

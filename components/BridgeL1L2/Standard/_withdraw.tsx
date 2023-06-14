@@ -9,7 +9,7 @@ import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20T
 import TokenListToken from 'blockchain/NevmRolluxBridge/interfaces/TokenListToken';
 import { ConnectButton } from 'components/ConnectButton';
 import { OtherProvidersMenuSelector } from 'components/BridgeL1L2/OtherProviders/OtherProvidersMenuSelector';
-import { BigNumber, Contract, ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 import React, { FC, useEffect, useState } from 'react';
 import { useSelectedNetwork } from 'hooks/rolluxBridge/useSelectedNetwork';

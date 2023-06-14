@@ -1,8 +1,7 @@
 import React, { FC } from "react"
-import { Button, Image, Text, HStack, Box, Spacer } from "@chakra-ui/react"
+import { Image, Text, HStack, Box, Spacer } from "@chakra-ui/react"
 import { useEtherBalance, useEthers, useTokenBalance } from "@usedapp/core"
 import { ethers } from "ethers"
-import { Check } from "@mui/icons-material"
 import { CheckIcon } from "@chakra-ui/icons"
 
 export type SelectTokenModalItemProps = {

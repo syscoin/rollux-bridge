@@ -1,5 +1,4 @@
 import { Button, HStack, Image, Text } from "@chakra-ui/react";
-import TokenListToken from "blockchain/NevmRolluxBridge/interfaces/TokenListToken";
 import React, { FC } from "react";
 
 export type SelectTokenBadgeProps = {
