@@ -624,6 +624,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     mt={{ base: '9', xl: 0 }}
                     flexDir="column"
                     maxW={{ 'xs': '483px', base: '583px' }}
+                    minW={{ 'xs': '350px', base: '583px' }}
                     gap="21px"
                     className="main_container"
                 >

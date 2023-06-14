@@ -1,13 +1,20 @@
-import { Modal, ModalBody, Button, Text, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, useDisclosure, ModalFooter, Flex } from "@chakra-ui/react";
+import { Modal, ModalBody, Button, Text, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, useDisclosure, ModalFooter, Flex, HStack, Spacer, Divider } from "@chakra-ui/react";
+import { BigNumber } from "ethers";
 import React, { FC } from "react";
 
 export type ReviewDepositProps = {
     children: React.ReactNode;
     isDisabled: boolean;
+    amount: number,
+    coinName: string,
+    gasFee: number,
+    estimatedFiatFee: number,
+    isDepositLoading: boolean,
 }
 
-export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled }) => {
+export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled, amount, coinName, gasFee, estimatedFiatFee, isDepositLoading }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+
 
     return (<>
         <Modal isOpen={isOpen} onClose={onClose}>
@@ -16,7 +23,25 @@ export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled }) 
                 <ModalHeader>Review deposit</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <Text>Review deposit</Text>
+                    <HStack mb={2}>
+                        <Text>Amount:</Text>
+                        <Spacer />
+                        <Text>{amount} {coinName}</Text>
+                    </HStack>
+                    <Divider />
+                    <HStack mb={2}>
+                        <Text>Estimated fee:</Text>
+                        <Spacer />
+                        <Text>{gasFee} ETH</Text>
+                    </HStack>
+                    <Divider />
+                    <HStack mb={2}>
+                        <Text>Estimated fiat fee:</Text>
+                        <Spacer />
+                        <Text>$ {estimatedFiatFee}</Text>
+                    </HStack>
+                    <Divider />
+
                 </ModalBody>
                 <ModalFooter>
                     <Flex flex={1} flexDirection={'row'} width={'100%'}>

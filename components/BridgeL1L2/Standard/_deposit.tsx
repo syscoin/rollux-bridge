@@ -20,6 +20,7 @@ import { DirectionSwitcherArrow } from '../DirectionSwitcherArrow';
 import { MaxBalance } from '../MaxBalance';
 import { useCrossChainMessenger } from "../../../hooks/rolluxBridge/useCrossChainMessenger";
 import { useEstimateTransaction } from 'hooks/rolluxBridge/useEstimateTransaction';
+import SelectTokenModal from './SelectTokenModal';
 
 export type DepositPartProps = {
     onClickDepositButton: (amount: string) => void;
@@ -37,12 +38,18 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
     const [amountToSwap, setAmountToSwap] = useState<string>('0.00');
+    const [isDepositLoading, setIsDepositLoading] = useState<boolean>(false);
 
     const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork, contractsL1 } = useSelectedNetwork();
 
     const { account, chainId, switchNetwork } = useEthers();
     const balanceNativeToken = useEtherBalance(account, { chainId: l1ChainId });
     const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: l1ChainId });
+
+    const balanceNativeTokenL2 = useEtherBalance(account, { chainId: l2ChainId }) ?? 0;
+    const balanceERC20TokenL2 = useTokenBalance(selectedTokenAddressL2, account, { chainId: l2ChainId }) ?? 0;
+
+
     const allowanceERC20Token = useTokenAllowance(selectedTokenAddress, account, contractsL1.L1StandardBridge, {
         chainId: l1ChainId
     });
@@ -58,7 +65,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
     const selectedToken = currency !== 'SYS' ?
         l1ERC20Tokens?.find(token => token.symbol === currency) :
-        { address: '', chainId: chainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }
+        { address: '', chainId: l1ChainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }
 
     const messenger = useCrossChainMessenger();
 
@@ -73,48 +80,37 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             weiEstimate: undefined
         })
 
-        const gasLimit = selectedTokenAddress !== undefined ?
-            messenger.estimateGas.depositERC20(
-                selectedTokenAddress ?? ethers.constants.AddressZero,
-                selectedTokenAddressL2 ?? ethers.constants.AddressZero,
-                ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals)
-            ) : messenger.estimateGas.depositETH(ethers.utils.parseUnits(amountToSwap, 18))
-
-        gasLimit.then(async (gasLimit) => {
-            const estimateResult = await calculateEstimate(
-                gasLimit,
-                1);
-
-            if (estimateResult === undefined) {
-                console.warn('Failed to estimate transaction price.');
-                return;
-            }
-
-            setEstimatedTxPrice(estimateResult);
-        });
-
-    }, [messenger, amountToSwap, selectedTokenDecimals, selectedTokenAddress, selectedTokenAddressL2, calculateEstimate]);
-
-
-
-    const viewTokenBalance = async (tokenAddress: string, decimals: number, owner: string): Promise<string> => {
-        let ret: string = '0.00';
+        console.log(selectedTokenAddress, selectedTokenAddressL2, amountToSwap, selectedTokenDecimals)
 
         try {
-            const contract = new Contract(tokenAddress, ERC20Interface,
-                new ethers.providers.StaticJsonRpcProvider(rpcL1)
-            );
+            const gasLimit = (selectedTokenAddress !== ethers.constants.AddressZero && selectedTokenAddress
+                && selectedTokenAddressL2 && selectedTokenDecimals
+            ) ?
+                messenger.estimateGas.depositERC20(
+                    selectedTokenAddress,
+                    selectedTokenAddressL2,
+                    ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals)
+                ) : messenger.estimateGas.depositETH(ethers.utils.parseUnits(amountToSwap, 18))
 
-            const balance = await contract.balanceOf(owner);
+            gasLimit.then(async (gasLimit) => {
+                const estimateResult = await calculateEstimate(
+                    gasLimit,
+                    1);
 
-            return ethers.utils.formatUnits(balance, decimals);
+                if (estimateResult === undefined) {
+                    console.warn('Failed to estimate transaction price.');
+                    return;
+                }
 
+                setEstimatedTxPrice(estimateResult);
+            }).catch((e) => {
+                console.warn(e);
+            })
         } catch (e) {
-            // console.warn("Could not fetch balance for token.");
-
-            return ret;
+            console.warn(e);
         }
-    }
+
+    }, [messenger, amountToSwap, selectedTokenDecimals, selectedTokenAddress, selectedTokenAddressL2, calculateEstimate]);
 
 
     // balance hook
@@ -157,10 +153,13 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
     // currency hook
     useEffect(() => {
+
         if ('SYS' === currency) {
+            setSelectedTokenAddress(undefined);
+            setSelectedTokenAddressL2(undefined);
+            setSelectedTokenDecimals(18);
             return;
         }
-
 
         let findToken: TokenListToken | undefined = undefined;
         let findTokenL2: TokenListToken | undefined = undefined;
@@ -215,9 +214,9 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 const balancesInfo: { [key: string]: string } = {};
 
                 tokensL1.forEach((token) => {
-                    viewTokenBalance(token.address, token.decimals, account).then((balance: string) => {
-                        balancesInfo[token.symbol] = balance;
-                    })
+                    // viewTokenBalance(token.address, token.decimals, account).then((balance: string) => {
+                    //     balancesInfo[token.symbol] = balance;
+                    // })
                 })
 
                 setTokenBalancesMap(balancesInfo);
@@ -267,15 +266,15 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
     return (
         <Flex flexDir="column">
-            <FormControl isInvalid={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}>
+            <FormControl isInvalid={false}>
                 <Flex justifyContent="space-between">
 
                     <OtherProvidersMenuSelector preSelectLabel={'From'} onSelect={(provider) => onSelectBridgeProvider(provider, false)} />
                     <Spacer />
                     {
                         selectedToken && selectedToken?.symbol !== 'SYS' ?
-                            <><Text textAlign={'right'} mr={3} opacity={.5}>Available {tokenBalancesMap?.[selectedToken.symbol] || '0.00'} </Text><MaxBalance onClick={() => {
-                                setAmountToSwap(tokenBalancesMap?.[selectedToken.symbol] || '0.00');
+                            <><Text textAlign={'right'} mr={3} opacity={.5}>Available {balanceToDisplay} </Text><MaxBalance onClick={() => {
+                                setAmountToSwap(balanceToDisplay);
                             }} /></> : selectedToken ?
                                 <><Text textAlign={'right'} mr={3} opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'} </Text><MaxBalance onClick={() => {
                                     setAmountToSwap(balanceNativeToken ? formatEther(balanceNativeToken).toString() : '0.00');
@@ -293,7 +292,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                         <NumberInputField placeholder='0.00' />
                     </NumberInput>
                     <Spacer />
-                    <Menu isLazy lazyBehavior="unmount" placement="top-start" autoSelect={false}>
+                    {/* <Menu isLazy lazyBehavior="unmount" placement="top-start" autoSelect={false}>
                         <MenuButton minW="fit-content">
                             <HStack>
                                 {
@@ -346,7 +345,18 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                                 </MenuItem>
                             ))}
                         </MenuList>
-                    </Menu>
+                    </Menu> */}
+                    <SelectTokenModal
+                        tokens={l1ERC20Tokens}
+                        onSelect={(token) => {
+                            console.log(token);
+                            setCurrency(token.symbol);
+                            setAmountToSwap('0.00');
+                        }}
+                        chainId={l1ChainId}
+                        selectedToken={selectedToken !== undefined ? selectedToken : { address: '', chainId: l1ChainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }}
+                    />
+
                 </HStack>
 
                 <FormErrorMessage>Invalid amount</FormErrorMessage>
@@ -371,6 +381,18 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                             <Text>{selectedToken.symbol}</Text>
                         </HStack>
                     </Wrap>
+
+                    <HStack mt={3} alignItems={'center'}>
+                        <Image
+                            alt="coin logo"
+                            boxSize="24px"
+                            borderRadius="full"
+                            src={selectedToken.logoURI}
+                        />
+                        <Text>Balance {parseFloat(ethers.utils.formatUnits(currency === 'SYS' ? balanceNativeTokenL2 : balanceERC20TokenL2,
+                            selectedTokenDecimals
+                        )).toFixed(6)} {selectedToken.symbol}</Text>
+                    </HStack>
                 </Flex>
             )}
 
@@ -447,17 +469,28 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
                 {('SYS' === currency && account && (chainId && chainId === l1ChainId)) && <>
                     <ReviewDeposit
+                        amount={parseFloat(amountToSwap)}
+                        coinName={currency}
+                        gasFee={estimatedTxPrice.weiEstimate ?? 0}
+                        isDepositLoading={isDepositLoading}
+                        estimatedFiatFee={estimatedTxPrice.usdEstimate ?? 0}
                         isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) || !parseFloat(amountToSwap)}
                     >
-                        <Button
-                            width={'100%'}
-                            variant="primary"
-                            onClick={() => {
-                                onClickDepositButton(amountToSwap);
-                            }}
-                        >
-                            Deposit
-                        </Button>
+                        <>
+                            <Button
+                                isLoading={isDepositLoading}
+                                width={'100%'}
+                                variant="primary"
+                                onClick={() => {
+
+                                    onClickDepositButton(amountToSwap);
+
+                                }}
+                            >
+                                Deposit
+                            </Button>
+                        </>
+
                     </ReviewDeposit>
 
                 </>}
