@@ -42,7 +42,7 @@ export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = (
 
     // Responsive design variables
     const boxSize = useBreakpointValue({ base: "15px", md: "20px", lg: "25px", xl: "30px" });
-    const placement = useBreakpointValue({ base: "end", md: "top-end" });
+    const placement = useBreakpointValue({ base: "bottom", md: "top-end" });
 
     return (
         <Menu isLazy lazyBehavior="unmount" placement={placement as PlacementWithLogical} autoSelect={false}>
@@ -62,7 +62,7 @@ export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = (
                 </HStack>
             </MenuButton>
 
-            <MenuList maxH="300px" overflow="scroll" position="absolute" left={placement === "end" ? "0" : "-50px"} top="50px">
+            <MenuList maxH="300px" overflow="scroll" position="absolute" left={placement === "end" ? "0" : "-100px"} top="50px">
                 {/* Search Input */}
                 <Box p={4}>
                     <Input

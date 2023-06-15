@@ -13,6 +13,7 @@ export const chakraTheme = extendTheme({
     },
     colors: {
         brand: {
+            lightPrimary: '#f4fadb',
             primary: '#DBEF88',
             primaryGradient: 'linear-gradient(90.06deg, #DBEF88 -3.26%, #EACF5E 207.26%)',
             secondaryGradient: 'linear-gradient(90deg, #E0E0E0 4.05%, #DBEF88 95.38%)'

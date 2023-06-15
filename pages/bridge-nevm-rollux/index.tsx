@@ -470,11 +470,11 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
      *
      * todo : refactor whole app to useDapp instead of web3-react
      */
-    useEffect(() => {
-        if (!account && connectedWalletCtxt.nevm.account) {
-            activateBrowserWallet()
-        }
-    }, [account, activateBrowserWallet, connectedWalletCtxt.nevm.account]);
+    // useEffect(() => {
+    //     if (!account && connectedWalletCtxt.nevm.account) {
+    //         activateBrowserWallet()
+    //     }
+    // }, [account, activateBrowserWallet, connectedWalletCtxt.nevm.account]);
 
     useEffect(() => {
 
@@ -569,9 +569,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         <ChakraProvider theme={chakraTheme}>
             <Head>
                 <title>Syscoin Bridge | Rollux & NEVM </title>
-                <link rel="shortcut icon" href="/favicon.ico" />
+                <link rel="shortcut icon" href="/favicon-rollux.ico" />
                 <meta name="description" content="Syscoin Trustless Bridge" />
-                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" href="/favicon-rollux.ico" />
             </Head>
 
             <RolluxHeader />

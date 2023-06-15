@@ -20,6 +20,7 @@ import { MaxBalance } from '../MaxBalance';
 import { useCrossChainMessenger } from "../../../hooks/rolluxBridge/useCrossChainMessenger";
 import { useEstimateTransaction } from 'hooks/rolluxBridge/useEstimateTransaction';
 import SelectTokenModal from './SelectTokenModal';
+import { RolluxLogo } from 'components/Icons/RolluxLogo';
 
 export type DepositPartProps = {
     onClickDepositButton: (amount: string) => void;
@@ -264,7 +265,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
 
     return (
-        <Flex flexDir="column">
+        <Flex flexDir="column" pb={4} pr={1} pl={1}>
             <FormControl isInvalid={false}>
                 <Flex justifyContent="space-between">
 
@@ -280,7 +281,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                                 }} /></> : <></>
                     }
                 </Flex>
-                <HStack bg="#f4fadb" borderRadius="6px" minH="48px" px="19px" border={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? '2px solid' : 'none'} borderColor="red.400">
+                <HStack bg="brand.lightPrimary" borderRadius="6px" mt={1} minH="48px" pl="19px" pr={'0px'} border={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? '2px solid' : 'none'} borderColor="red.400">
                     <NumberInput w={'100%'} value={amountToSwap} variant="unstyled" size="lg" onChange={(valueAsString) => {
                         if (valueAsString.length > 0 && parseFloat(valueAsString) > 0) {
                             setAmountToSwap(valueAsString)
@@ -362,13 +363,20 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             </FormControl>
             <DirectionSwitcherArrow onClick={onSwapDirection} />
             {selectedToken && (
-                <Flex flexDir="column" maxW="100%">
-                    <Text fontWeight={700} mt={{ base: '24px', md: '44px' }} ml={2}>
-                        You will get on Rollux
-                    </Text>
+                <Flex flexDir="column" maxW="100%" mt={3} backgroundColor={'brand.lightPrimary'} borderRadius={'4px'} p={3}>
+                    <HStack mt={{ base: '3px', md: '12px' }} ml={2}>
+                        <Text fontWeight={700} >
+                            To
+                        </Text>
+                        <RolluxLogo width={20} height={20} />
+                        <Text fontWeight={700}>
+                            Rollux
+                        </Text>
+                    </HStack>
+
 
                     <Wrap alignItems="center" mt="15px" spacing="27px" maxW="calc(100vw - 70px)" ml={2}>
-                        <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>{amountToSwap}</Text>
+                        <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>You will receive {amountToSwap}</Text>
 
                         <HStack mt="44px" alignItems="center">
                             <Image
@@ -395,7 +403,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 </Flex>
             )}
 
-            {(account && selectedToken && selectedToken.symbol === 'SYS') && (<>
+            {/* {(account && selectedToken && selectedToken.symbol === 'SYS') && (<>
                 <Flex flexDir={'column'} mt={4}>
                     <WarningInfoBlock warningText='In case if You want to use other provider instead of Standard Bridge for deposit SYS please click button below.'>
                         <Button variant={'primary'} onClick={() => onSelectBridgeProvider('SYS', true)}>
@@ -404,7 +412,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     </WarningInfoBlock>
                 </Flex>
 
-            </>)}
+            </>)} */}
 
             <Flex
                 mt={{ base: '32px', md: '44px' }}

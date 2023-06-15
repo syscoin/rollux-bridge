@@ -22,6 +22,7 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
   const balance = useEtherBalance(account, { chainId: chainId });
   const { selectedNetwork } = useSelectedNetwork();
   const [avatar, setAvatar] = useState<string>('');
+  const { activateBrowserWallet } = useEthers();
 
   const { isOpen, onClose, onOpen } = useDisclosure()
 
@@ -71,7 +72,7 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
       <Button
         variant="primary"
         px="32.5px"
-        onClick={() => connectedWalletCtxt.connectNEVM('metamask')}
+        onClick={() => activateBrowserWallet()}
         {...rest}
       >
         Connect Wallet

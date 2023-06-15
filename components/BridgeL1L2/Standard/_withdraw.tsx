@@ -288,17 +288,6 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                 </Flex>
             )}
 
-            {(account && selectedToken && outputNetwork === 'SYS') && (<>
-                <Flex flexDir={'column'} mt={4}>
-                    <WarningInfoBlock warningText='In case if You want to use other provider instead of Standard Bridge for withdraw SYS or tokens please click button below.'>
-                        <Button variant={'primary'} onClick={() => onSelectBridgeProvider('SYS', true)}>
-                            Select other provider
-                        </Button>
-                    </WarningInfoBlock>
-                </Flex>
-
-            </>)}
-
             <Flex
                 mt={{ base: '32px', md: '44px' }}
                 w="100%"
