@@ -11,12 +11,14 @@ import { useEffect, useState } from "react";
 import NextLink from "next/link"
 //@ts-ignore
 import { createIcon } from '@download/blockies';
+import { ConnectWalletModal } from "./BridgeL1L2/ConnectWalletModal/ConnectWalletModal";
 
 
 interface ConnectButtonProps extends ButtonProps {
 }
 
 export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
+  const { isOpen: isOpenConnect, onClose: onCloseConnect, onOpen: onOpenConnect } = useDisclosure()
 
   const { account, activateBrowserWallet, deactivate, switchNetwork, chainId } = useEthers();
   const balance = useEtherBalance(account, { chainId: chainId });
@@ -49,33 +51,21 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
     }
   }, [account])
 
-  // const [hasPending, setHasPending] = useState<boolean>(false);
-
-  // const getHasPending = () => {
-  //   console.log(account)
-  //   if (library && account) {
-  //     library.getTransactionCount(account, "pending").then(count => setHasPending(count > 0))
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const interval = setInterval(getHasPending, 5000)
-
-  //   return clearInterval(interval);
-  // }, [getHasPending]);
-
-
 
   return <>
     {!account ? (
-      <Button
-        variant="primary"
-        px="32.5px"
-        onClick={() => activateBrowserWallet()}
-        {...rest}
-      >
-        Connect Wallet
-      </Button>
+      <>
+        <Button
+          variant="primary"
+          px="32.5px"
+          onClick={() => onOpenConnect()}
+          {...rest}
+        >
+          Connect Wallet
+        </Button>
+
+        <ConnectWalletModal isOpen={isOpenConnect} onClose={onCloseConnect} onOpen={onOpenConnect} />
+      </>
     ) : (
       <Button px="32.5px" onClick={onOpen} {...rest}>
         <Avatar size={'xs'} name={account} src={avatar} mr={3} />
