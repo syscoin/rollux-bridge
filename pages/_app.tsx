@@ -1,18 +1,15 @@
 import { ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
 import { ThemeProvider } from "@mui/material";
-import { Config, DAppProvider } from "@usedapp/core";
+import { Config, DAppProvider, MetamaskConnector, CoinbaseWalletConnector, Mainnet } from "@usedapp/core";
 import { NEVMChain, RolluxChain, RolluxChainMainnet, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
-// import { NetworkValidator } from "components/Common/NetworkValidator";
 import { Header } from "components/Header";
-// import { RolluxHeader } from "components/RolluxHeader";
 import type { AppProps } from "next/app";
-import { Roboto } from 'next/font/google';
 import { useRouter } from "next/router";
 import { QueryClient, QueryClientProvider } from "react-query";
 import theme from "../components/theme";
-// import ConnectedWalletProvider from "../contexts/ConnectedWallet/Provider";
-// import MetamaskProvider from "../contexts/Metamask/Provider";
-// import PaliWalletContextProvider from "../contexts/PaliWallet/Provider";
+import ConnectedWalletProvider from "../contexts/ConnectedWallet/Provider";
+import MetamaskProvider from "../contexts/Metamask/Provider";
+import PaliWalletContextProvider from "../contexts/PaliWallet/Provider";
 import "../styles/globals.css";
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from "components/Common/ErrorFallback";
@@ -34,7 +31,21 @@ const dappConfig: Config = {
     [57000]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697',
 
   },
-  networks: [RolluxChain, TanenbaumChain, NEVMChain, RolluxChainMainnet]
+  networks: [RolluxChain, TanenbaumChain, NEVMChain, RolluxChainMainnet, Mainnet],
+  connectors: {
+    metamask: new MetamaskConnector(),
+    coinBase: new CoinbaseWalletConnector(),
+    // walletConnectV2: new WalletConnectV2Connector.WalletConnectV2Connector({
+    //   projectId: '6b7e7faf5a9e54e3c5f22289efa5975b',
+    //   chains: [RolluxChain, TanenbaumChain, NEVMChain, RolluxChainMainnet],
+    //   rpcMap: {
+    //     57000: RolluxChain.rpcUrl || '',
+    //     5700: TanenbaumChain.rpcUrl || '',
+    //     57: NEVMChain.rpcUrl || '',
+    //     570: RolluxChainMainnet.rpcUrl || '',
+    //   }
+    // })
+  }
 }
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -50,18 +61,18 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        {/* <PaliWalletContextProvider>
-          <MetamaskProvider> */}
-        {/* <ConnectedWalletProvider> */}
-        <DAppProvider config={dappConfig}>
-          <ThemeProvider theme={theme}>
-            {removeMuiHeader.includes(pathname) ? null : <Header />}
-          </ThemeProvider>
-          <Component {...pageProps} />
-        </DAppProvider>
-        {/* </ConnectedWalletProvider> */}
-        {/* </MetamaskProvider>
-        </PaliWalletContextProvider> */}
+        <PaliWalletContextProvider>
+          <MetamaskProvider>
+            <ConnectedWalletProvider>
+              <DAppProvider config={dappConfig}>
+                <ThemeProvider theme={theme}>
+                  {removeMuiHeader.includes(pathname) ? null : <Header />}
+                </ThemeProvider>
+                <Component {...pageProps} />
+              </DAppProvider>
+            </ConnectedWalletProvider>
+          </MetamaskProvider>
+        </PaliWalletContextProvider>
       </ErrorBoundary>
     </QueryClientProvider>
   );

@@ -17,7 +17,8 @@ import {
     CloseIcon
 } from "@chakra-ui/icons"
 import CloseButton from "../CloseButton";
-import { useEthers } from "@usedapp/core";
+import { CoinbaseWalletConnector, Mainnet, useEthers } from "@usedapp/core";
+import { NEVMChain, RolluxChain, RolluxChainMainnet, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
 
 export type ConnectWalletBlockProps = {
     setScreen: (value: string) => void;
@@ -25,7 +26,7 @@ export type ConnectWalletBlockProps = {
 }
 
 export const ConnectWalletBlock: FC<ConnectWalletBlockProps> = ({ setScreen, onClose }) => {
-    const { activateBrowserWallet } = useEthers();
+    const { activateBrowserWallet, activate } = useEthers();
 
     return (<>
         <ModalHeader>
@@ -45,8 +46,28 @@ export const ConnectWalletBlock: FC<ConnectWalletBlockProps> = ({ setScreen, onC
                 }}>MetaMask</Button>
                 <Button w={'100%'} variant="secondary" onClick={() => { }}>Pali Wallet</Button>
                 <Button w={'100%'} variant="secondary" onClick={() => { }}>Rainbow</Button>
-                <Button w={'100%'} variant="secondary" onClick={() => { }}>Coinbase Wallet</Button>
-                <Button w={'100%'} variant="secondary" onClick={() => { }}>WalletConnect</Button>
+                <Button w={'100%'} variant="secondary" onClick={() => {
+                    activate(new CoinbaseWalletConnector());
+                }}>Coinbase Wallet</Button>
+                <Button w={'100%'} variant="secondary" onClick={() => {
+                    import("@usedapp/wallet-connect-v2-connector").then(({ WalletConnectV2Connector }) => {
+
+                        onClose();
+
+                        activate(new WalletConnectV2Connector(
+                            {
+                                projectId: "6b7e7faf5a9e54e3c5f22289efa5975b", chains: [
+                                    TanenbaumChain,
+                                ],
+                                rpcMap: {
+                                    [TanenbaumChain.chainId]: TanenbaumChain.rpcUrl as string,
+                                }
+
+                            }
+                        ));
+                    })
+
+                }}>WalletConnect</Button>
                 <Button w={'100%'} variant="secondary" onClick={() => { }}>Trust Wallet</Button>
             </VStack>
             <Divider mt={5} />
