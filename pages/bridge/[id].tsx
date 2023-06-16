@@ -55,7 +55,7 @@ const Bridge: NextPage<Props> = ({ transfer }) => {
   return (
     <TransferProvider id={id as string}>
       <DrawerPage>
-        <BlocktimeDisclaimer/>
+        <BlocktimeDisclaimer />
         <Container sx={{ mt: 10 }}>
           {paliWallet.isTestnet && (
             <Alert severity="error" sx={{ mb: 2 }}>

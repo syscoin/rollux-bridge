@@ -1,6 +1,6 @@
 import { ArrowBackIcon, ArrowForwardIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { Avatar, Button, ButtonGroup, ButtonProps, Box, Flex, List, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure, VStack, Heading, StackDivider, Link, Spacer } from "@chakra-ui/react"
-import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
+// import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
 import { useEtherBalance, useEthers, useSigner } from "@usedapp/core";
 import { RolluxChain, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
 import { SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks";
@@ -17,12 +17,11 @@ interface ConnectButtonProps extends ButtonProps {
 }
 
 export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
-  const connectedWalletCtxt = useConnectedWallet();
-  const { account, deactivate, switchNetwork, chainId } = useEthers();
+
+  const { account, activateBrowserWallet, deactivate, switchNetwork, chainId } = useEthers();
   const balance = useEtherBalance(account, { chainId: chainId });
   const { selectedNetwork } = useSelectedNetwork();
   const [avatar, setAvatar] = useState<string>('');
-  const { activateBrowserWallet } = useEthers();
 
   const { isOpen, onClose, onOpen } = useDisclosure()
 

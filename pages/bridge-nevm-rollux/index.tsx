@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { chakraTheme } from 'components/chakraTheme';
 import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
-import { useMetamask } from "@contexts/Metamask/Provider";
+// import { useMetamask } from "@contexts/Metamask/Provider";
 import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
 import { useEthers, useSigner } from "@usedapp/core";
 import { getNetworkByChainId, getNetworkByName, NetworkData, networks, networksMap, SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks";
@@ -49,9 +49,9 @@ type BridgeNevmRolluxProps = {}
 export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const router = useRouter();
     const [currentDisplay, setCurrentDisplay] = useState<CurrentDisplayView>(CurrentDisplayView.deposit);
-    const metamask = useMetamask();
-    const connectedWalletCtxt = useConnectedWallet();
-    const isConnected = connectedWalletCtxt.nevm.account;
+    // const metamask = useMetamask();
+    // const connectedWalletCtxt = useConnectedWallet();
+    // const isConnected = connectedWalletCtxt.nevm.account;
     const { account, activateBrowserWallet, library, switchNetwork, chainId } = useEthers();
     const [crossChainMessenger, setCrossChainMessenger] = useState<CrossChainMessenger | undefined>(undefined);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -893,7 +893,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                         </Tabs>
                     </Flex>
 
-                    {!isConnected && <ConnectionWarning />}
+                    {!account && <ConnectionWarning />}
                 </Flex>
             </VStack>
 
