@@ -3,6 +3,7 @@ import { Button, Modal, ModalHeader, ModalContent, ModalOverlay, ModalBody, Divi
 import { QuestionIcon } from "@chakra-ui/icons";
 import ConnectWalletBlock from "./Blocks/ConnectWalletBlock";
 import { HelpMainBlock } from "./Blocks/HelpMainBlock";
+import { GetAWalletBlock } from "./Blocks/GetAWalletBlock";
 
 
 export type ConnectWalletModalProps = {
@@ -13,7 +14,8 @@ export type ConnectWalletModalProps = {
 
 const sreensMapping: { [key: string]: any } = {
     'connect': ConnectWalletBlock,
-    'help': HelpMainBlock
+    'help': HelpMainBlock,
+    'get-wallet': GetAWalletBlock
 }
 
 

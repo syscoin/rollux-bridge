@@ -22,6 +22,7 @@ import {
     LockIcon
 } from "@chakra-ui/icons"
 import CloseButton from "../CloseButton";
+import BackButton from "../BackButton";
 
 export type HelpMainBlockProps = {
     setScreen: (value: string) => void;
@@ -32,7 +33,7 @@ export const HelpMainBlock: FC<HelpMainBlockProps> = ({ setScreen, onClose }) =>
     return (<>
         <ModalHeader>
             <HStack spacing={4}>
-                <IconButton aria-label="Info" icon={<ArrowBackIcon />} />
+                <BackButton setScreen={setScreen} />
                 <Spacer />
                 <Text textAlign={'center'}>What is a Wallet?</Text>
                 <Spacer />
@@ -59,6 +60,13 @@ export const HelpMainBlock: FC<HelpMainBlockProps> = ({ setScreen, onClose }) =>
                     </Text>
                 </Box>
             </HStack>
+            <Divider />
+            <VStack spacing={4} mt={3} justifyContent={'center'}>
+                <Button variant={'primary'} onClick={() => {
+                    setScreen('get-wallet');
+                }}>Get a Wallet</Button>
+                <Button variant="outline">Learn More</Button>
+            </VStack>
         </ModalBody>
     </>);
 }

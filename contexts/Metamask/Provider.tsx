@@ -65,7 +65,7 @@ const MetamaskProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
     web3.eth.getBalance(account).then((balance) => {
-      setBalance(web3.utils.fromWei(balance));
+      setBalance(web3.utils.fromWei(balance || "0", "ether"));
     });
   }, [web3, account]);
 
