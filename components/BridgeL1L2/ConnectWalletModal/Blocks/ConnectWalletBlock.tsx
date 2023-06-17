@@ -14,11 +14,11 @@ import {
 
 import {
     QuestionIcon,
-    CloseIcon
 } from "@chakra-ui/icons"
 import CloseButton from "../CloseButton";
-import { CoinbaseWalletConnector, Mainnet, useEthers } from "@usedapp/core";
-import { NEVMChain, RolluxChain, RolluxChainMainnet, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
+import { CoinbaseWalletConnector, useEthers } from "@usedapp/core";
+import { TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
+import { PaliWalletConnector } from "blockchain/NevmRolluxBridge/walletConnectors/PaliWalletConnector";
 
 export type ConnectWalletBlockProps = {
     setScreen: (value: string) => void;
@@ -45,7 +45,7 @@ export const ConnectWalletBlock: FC<ConnectWalletBlockProps> = ({ setScreen, onC
                     activateBrowserWallet();
                 }}>MetaMask</Button>
                 <Button w={'100%'} variant="secondary" onClick={() => {
-                    activateBrowserWallet({ type: 'pali' });
+                    activate(new PaliWalletConnector());
                 }}>Pali Wallet</Button>
                 <Button w={'100%'} variant="secondary" onClick={() => { }}>Rainbow</Button>
                 <Button w={'100%'} variant="secondary" onClick={() => {

@@ -1,8 +1,84 @@
 import { Connector, ConnectorUpdateData, ConnectorEvent } from '@usedapp/core'
 import { providers } from 'ethers'
-import detectEthereumProvider from '@metamask/detect-provider'
 
 const GET_PALI_LINK = 'https://paliwallet.com/'
+
+interface MetaMaskEthereumProvider {
+    isMetaMask?: boolean;
+    once(eventName: string | symbol, listener: (...args: any[]) => void): this;
+    on(eventName: string | symbol, listener: (...args: any[]) => void): this;
+    off(eventName: string | symbol, listener: (...args: any[]) => void): this;
+    addListener(eventName: string | symbol, listener: (...args: any[]) => void): this;
+    removeListener(eventName: string | symbol, listener: (...args: any[]) => void): this;
+    removeAllListeners(event?: string | symbol): this;
+}
+
+
+function detectEthereumProvider<T = MetaMaskEthereumProvider>({
+    mustBeMetaMask = false,
+    silent = false,
+    timeout = 3000,
+} = {}): Promise<T | null> {
+
+    _validateInputs();
+
+    let handled = false;
+
+    return new Promise((resolve) => {
+        if ((window as Window).ethereum) {
+
+            handleEthereum();
+
+        } else {
+
+            window.addEventListener(
+                'ethereum#initialized',
+                handleEthereum,
+                { once: true },
+            );
+
+            setTimeout(() => {
+                handleEthereum();
+            }, timeout);
+        }
+
+        function handleEthereum() {
+
+            if (handled) {
+                return;
+            }
+            handled = true;
+
+            window.removeEventListener('ethereum#initialized', handleEthereum);
+
+            const { ethereum } = window as Window;
+
+            if (ethereum && (!mustBeMetaMask || ethereum.isMetaMask)) {
+                resolve(ethereum as unknown as T);
+            } else {
+
+                const message = mustBeMetaMask && ethereum
+                    ? 'Non-MetaMask window.ethereum detected.'
+                    : 'Unable to detect window.ethereum.';
+
+                !silent && console.error('@metamask/detect-provider:', message);
+                resolve(null);
+            }
+        }
+    });
+
+    function _validateInputs() {
+        if (typeof mustBeMetaMask !== 'boolean') {
+            throw new Error(`@metamask/detect-provider: Expected option 'mustBeMetaMask' to be a boolean.`);
+        }
+        if (typeof silent !== 'boolean') {
+            throw new Error(`@metamask/detect-provider: Expected option 'silent' to be a boolean.`);
+        }
+        if (typeof timeout !== 'number') {
+            throw new Error(`@metamask/detect-provider: Expected option 'timeout' to be a number.`);
+        }
+    }
+}
 
 export async function getMetamaskProvider() {
     if (!(window as any).pali) {
@@ -21,7 +97,7 @@ export async function getMetamaskProvider() {
         injectedProviders.find((provider) => {
             console.log(provider);
             return provider.isMetaMask ?? false
-        }) ?? (await detectEthereumProvider())
+        }) ?? await detectEthereumProvider({ mustBeMetaMask: true })
 
     if (!injectedProvider) {
         console.log(`Pali wallet is not installed - you can get it under ${GET_PALI_LINK}`)
@@ -78,10 +154,6 @@ export class PaliWalletConnector implements Connector {
         } catch (e: any) {
             console.log(e)
 
-            if (e.error.message.includes('method has not been authorized by the user')) {
-                console.error('User need to update their Pali wallet settings to enable window.ethereum');
-            }
-
             throw new Error('Could not activate connector: ' + (e.message ?? ''))
         }
     }
@@ -90,6 +162,3 @@ export class PaliWalletConnector implements Connector {
         this.provider = undefined
     }
 }
-
-
-export default PaliWalletConnector;

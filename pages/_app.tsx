@@ -13,7 +13,7 @@ import PaliWalletContextProvider from "../contexts/PaliWallet/Provider";
 import "../styles/globals.css";
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from "components/Common/ErrorFallback";
-import PaliWalletConnector from "blockchain/NevmRolluxBridge/walletConnectors/PaliWalletConnector";
+import { PaliWalletConnector } from "blockchain/NevmRolluxBridge/walletConnectors/PaliWalletConnector";
 
 const queryClient = new QueryClient();
 
@@ -36,7 +36,6 @@ const dappConfig: Config = {
   connectors: {
     metamask: new MetamaskConnector(),
     coinBase: new CoinbaseWalletConnector(),
-    pali: new PaliWalletConnector(),
     // walletConnectV2: new WalletConnectV2Connector.WalletConnectV2Connector({
     //   projectId: '6b7e7faf5a9e54e3c5f22289efa5975b',
     //   chains: [RolluxChain, TanenbaumChain, NEVMChain, RolluxChainMainnet],
