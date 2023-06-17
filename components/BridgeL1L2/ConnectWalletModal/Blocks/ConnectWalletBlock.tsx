@@ -44,7 +44,9 @@ export const ConnectWalletBlock: FC<ConnectWalletBlockProps> = ({ setScreen, onC
                 <Button w={'100%'} variant="secondary" onClick={() => {
                     activateBrowserWallet();
                 }}>MetaMask</Button>
-                <Button w={'100%'} variant="secondary" onClick={() => { }}>Pali Wallet</Button>
+                <Button w={'100%'} variant="secondary" onClick={() => {
+                    activateBrowserWallet({ type: 'pali' });
+                }}>Pali Wallet</Button>
                 <Button w={'100%'} variant="secondary" onClick={() => { }}>Rainbow</Button>
                 <Button w={'100%'} variant="secondary" onClick={() => {
                     activate(new CoinbaseWalletConnector());
@@ -68,7 +70,6 @@ export const ConnectWalletBlock: FC<ConnectWalletBlockProps> = ({ setScreen, onC
                     })
 
                 }}>WalletConnect</Button>
-                <Button w={'100%'} variant="secondary" onClick={() => { }}>Trust Wallet</Button>
             </VStack>
             <Divider mt={5} />
             <Text textAlign={'center'}>
