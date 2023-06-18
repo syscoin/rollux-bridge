@@ -1,5 +1,5 @@
 import React, { FC } from "react"
-import { VStack, HStack, Text, Box, Image, Heading } from "@chakra-ui/react";
+import { VStack, HStack, Text, Box, Image, Heading, Spacer } from "@chakra-ui/react";
 
 export type ConnectWalletButtonProps = {
     onClick: () => void;
@@ -48,6 +48,10 @@ export const ConnectWalletButton: FC<ConnectWalletButtonProps> = ({ onClick, log
                 transform: 'scale(1.02) translate(0px, -2px) !important',
                 boxShadow: '0 0 0 1px #68D391, 0 0 0 1px #68D391',
             },
+            '&:active': {
+                transform: 'scale(1.02) translate(0px, -2px) !important',
+                boxShadow: '0 0 0 1px #68D391, 0 0 0 1px #68D391',
+            },
             backgroundColor: 'gray.100',
             borderRadius: '8px',
             border: '1px solid #E2E8F0',
@@ -55,10 +59,12 @@ export const ConnectWalletButton: FC<ConnectWalletButtonProps> = ({ onClick, log
         }}>
             <HStack>
                 <Image src={logoPath} alt={label} boxSize="24px" h={'40px'} w={'40px'} />
-                <VStack spacing={2}>
-                    <Heading size={'sm'}>{label}</Heading>
+                <HStack w={'100%'} spacing={2} justifyContent={'center'}>
+
+                    <Heading textAlign={'left'} w={'100%'} size={'sm'}>{label}</Heading>
+                    <Spacer />
                     {recentsTracker().isRecent(label) && <Text w={'100%'} textAlign={'left'} color={'green.500'}>Recent</Text>}
-                </VStack>
+                </HStack>
 
             </HStack>
         </Box>

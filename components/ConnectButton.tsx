@@ -12,7 +12,7 @@ import NextLink from "next/link"
 //@ts-ignore
 import { createIcon } from '@download/blockies';
 import { ConnectWalletModal } from "./BridgeL1L2/ConnectWalletModal/ConnectWalletModal";
-import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit';
+// import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit';
 
 interface ConnectButtonProps extends ButtonProps {
 }

@@ -46,6 +46,7 @@ export const ConnectWalletBlock: FC<ConnectWalletBlockProps> = ({ setScreen, onC
                     label={'Pali Wallet'}
                     logoPath={'/wallets/Pali.svg'}
                     onClick={() => {
+                        onClose();
                         activate(new PaliWalletConnector());
                     }}
                 />
@@ -53,53 +54,63 @@ export const ConnectWalletBlock: FC<ConnectWalletBlockProps> = ({ setScreen, onC
                     label={'MetaMask'}
                     logoPath={'/wallets/Metamask.svg'}
                     onClick={() => {
+                        onClose();
                         activateBrowserWallet();
                     }}
                 />
+                <ConnectWalletButton
+                    label={'Rainbow Wallet'}
+                    logoPath={'/wallets/Rainbow.svg'}
+                    onClick={() => {
+                        import("@usedapp/wallet-connect-v2-connector").then(({ WalletConnectV2Connector }) => {
 
+                            onClose();
 
+                            activate(new WalletConnectV2Connector(
+                                {
+                                    projectId: "6b7e7faf5a9e54e3c5f22289efa5975b", chains: [
+                                        TanenbaumChain,
+                                    ],
+                                    rpcMap: {
+                                        [TanenbaumChain.chainId]: TanenbaumChain.rpcUrl as string,
+                                    }
 
-                <Button w={'100%'} variant="secondary" onClick={() => {
-                    // use wallet connect way
-                    import("@usedapp/wallet-connect-v2-connector").then(({ WalletConnectV2Connector }) => {
-
-                        onClose();
-
-                        activate(new WalletConnectV2Connector(
-                            {
-                                projectId: "6b7e7faf5a9e54e3c5f22289efa5975b", chains: [
-                                    TanenbaumChain,
-                                ],
-                                rpcMap: {
-                                    [TanenbaumChain.chainId]: TanenbaumChain.rpcUrl as string,
                                 }
-
-                            }
-                        ));
-                    })
-                }}>Rainbow</Button>
-                <Button w={'100%'} variant="secondary" onClick={() => {
-                    activate(new CoinbaseWalletConnector());
-                }}>Coinbase Wallet</Button>
-                <Button w={'100%'} variant="secondary" onClick={() => {
-                    import("@usedapp/wallet-connect-v2-connector").then(({ WalletConnectV2Connector }) => {
-
+                            ));
+                        })
+                    }}
+                />
+                <ConnectWalletButton
+                    label={'Coinbase Wallet'}
+                    logoPath={'/wallets/Coinbase.svg'}
+                    onClick={() => {
                         onClose();
+                        activate(new CoinbaseWalletConnector());
+                    }}
+                />
+                <ConnectWalletButton
+                    label={'Wallet Connect'}
+                    logoPath={'/wallets/WalletConnect.svg'}
+                    onClick={() => {
+                        import("@usedapp/wallet-connect-v2-connector").then(({ WalletConnectV2Connector }) => {
 
-                        activate(new WalletConnectV2Connector(
-                            {
-                                projectId: "6b7e7faf5a9e54e3c5f22289efa5975b", chains: [
-                                    TanenbaumChain,
-                                ],
-                                rpcMap: {
-                                    [TanenbaumChain.chainId]: TanenbaumChain.rpcUrl as string,
+                            onClose();
+
+                            activate(new WalletConnectV2Connector(
+                                {
+                                    projectId: "6b7e7faf5a9e54e3c5f22289efa5975b", chains: [
+                                        TanenbaumChain,
+                                    ],
+                                    rpcMap: {
+                                        [TanenbaumChain.chainId]: TanenbaumChain.rpcUrl as string,
+                                    }
+
                                 }
-
-                            }
-                        ));
-                    })
-
-                }}>WalletConnect</Button>
+                            ));
+                        }
+                        )
+                    }}
+                />
             </VStack>
             <Divider mt={5} />
             <Text textAlign={'center'}>

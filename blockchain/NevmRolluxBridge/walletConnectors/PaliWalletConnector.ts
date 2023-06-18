@@ -25,7 +25,7 @@ function detectEthereumProvider<T = MetaMaskEthereumProvider>({
     let handled = false;
 
     return new Promise((resolve) => {
-        if ((window as Window).ethereum) {
+        if ((window as Window).ethereum && (window as any).pali) {
 
             handleEthereum();
 
@@ -52,8 +52,10 @@ function detectEthereumProvider<T = MetaMaskEthereumProvider>({
             window.removeEventListener('ethereum#initialized', handleEthereum);
 
             const { ethereum } = window as Window;
+            const { pali } = window as any;
+            console.log(ethereum);
 
-            if (ethereum && (!mustBeMetaMask || ethereum.isMetaMask)) {
+            if (ethereum && (!mustBeMetaMask || ethereum.isMetaMask) && pali) {
                 resolve(ethereum as unknown as T);
             } else {
 
