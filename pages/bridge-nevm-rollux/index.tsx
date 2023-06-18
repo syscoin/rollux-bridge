@@ -1,7 +1,7 @@
 import {
     ChakraProvider,
     Flex, Grid, Heading,
-    Highlight, Spinner, Tab,
+    Highlight, Icon, Spinner, Tab,
     TabList,
     TabPanel,
     TabPanels,
@@ -27,12 +27,12 @@ import { useCallback, useEffect, useState } from "react";
 import DepositPart from '../../components/BridgeL1L2/Standard/_deposit';
 import WithdrawPart from '../../components/BridgeL1L2/Standard/_withdraw';
 import L2StandardBridgeABI from "blockchain/NevmRolluxBridge/abi/L2StandardBridge"
-import UnfinishedWithdrawalItem from 'components/BridgeL1L2/WIthdraw/UnfinishedWithdrawalItem';
-import ViewWithdrawalModal from 'components/BridgeL1L2/WIthdraw/ViewWithdrawalModal';
-import ProveMessageStep from 'components/BridgeL1L2/WIthdraw/Steps/ProveMessageStep';
+import UnfinishedWithdrawalItem from 'components/BridgeL1L2/Withdraw/UnfinishedWithdrawalItem';
+import ViewWithdrawalModal from 'components/BridgeL1L2/Withdraw/ViewWithdrawalModal';
+import ProveMessageStep from 'components/BridgeL1L2/Withdraw/Steps/ProveMessageStep';
 import { useLocalStorage } from 'usehooks-ts';
-import RelayMessageStep from 'components/BridgeL1L2/WIthdraw/Steps/RelayMessageStep';
-import { PendingMessage } from 'components/BridgeL1L2/WIthdraw/Steps/PendingMessage';
+import RelayMessageStep from 'components/BridgeL1L2/Withdraw/Steps/RelayMessageStep';
+import { PendingMessage } from 'components/BridgeL1L2/Withdraw/Steps/PendingMessage';
 import { useSelectedNetwork } from "./../../hooks/rolluxBridge/useSelectedNetwork"
 import { useCrossChainMessenger } from 'hooks/rolluxBridge/useCrossChainMessenger';
 import Coinify from 'components/BridgeL1L2/Coinify/Coinify';
@@ -40,6 +40,10 @@ import Chainge from 'components/BridgeL1L2/Chainge/Chainge';
 import { CurrentDisplayView } from "components/BridgeL1L2/interfaces"
 import { OtherProvidersListing } from 'components/BridgeL1L2/OtherProviders/OtherProvidersListing';
 import { BridgedNetwork, FiatOrBridged } from 'blockchain/NevmRolluxBridge/bridgeProviders/types';
+import { BridgeTypeSelector } from 'components/BridgeL1L2/Withdraw/BridgeTypeSelector';
+import { ArrowRightIcon } from '@chakra-ui/icons';
+import { MdShield, MdRunCircle } from "react-icons/md";
+
 
 type BridgeNevmRolluxProps = {}
 
@@ -553,11 +557,13 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         if (force === true) {
             setShowOtherProviders(true);
             setSelectedIOCurrency(selectedIOCurrency);
+
         } else {
 
             if (selectedIOCurrency !== BridgedNetwork.SYS) {
                 // if its sys we just want to display message about ability to use third party provider
                 setShowOtherProviders(true)
+
             }
 
             setSelectedIOCurrency(selectedIOCurrency);
@@ -623,8 +629,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     p={{ base: '16px' }}
                     mt={{ base: '9', xl: 0 }}
                     flexDir="column"
-                    maxW={{ 'xs': '483px', base: '583px' }}
-                    minW={{ 'xs': '350px', base: '583px' }}
+                    maxW={{ 'sm': '520px', base: '583px' }}
+                    minW={{ 'sm': '350px', base: '383px' }}
                     gap="21px"
                     className="main_container"
                 >
@@ -723,6 +729,24 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                 <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
 
                                     {/* <SwitcherOtherProviders onSwitch={((enabled) => setShowOtherProviders(enabled))} /> */}
+
+                                    <BridgeTypeSelector onSelected={() => {
+                                        handleSwitchProviders('SYS', true);
+                                    }}
+                                        label="Use a third party bridge"
+                                        icon={<Icon as={MdRunCircle} />}
+                                        description="This usually takes under 20min. Bridge to multiple chains, limited to certain tokens."
+                                        defaultChecked={showOtherProviders === true}
+                                    />
+
+                                    <BridgeTypeSelector onSelected={() => {
+                                        setShowOtherProviders(false);
+                                    }}
+                                        label="Use the official bridge"
+                                        icon={<Icon as={MdShield} />}
+                                        description="This usually takes 7days. Bridge any token to Syscoin NEVM."
+                                        defaultChecked={showOtherProviders === false}
+                                    />
 
                                     {showOtherProviders === true ? <OtherProvidersListing
                                         selectedIOCurrency={selectedIOCurrency}
@@ -864,6 +888,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                 </Flex>
 
                                             </>}
+
 
 
 

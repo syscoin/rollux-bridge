@@ -1,4 +1,4 @@
-import { ChevronDownIcon } from '@chakra-ui/icons';
+import { ArrowRightIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import {
     Box,
     Button, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Image, Input, Menu,
@@ -16,6 +16,8 @@ import { useSelectedNetwork } from 'hooks/rolluxBridge/useSelectedNetwork';
 import WarningInfoBlock from 'components/Common/WarningInfoBlock';
 import { DirectionSwitcherArrow } from '../DirectionSwitcherArrow';
 import SelectTokenModal from './SelectTokenModal';
+import { RolluxLogo } from 'components/Icons/RolluxLogo';
+import { MaxBalance } from '../MaxBalance';
 
 export type WithdrawPartProps = {
     onClickWithdrawButton: (amount: string) => void;
@@ -31,9 +33,11 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
     const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
-    const [amountToSwap, setAmountToSwap] = useState<string>('0.00');
+    const [amountToSwap, setAmountToSwap] = useState<string>('');
     const { account, chainId, switchNetwork } = useEthers();
     const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork } = useSelectedNetwork();
+
+
 
     const balanceNativeToken = useEtherBalance(account, { chainId: l2ChainId });
     const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: l2ChainId });
@@ -44,6 +48,10 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
     const selectedToken = currency !== 'SYS' ?
         l2ERC20Tokens?.find(token => token.symbol === currency) :
         { address: '', chainId: l2ChainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }
+
+    const balanceNativeTokenL1 = useEtherBalance(account, { chainId: l1ChainId });
+    const balanceERC20TokenL1 = useTokenBalance(selectedToken?.address || ethers.constants.AddressZero, account, { chainId: l1ChainId });
+
 
 
     const [outputNetwork, setOutputNetwork] = useState<string>('SYS');
@@ -170,24 +178,34 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
     return (
         <Flex flexDir="column">
+
             <FormControl isInvalid={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}>
                 <Flex justifyContent="space-between">
                     <FormLabel fontWeight="700">
-                        From Rollux
-                    </FormLabel>
+                        <HStack>
+                            <Text>From</Text>
+                            <RolluxLogo width={20} height={20} />
+                            <Text> Rollux</Text>
+                        </HStack>
 
+                    </FormLabel>
+                    <Spacer />
                     {
                         selectedToken && selectedToken?.symbol !== 'SYS' ?
-                            <Text opacity={.5}>Available {parseFloat(ethers.utils.formatUnits(balanceERC20Token || BigNumber.from('0'), selectedTokenDecimals)).toFixed(2) || '0.00'}</Text> : selectedToken ?
-                                <Text opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'}</Text> : <></>
+                            <><Text mr={1} opacity={.5}>Available {parseFloat(ethers.utils.formatUnits(balanceERC20Token || BigNumber.from('0'), selectedTokenDecimals)).toFixed(2) || '0.00'}</Text>
+                                <MaxBalance onClick={() => {
+                                    setAmountToSwap(balanceToDisplay);
+                                }} />
+                            </> : selectedToken ?
+                                <><Text mr={1} opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'}</Text><MaxBalance onClick={() => {
+                                    setAmountToSwap(balanceToDisplay);
+                                }} /></> : <></>
                     }
                 </Flex>
-                <HStack bg="#f4fadb" borderRadius="6px" minH="48px" px="19px" border={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals)) ? '2px solid' : 'none'} borderColor="red.400">
-                    <NumberInput variant="unstyled" size="lg" onChange={(valueAsString) => {
-                        if (valueAsString.length > 0 && parseFloat(valueAsString) > 0) {
+                <HStack bg="brand.lightPrimary" borderRadius="6px" minH="48px" pl="19px" pr={'0px'} border={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals)) ? '2px solid' : 'none'} borderColor="red.400">
+                    <NumberInput variant="unstyled" value={(amountToSwap.length > 0) ? amountToSwap : ''} size="lg" onChange={(valueAsString) => {
+                        if (valueAsString.length > 0 && parseFloat(valueAsString) >= 0) {
                             setAmountToSwap(valueAsString)
-                        } else {
-                            setAmountToSwap('0.00');
                         }
                     }}>
                         <NumberInputField placeholder='0.00' />
@@ -264,16 +282,16 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
             </FormControl>
             <DirectionSwitcherArrow onClick={onSwapDirection} />
             {selectedToken && (
-                <Flex flexDir="column" maxW="100%">
-                    <Box sx={{ mt: { base: '24px', md: '44px' } }}>
-                        <OtherProvidersMenuSelector preSelectLabel={'You will get on '} onSelect={(provider) => {
+                <Flex flexDir="column" maxW="100%" backgroundColor={'brand.lightPrimary'}>
+                    <Box mt={{ base: '3px', md: '12px' }} ml={2}>
+                        <OtherProvidersMenuSelector preSelectLabel={'To '} onSelect={(provider) => {
                             setOutputNetwork(provider);
                             onSelectBridgeProvider(provider, false);
                         }} />
                     </Box>
 
-                    <Wrap alignItems="center" mt="15px" spacing="27px" maxW="calc(100vw - 70px)">
-                        <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>{amountToSwap}</Text>
+                    <Wrap alignItems="center" mt={1} ml={3} spacing="27px" maxW="calc(100vw - 70px)">
+                        <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>You will receive {amountToSwap}</Text>
 
                         <HStack mt="44px" alignItems="center">
                             <Image
@@ -285,6 +303,21 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                             <Text>{selectedToken.symbol}</Text>
                         </HStack>
                     </Wrap>
+
+                    {account && <>
+                        <HStack mt={3} ml={1} alignItems={'center'}>
+                            <Image
+                                alt="coin logo"
+                                boxSize="24px"
+                                borderRadius="full"
+                                src={selectedToken.logoURI}
+                            />
+                            <Text>Balance {parseFloat(ethers.utils.formatUnits(currency === 'SYS' ? (balanceNativeTokenL1 ?? BigNumber.from("0")) : (balanceERC20TokenL1 ?? BigNumber.from("0")),
+                                selectedTokenDecimals
+                            )).toFixed(6)} {selectedToken.symbol}</Text>
+                        </HStack>
+                    </>}
+
                 </Flex>
             )}
 

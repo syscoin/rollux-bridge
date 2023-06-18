@@ -6,7 +6,7 @@ export const providers: OtherBridgeProvider[] = [
     {
         label: 'Chainge',
         code: 'chainge',
-        description: 'Chainge 3rd party bridge provider',
+        description: 'Chainge',
         url: 'chainge.io',
         logoUrl: '/bridge-providers/chainge-logo.png',
         supportsCrypto: true,
@@ -32,7 +32,7 @@ export const providers: OtherBridgeProvider[] = [
     {
         label: 'Coinify',
         code: 'coinify',
-        description: 'Coinify 3rd party bridge provider',
+        description: 'Coinify',
         url: 'coinify.com',
         logoUrl: '/bridge-providers/coinify-logo.png',
         supportsCrypto: false,

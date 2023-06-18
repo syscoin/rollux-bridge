@@ -22309,6 +22309,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-icons@npm:^4.9.0":
+  version: 4.9.0
+  resolution: "react-icons@npm:4.9.0"
+  peerDependencies:
+    react: "*"
+  checksum: 69d1000d02349cf4baa78a0882aff09723d348d910256ea7489dea777abf10f158b27c1b5d3b1d2ec030e21320eae0afcc13f9c9d11afb85a8809c59a23a923c
+  languageName: node
+  linkType: hard
+
 "react-is@npm:^16.13.1, react-is@npm:^16.7.0":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
@@ -24745,6 +24754,7 @@ __metadata:
     react-dom: 18.1.0
     react-error-boundary: ^3.1.4
     react-hook-form: ^7.31.3
+    react-icons: ^4.9.0
     react-query: ^3.39.1
     satoshi-bitcoin: ^1.0.5
     swr: ^2.1.3

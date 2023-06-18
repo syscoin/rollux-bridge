@@ -33,7 +33,7 @@ export const OtherProvidersListing: FC<OtherProvidersListingProps> = ({ currentV
             <Button variant={'primary'} onClick={handleClickedUseStandardBridge}>Use Standard Bridge</Button>
         </WarningInfoBlock>
 
-        <Flex flex={1} direction={'row'} maxW="483px" justifyContent={'center'}>
+        <Flex flex={1} direction={'row'} justifyContent={'center'}>
             {providers.map((value, index) => {
                 const ComponentToRender = value.component;
 

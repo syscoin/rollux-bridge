@@ -37,7 +37,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
     const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
-    const [amountToSwap, setAmountToSwap] = useState<string>('0.00');
+    const [amountToSwap, setAmountToSwap] = useState<string>('');
     const [isDepositLoading, setIsDepositLoading] = useState<boolean>(false);
 
     const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork, contractsL1 } = useSelectedNetwork();
@@ -282,11 +282,9 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     }
                 </Flex>
                 <HStack bg="brand.lightPrimary" borderRadius="6px" mt={1} minH="48px" pl="19px" pr={'0px'} border={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? '2px solid' : 'none'} borderColor="red.400">
-                    <NumberInput w={'100%'} value={amountToSwap} variant="unstyled" size="lg" onChange={(valueAsString) => {
-                        if (valueAsString.length > 0 && parseFloat(valueAsString) > 0) {
+                    <NumberInput w={'100%'} value={(amountToSwap.length > 0) ? amountToSwap : ''} variant="unstyled" size="lg" onChange={(valueAsString) => {
+                        if (valueAsString.length > 0) {
                             setAmountToSwap(valueAsString)
-                        } else {
-                            setAmountToSwap('0.00');
                         }
                     }}>
                         <NumberInputField placeholder='0.00' />
@@ -389,17 +387,20 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                         </HStack>
                     </Wrap>
 
-                    <HStack mt={3} alignItems={'center'}>
-                        <Image
-                            alt="coin logo"
-                            boxSize="24px"
-                            borderRadius="full"
-                            src={selectedToken.logoURI}
-                        />
-                        <Text>Balance {parseFloat(ethers.utils.formatUnits(currency === 'SYS' ? balanceNativeTokenL2 : balanceERC20TokenL2,
-                            selectedTokenDecimals
-                        )).toFixed(6)} {selectedToken.symbol}</Text>
-                    </HStack>
+                    {account && <>
+                        <HStack mt={3} alignItems={'center'}>
+                            <Image
+                                alt="coin logo"
+                                boxSize="24px"
+                                borderRadius="full"
+                                src={selectedToken.logoURI}
+                            />
+                            <Text>Balance {parseFloat(ethers.utils.formatUnits(currency === 'SYS' ? balanceNativeTokenL2 : balanceERC20TokenL2,
+                                selectedTokenDecimals
+                            )).toFixed(6)} {selectedToken.symbol}</Text>
+                        </HStack>
+                    </>}
+
                 </Flex>
             )}
 

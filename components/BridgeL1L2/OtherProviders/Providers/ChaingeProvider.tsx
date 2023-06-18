@@ -1,4 +1,4 @@
-import { Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from "@chakra-ui/react";
+import { Box, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from "@chakra-ui/react";
 import { OtherBridgeComponentBaseProps } from "blockchain/NevmRolluxBridge/bridgeProviders/types";
 import React, { FC } from "react";
 import { ProviderCard } from "../ProviderCard";
@@ -17,7 +17,7 @@ export const ChaingeProvider: FC<OtherBridgeComponentBaseProps> = ({
     };
 
     return (
-        <>
+        <Box minW={'100%'}>
             <ProviderCard
                 config={bridgeDetails}
                 onButtonClick={handleButtonClick}
@@ -42,6 +42,6 @@ export const ChaingeProvider: FC<OtherBridgeComponentBaseProps> = ({
                     </ModalBody>
                 </ModalContent>
             </Modal>
-        </>
+        </Box>
     );
 }

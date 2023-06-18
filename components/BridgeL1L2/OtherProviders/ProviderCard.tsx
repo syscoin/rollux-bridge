@@ -10,8 +10,26 @@ export type ProviderCardProps = {
 
 export const ProviderCard: FC<ProviderCardProps> = ({ config, onButtonClick }) => {
     return (
-        <Card mt={4} w={['300px', 'sm', 'md', 'lg']} maxH={'200px'} cursor="pointer">
-            <CardBody>
+        <Box mt={4} maxH={'200px'} cursor="pointer" w={'100%'}
+            onClick={onButtonClick}
+            sx={{
+                '&:hover': {
+                    transform: 'scale(1.02) translate(0px, -2px) !important',
+                    boxShadow: '0 0 0 1px #68D391, 0 0 0 1px #68D391',
+                },
+                '&:active': {
+                    transform: 'scale(1.02) translate(0px, -2px) !important',
+                    boxShadow: '0 0 0 1px #68D391, 0 0 0 1px #68D391',
+                },
+                backgroundColor: 'white.300',
+                borderRadius: '8px',
+                border: '1px solid #E2E8F0',
+                padding: '15px',
+                marginBottom: '10px',
+
+            }}
+        >
+            <Box w={'100%'}>
                 <Flex alignItems='center' direction='row' justifyContent='flex-start'>
                     <Box boxSize="50px">
                         <Image alt="logo" src={config.logoUrl ?? ''} fallbackSrc="https://via.placeholder.com/150" boxSize="100%" objectFit="contain" />
@@ -29,7 +47,7 @@ export const ProviderCard: FC<ProviderCardProps> = ({ config, onButtonClick }) =
                         </Text>
                     </Link>
                 </Flex>
-            </CardBody>
-        </Card>
+            </Box>
+        </Box>
     );
 }
