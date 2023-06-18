@@ -3,8 +3,10 @@ import { HamburgerIcon } from '@chakra-ui/icons';
 import { ConnectButton } from "./ConnectButton";
 import NetworkSwitcher from "./HeaderElements/NetworkSwitcher";
 import NextLink from "next/link"
+import { useEthers } from "@usedapp/core";
 
 export const RolluxHeader: React.FC = () => {
+  const { account } = useEthers();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const src = useBreakpointValue({
     base: '/rollux-portal-logo-white.svg',
@@ -41,7 +43,8 @@ export const RolluxHeader: React.FC = () => {
                 </NextLink>
 
                 <ConnectButton mb={3} variant="secondary" />
-                <NetworkSwitcher />
+                {account && <NetworkSwitcher />}
+
               </Flex>
             </>
           )}
@@ -60,7 +63,7 @@ export const RolluxHeader: React.FC = () => {
             </Button>
           </NextLink>
           <ConnectButton variant="secondary" />
-          <NetworkSwitcher />
+          {account && <NetworkSwitcher />}
         </HStack>
       )}
     </Flex>

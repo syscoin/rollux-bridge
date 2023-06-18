@@ -20,8 +20,7 @@ interface ConnectButtonProps extends ButtonProps {
 export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
   const { isOpen: isOpenConnect, onClose: onCloseConnect, onOpen: onOpenConnect } = useDisclosure()
 
-  const { account, activateBrowserWallet, deactivate, switchNetwork, chainId } = useEthers();
-  const balance = useEtherBalance(account, { chainId: chainId });
+  const { account, deactivate, switchNetwork, chainId } = useEthers();
   const { selectedNetwork } = useSelectedNetwork();
   const [avatar, setAvatar] = useState<string>('');
 
