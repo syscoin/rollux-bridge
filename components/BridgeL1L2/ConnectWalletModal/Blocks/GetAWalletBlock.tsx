@@ -19,7 +19,8 @@ import {
     QuestionIcon,
     CloseIcon,
     ArrowBackIcon,
-    LockIcon
+    LockIcon,
+    ArrowRightIcon
 } from "@chakra-ui/icons"
 import CloseButton from "../CloseButton";
 import BackButton from "../BackButton";
@@ -59,8 +60,8 @@ const wallets = [
         name: 'Rainbow',
         description: 'Mobile Wallet and Extension',
         image: '/wallets/Rainbow.svg',
-        extensionLink: 'hhttps://rainbow.me/extension?utm_source=rainbowkit', // @todo replace with rainbow link
-        mobileLink: 'https://rainbow.me/extension?utm_source=rainbowkit', // @todo replace with rainbow link
+        extensionLink: 'https://rainbow.me/extension?utm_source=rainbowkit',
+        mobileLink: 'https://rainbow.me/',
 
     },
 ];
@@ -72,6 +73,8 @@ export const GetAWalletBlock: FC<GetAWalletBlockProps> = ({ setScreen, onClose }
         name: string;
         description: string;
         image: string;
+        extensionLink: string;
+        mobileLink: string;
     } | undefined>(undefined);
 
     useEffect(() => {
@@ -97,11 +100,28 @@ export const GetAWalletBlock: FC<GetAWalletBlockProps> = ({ setScreen, onClose }
             </ModalHeader>
             <Divider />
             <ModalBody>
-                <VStack spacing={4}>
-                    <Heading size="md">Install {selectedGetWallet}</Heading>
-                    <Text>Get {selectedGetWallet} for your phone or desktop.</Text>
-                    <Button colorScheme="blue">Install {selectedGetWallet}</Button>
-                </VStack>
+                <HStack spacing={4} mb={3}>
+                    <Image style={{ 'borderRadius': '15px' }} src={selectedWalletInfo.image} width={50} height={50} alt={selectedWalletInfo.name} />
+                    <Box>
+                        <Heading size="sm">{selectedWalletInfo.name}</Heading>
+                        <Text>{selectedWalletInfo.description}</Text>
+                    </Box>
+                </HStack>
+                <HStack spacing={4}>
+                    <Button w={'100%'} variant={'secondary'} onClick={() => {
+                        window.open(selectedWalletInfo.extensionLink, '_blank');
+                    }} colorScheme="blue">
+                        <ArrowRightIcon mr={2} />
+                        Get Extension
+                    </Button>
+                    <Spacer />
+                    <Button w={'100%'} variant={'secondary'} onClick={() => {
+                        window.open(selectedWalletInfo.mobileLink, '_blank');
+                    }} colorScheme="blue">
+                        <ArrowRightIcon mr={2} />
+                        Get Mobile
+                    </Button>
+                </HStack>
             </ModalBody>
         </>);
     }

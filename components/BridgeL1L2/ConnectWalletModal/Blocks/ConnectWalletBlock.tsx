@@ -19,6 +19,7 @@ import CloseButton from "../CloseButton";
 import { CoinbaseWalletConnector, useEthers } from "@usedapp/core";
 import { TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
 import { PaliWalletConnector } from "blockchain/NevmRolluxBridge/walletConnectors/PaliWalletConnector";
+import { ConnectWalletButton } from "../Components/ConnectWalletButton";
 
 export type ConnectWalletBlockProps = {
     setScreen: (value: string) => void;
@@ -41,13 +42,42 @@ export const ConnectWalletBlock: FC<ConnectWalletBlockProps> = ({ setScreen, onC
         <Divider />
         <ModalBody>
             <VStack spacing={1} justifyContent={'left'}>
+                <ConnectWalletButton
+                    label={'Pali Wallet'}
+                    logoPath={'/wallets/Pali.svg'}
+                    onClick={() => {
+                        activate(new PaliWalletConnector());
+                    }}
+                />
+                <ConnectWalletButton
+                    label={'MetaMask'}
+                    logoPath={'/wallets/Metamask.svg'}
+                    onClick={() => {
+                        activateBrowserWallet();
+                    }}
+                />
+
+
+
                 <Button w={'100%'} variant="secondary" onClick={() => {
-                    activateBrowserWallet();
-                }}>MetaMask</Button>
-                <Button w={'100%'} variant="secondary" onClick={() => {
-                    activate(new PaliWalletConnector());
-                }}>Pali Wallet</Button>
-                <Button w={'100%'} variant="secondary" onClick={() => { }}>Rainbow</Button>
+                    // use wallet connect way
+                    import("@usedapp/wallet-connect-v2-connector").then(({ WalletConnectV2Connector }) => {
+
+                        onClose();
+
+                        activate(new WalletConnectV2Connector(
+                            {
+                                projectId: "6b7e7faf5a9e54e3c5f22289efa5975b", chains: [
+                                    TanenbaumChain,
+                                ],
+                                rpcMap: {
+                                    [TanenbaumChain.chainId]: TanenbaumChain.rpcUrl as string,
+                                }
+
+                            }
+                        ));
+                    })
+                }}>Rainbow</Button>
                 <Button w={'100%'} variant="secondary" onClick={() => {
                     activate(new CoinbaseWalletConnector());
                 }}>Coinbase Wallet</Button>
