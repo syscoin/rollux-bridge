@@ -13,7 +13,6 @@ import PaliWalletContextProvider from "../contexts/PaliWallet/Provider";
 import "../styles/globals.css";
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from "components/Common/ErrorFallback";
-import { PaliWalletConnector } from "blockchain/NevmRolluxBridge/walletConnectors/PaliWalletConnector";
 
 const queryClient = new QueryClient();
 

@@ -12,7 +12,7 @@ import NextLink from "next/link"
 //@ts-ignore
 import { createIcon } from '@download/blockies';
 import { ConnectWalletModal } from "./BridgeL1L2/ConnectWalletModal/ConnectWalletModal";
-
+import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit';
 
 interface ConnectButtonProps extends ButtonProps {
 }
@@ -65,6 +65,7 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
         </Button>
 
         <ConnectWalletModal isOpen={isOpenConnect} onClose={onCloseConnect} onOpen={onOpenConnect} />
+        {/* <RainbowConnectButton /> */}
       </>
     ) : (
       <Button px="32.5px" onClick={onOpen} {...rest}>
