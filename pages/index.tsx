@@ -577,12 +577,12 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
             <RolluxHeader />
 
-            <VStack spacing={{ base: '-20', xl: '0' }} pb="50px">
+            <VStack spacing={{ base: '5', xl: currentDisplay === CurrentDisplayView.deposit ? '5' : '20' }} pb="50px">
                 <Flex
                     id="bg"
                     boxSize={{ base: undefined, xl: '100%' }}
-                    overflow="visible"
-                    position={{ base: 'initial', xl: 'absolute' }}
+                    overflow="scroll"
+                    position={{ base: 'initial', xl: 'fixed' }}
                     bg="#28282F"
                     top="0"
                     p={{ base: '16px', xl: '100px' }}
@@ -622,7 +622,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     left="60%"
                     transform={{ base: undefined, xl: 'translate(-50%, -50%)' }}
                     p={{ base: '16px' }}
-                    mt={{ base: '9', xl: 0 }}
+                    mt={{ base: '9', xl: '10' }}
                     flexDir="column"
                     maxW={{ 'sm': '520px', base: '583px' }}
                     minW={{ 'sm': '350px', base: '383px' }}
