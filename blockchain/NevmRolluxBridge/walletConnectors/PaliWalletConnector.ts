@@ -1,86 +1,87 @@
 import { Connector, ConnectorUpdateData, ConnectorEvent } from '@usedapp/core'
 import { providers } from 'ethers'
+import detectEthereumProvider from '@metamask/detect-provider'
 
 const GET_PALI_LINK = 'https://paliwallet.com/'
 
-interface MetaMaskEthereumProvider {
-    isMetaMask?: boolean;
-    once(eventName: string | symbol, listener: (...args: any[]) => void): this;
-    on(eventName: string | symbol, listener: (...args: any[]) => void): this;
-    off(eventName: string | symbol, listener: (...args: any[]) => void): this;
-    addListener(eventName: string | symbol, listener: (...args: any[]) => void): this;
-    removeListener(eventName: string | symbol, listener: (...args: any[]) => void): this;
-    removeAllListeners(event?: string | symbol): this;
-}
+// interface MetaMaskEthereumProvider {
+//     isMetaMask?: boolean;
+//     once(eventName: string | symbol, listener: (...args: any[]) => void): this;
+//     on(eventName: string | symbol, listener: (...args: any[]) => void): this;
+//     off(eventName: string | symbol, listener: (...args: any[]) => void): this;
+//     addListener(eventName: string | symbol, listener: (...args: any[]) => void): this;
+//     removeListener(eventName: string | symbol, listener: (...args: any[]) => void): this;
+//     removeAllListeners(event?: string | symbol): this;
+// }
 
 
-function detectEthereumProvider<T = MetaMaskEthereumProvider>({
-    mustBeMetaMask = false,
-    silent = false,
-    timeout = 3000,
-} = {}): Promise<T | null> {
+// function detectEthereumProvider<T = MetaMaskEthereumProvider>({
+//     mustBeMetaMask = false,
+//     silent = false,
+//     timeout = 3000,
+// } = {}): Promise<T | null> {
 
-    _validateInputs();
+//     _validateInputs();
 
-    let handled = false;
+//     let handled = false;
 
-    return new Promise((resolve) => {
-        if ((window as Window).ethereum && (window as any).pali) {
+//     return new Promise((resolve) => {
+//         if ((window as Window).ethereum && (window as any).pali) {
 
-            handleEthereum();
+//             handleEthereum();
 
-        } else {
+//         } else {
 
-            window.addEventListener(
-                'ethereum#initialized',
-                handleEthereum,
-                { once: true },
-            );
+//             window.addEventListener(
+//                 'ethereum#initialized',
+//                 handleEthereum,
+//                 { once: true },
+//             );
 
-            setTimeout(() => {
-                handleEthereum();
-            }, timeout);
-        }
+//             setTimeout(() => {
+//                 handleEthereum();
+//             }, timeout);
+//         }
 
-        function handleEthereum() {
+//         function handleEthereum() {
 
-            if (handled) {
-                return;
-            }
-            handled = true;
+//             if (handled) {
+//                 return;
+//             }
+//             handled = true;
 
-            window.removeEventListener('ethereum#initialized', handleEthereum);
+//             window.removeEventListener('ethereum#initialized', handleEthereum);
 
-            const { ethereum } = window as Window;
-            const { pali } = window as any;
-            console.log(ethereum);
+//             const { ethereum } = window as Window;
+//             const { pali } = window as any;
+//             console.log(ethereum);
 
-            if (ethereum && (!mustBeMetaMask || ethereum.isMetaMask) && pali) {
-                resolve(ethereum as unknown as T);
-            } else {
+//             if (ethereum && (!mustBeMetaMask || ethereum.isMetaMask) && pali) {
+//                 resolve(ethereum as unknown as T);
+//             } else {
 
-                const message = mustBeMetaMask && ethereum
-                    ? 'Non-MetaMask window.ethereum detected.'
-                    : 'Unable to detect window.ethereum.';
+//                 const message = mustBeMetaMask && ethereum
+//                     ? 'Non-MetaMask window.ethereum detected.'
+//                     : 'Unable to detect window.ethereum.';
 
-                !silent && console.error('@metamask/detect-provider:', message);
-                resolve(null);
-            }
-        }
-    });
+//                 !silent && console.error('@metamask/detect-provider:', message);
+//                 resolve(null);
+//             }
+//         }
+//     });
 
-    function _validateInputs() {
-        if (typeof mustBeMetaMask !== 'boolean') {
-            throw new Error(`@metamask/detect-provider: Expected option 'mustBeMetaMask' to be a boolean.`);
-        }
-        if (typeof silent !== 'boolean') {
-            throw new Error(`@metamask/detect-provider: Expected option 'silent' to be a boolean.`);
-        }
-        if (typeof timeout !== 'number') {
-            throw new Error(`@metamask/detect-provider: Expected option 'timeout' to be a number.`);
-        }
-    }
-}
+//     function _validateInputs() {
+//         if (typeof mustBeMetaMask !== 'boolean') {
+//             throw new Error(`@metamask/detect-provider: Expected option 'mustBeMetaMask' to be a boolean.`);
+//         }
+//         if (typeof silent !== 'boolean') {
+//             throw new Error(`@metamask/detect-provider: Expected option 'silent' to be a boolean.`);
+//         }
+//         if (typeof timeout !== 'number') {
+//             throw new Error(`@metamask/detect-provider: Expected option 'timeout' to be a number.`);
+//         }
+//     }
+// }
 
 export async function getMetamaskProvider() {
     if (!(window as any).pali) {
