@@ -3,8 +3,7 @@ import { Chain, useEthers } from "@usedapp/core";
 import React, { FC, useEffect, useState } from "react";
 import { useEtherBalance } from "@usedapp/core";
 import { BigNumber, ethers } from "ethers";
-import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
-import { RolluxChain, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
+import { RolluxChain, TanenbaumChain, RolluxChainMainnet, NEVMChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
 
 const styleModal = {
     position: 'absolute' as 'absolute',
