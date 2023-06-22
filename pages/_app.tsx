@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import "../styles/globals.css";
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from "components/Common/ErrorFallback";
+import { provider } from "web3-core";
 
 const queryClient = new QueryClient();
 
@@ -43,15 +44,24 @@ const dappConfig: Config = {
   }
 }
 
+declare global {
+  interface Window {
+    ethereum: {
+      isMetaMask: boolean;
+      request: (params: { method: string; params?: any }) => Promise<any>;
+      isConnected: boolean;
+      selectedAddress: string;
+      on: (event: string, callback: (...args: any[]) => void) => void;
+      networkVersion: string;
+    } & provider;
+  }
+}
+
+
 function MyApp({ Component, pageProps }: AppProps) {
   const { pathname } = useRouter()
 
-  const removeMuiHeader = [
-    '/bridge-nevm-rollux',
-    '/bridge-nevm-rollux/withdrawals',
-    '/bridge-nevm-rollux/create-token',
-    '/bridge-nevm-rollux/nft',
-  ]
+
 
   return (
     <QueryClientProvider client={queryClient}>
