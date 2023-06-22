@@ -3,14 +3,14 @@ import { ethers } from "ethers"
 const contractsDev = {
     l1: {
         AddressManager: '0x8757cD6052fef862681e992F58fCdd71580b99d5',
-        L1CrossDomainMessenger: '0x0f81C3c3131Fa326a046d1C6103EBea5377843a0',
-        L1StandardBridge: '0x67D271dA35cd98e591722475fba3BA28dbA3C58c',
+        L1CrossDomainMessenger: '0x0E8aaa986C6eACc401680DC24727AC33d955DcBc',
+        L1StandardBridge: '0x9cc66f9B7b07F72a487FF751a7cBE281976fce7C',
         StateCommitmentChain: ethers.constants.AddressZero,
         CanonicalTransactionChain: ethers.constants.AddressZero,
         BondManager: ethers.constants.AddressZero,
-        OptimismPortal: '0xE4FBe4674610d4C201a037c032EB0b703d9d9377',
-        L2OutputOracle: '0xf1162A0b4ED6a980D63D59Ee4D8506Cd5BdD43fE',
-        L1ERC721Bridge: '0x1F12C27a285EdcF22A341d3566E17BF7864A2735',
+        OptimismPortal: '0xfE43B2C8A481c412481BC5A36261380eDc417266',
+        L2OutputOracle: '0xb8FFE6015e1c00CFA620F884f25f21f001744C0e',
+        L1ERC721Bridge: '0x336F509Cd9dECcfBc4ef38F329dA8D5930F142b8',
     },
     l2: {
         L2ToL1MessagePasser: '0x4200000000000000000000000000000000000016',
