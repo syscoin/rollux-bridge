@@ -2,14 +2,9 @@ import { ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
 import { ThemeProvider } from "@mui/material";
 import { Config, DAppProvider, MetamaskConnector, CoinbaseWalletConnector, Mainnet } from "@usedapp/core";
 import { NEVMChain, RolluxChain, RolluxChainMainnet, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
-import { Header } from "components/Header";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
 import { QueryClient, QueryClientProvider } from "react-query";
-import theme from "../components/theme";
-import ConnectedWalletProvider from "../contexts/ConnectedWallet/Provider";
-import MetamaskProvider from "../contexts/Metamask/Provider";
-import PaliWalletContextProvider from "../contexts/PaliWallet/Provider";
 import "../styles/globals.css";
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from "components/Common/ErrorFallback";
@@ -61,18 +56,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <PaliWalletContextProvider>
-          <MetamaskProvider>
-            <ConnectedWalletProvider>
-              <DAppProvider config={dappConfig}>
-                <ThemeProvider theme={theme}>
-                  {removeMuiHeader.includes(pathname) ? null : <Header />}
-                </ThemeProvider>
-                <Component {...pageProps} />
-              </DAppProvider>
-            </ConnectedWalletProvider>
-          </MetamaskProvider>
-        </PaliWalletContextProvider>
+        <DAppProvider config={dappConfig}>
+          <Component {...pageProps} />
+        </DAppProvider>
       </ErrorBoundary>
     </QueryClientProvider>
   );

@@ -17,7 +17,8 @@
     "baseUrl": "./",
     "paths": {
       "@contexts/*": ["./contexts/*"],
-      "@firebase": ["./firebase"]
+      "@firebase": ["./firebase"],
+      "components/*": ["./components/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
