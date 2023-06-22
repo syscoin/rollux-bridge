@@ -25,12 +25,12 @@ import { useCallback, useEffect, useState } from "react";
 import DepositPart from 'components/BridgeL1L2/Standard/_deposit';
 import WithdrawPart from 'components/BridgeL1L2/Standard/_withdraw';
 import L2StandardBridgeABI from "blockchain/NevmRolluxBridge/abi/L2StandardBridge"
-import { UnfinishedWithdrawalItem } from '../components/BridgeL1L2/Withdraw/UnfinishedWithdrawalItem';
-import { ViewWithdrawalModal } from '../components/BridgeL1L2/Withdraw/ViewWithdrawalModal';
-import { ProveMessageStep } from '../components/BridgeL1L2/Withdraw/Steps/ProveMessageStep';
+import UnfinishedWithdrawalItem from '../components/BridgeL1L2/Withdraw/UnfinishedWithdrawalItem';
+import ViewWithdrawalModal from '../components/BridgeL1L2/Withdraw/ViewWithdrawalModal';
+import ProveMessageStep from '../components/BridgeL1L2/Withdraw/Steps/ProveMessageStep';
 import { useLocalStorage } from 'usehooks-ts';
-import { RelayMessageStep } from '../components/BridgeL1L2/Withdraw/Steps/RelayMessageStep';
-import { PendingMessage } from '../components/BridgeL1L2/Withdraw/Steps/PendingMessage';
+import RelayMessageStep from '../components/BridgeL1L2/Withdraw/Steps/RelayMessageStep';
+import PendingMessage from '../components/BridgeL1L2/Withdraw/Steps/PendingMessage';
 import { useSelectedNetwork } from "../hooks/rolluxBridge/useSelectedNetwork"
 import { useCrossChainMessenger } from '../hooks/rolluxBridge/useCrossChainMessenger';
 import { CurrentDisplayView } from "../components/BridgeL1L2/interfaces"

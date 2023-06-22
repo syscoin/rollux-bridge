@@ -47,3 +47,5 @@ export const PendingMessage: FC<PendingMessageProps> = ({ status, waitTime }) =>
         </Card >
     );
 }
+
+export default PendingMessage;
