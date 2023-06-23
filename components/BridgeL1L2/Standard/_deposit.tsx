@@ -333,20 +333,20 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
 
 
-                    <Wrap alignItems="center" mt={1} ml={3} spacing="27px" maxW="calc(100vw - 70px)">
+
+                    <HStack mt={2} ml={2} alignItems="center">
                         <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>You will receive</Text>
                         <Text fontWeight={'700'}>{amountToSwap || '0'}</Text>
 
-                        <HStack mt="44px" alignItems="center">
-                            <Image
-                                alt="coin logo"
-                                boxSize="24px"
-                                borderRadius="full"
-                                src={selectedToken.logoURI}
-                            />
-                            <Text>{selectedToken.symbol}</Text>
-                        </HStack>
-                    </Wrap>
+
+                        <Image
+                            alt="coin logo"
+                            boxSize="24px"
+                            borderRadius="full"
+                            src={selectedToken.logoURI}
+                        />
+                        <Text>{selectedToken.symbol}</Text>
+                    </HStack>
 
 
                     {account && <>

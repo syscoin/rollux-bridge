@@ -2,7 +2,7 @@ import {
     Box,
     ChakraProvider,
     Flex, Grid, Heading,
-    Highlight, Icon, Spinner, Tab,
+    Highlight, HStack, Icon, Spacer, Spinner, Tab,
     TabList,
     TabPanel,
     TabPanels,
@@ -486,16 +486,14 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     useEffect(() => {
 
-        if (!account) {
-            console.log('No account connected');
+        if (account) {
 
-            return;
+            getCrossChainMessenger(signer, currentDisplay).then((messenger) => {
+
+                setCrossChainMessenger(messenger);
+            })
         }
 
-        getCrossChainMessenger(signer, currentDisplay).then((messenger) => {
-
-            setCrossChainMessenger(messenger);
-        })
     }, [signer, account, currentDisplay, getCrossChainMessenger])
 
 
@@ -585,69 +583,65 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             </Head>
 
             <RolluxHeader />
-
-            <VStack spacing={{ base: '5', xl: currentDisplay === CurrentDisplayView.deposit ? '5' : '20vh', '2xl': currentDisplay === CurrentDisplayView.deposit ? '5' : '10vh' }} pb="50px" mb={5}>
-                <Flex
-                    id="bg"
-                    boxSize={{ base: undefined, xl: '100%' }}
-                    overflow="scroll"
-                    position={{ base: 'initial', xl: 'fixed' }}
-                    bg="#28282F"
-                    top="0"
-                    p={{ base: '16px', xl: '100px' }}
-                    clipPath={{
-                        base: undefined,
-                        xl: 'polygon(0% -15%, 100% 120%, 100% 100%, 0% 100%)',
-                    }}
-                    pb={{ base: '103px', xl: '100px' }}
-                    zIndex={-1}
-                    w="100%"
-                >
-                    <Heading
-                        color="white"
-                        fontSize={{ base: '33px', xl: '5xl' }}
-                        maxW={{ base: '300px', md: '400px' }}
-                        lineHeight="135.69%"
-                        position={{ base: 'initial', xl: 'absolute' }}
-                        top="50%"
-                        right="65%"
-                        w="100%"
-                        transform={{ base: undefined, xl: 'translateY(-50%)' }}
-                        m="0 auto"
-                    >
-                        <Highlight
-                            query={['L1 NEVM', 'L2 Rollux']}
-                            styles={{ bg: 'brand.primary', textShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)' }}
-                        >
-                            Bridge your $ SYS between L1 NEVM and L2 Rollux
-                        </Highlight>
-                    </Heading>
-                </Flex>
-
-                <Flex
-                    as="main"
+            <Flex
+                id="bg"
+                boxSize={{ base: undefined, xl: '100%' }}
+                overflow="scroll"
+                position={{ base: 'initial', xl: 'fixed' }}
+                bg="#28282F"
+                top="0"
+                p={{ base: '16px', xl: '100px' }}
+                clipPath={{
+                    base: undefined,
+                    xl: 'polygon(0% -15%, 100% 120%, 100% 100%, 0% 100%)',
+                }}
+                pb={{ base: '103px', xl: '100px' }}
+                zIndex={-1}
+                w="100%"
+            >
+                <Heading
+                    color="white"
+                    fontSize={{ base: '33px', xl: '5xl' }}
+                    maxW={{ base: '300px', md: '400px' }}
+                    lineHeight="135.69%"
                     position={{ base: 'initial', xl: 'absolute' }}
                     top="50%"
-                    left="60%"
-                    transform={{ base: undefined, xl: 'translate(-50%, -50%)' }}
+                    right="65%"
+                    w="100%"
+                    transform={{ base: undefined, xl: 'translateY(-50%)' }}
+                    m="0 auto"
+                >
+                    <Highlight
+                        query={['L1 NEVM', 'L2 Rollux']}
+                        styles={{ bg: 'brand.primary', textShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)' }}
+                    >
+                        Bridge your $ SYS between L1 NEVM and L2 Rollux
+                    </Highlight>
+                </Heading>
+            </Flex>
+            <HStack mt={5} pb="50px" mb={5}>
+
+                <Spacer />
+                <Flex
+                    as="main"
+                    ml={3}
                     p={{ base: '16px' }}
                     mt={{ base: '9', xl: '10' }}
-                    flexDir="column"
+                    align="center"
                     maxW={{ 'sm': '520px', base: '583px' }}
                     minW={{ 'sm': '350px', base: '383px' }}
                     gap="21px"
                     className="main_container"
                 >
-                    <Flex
+                    <Box
                         px={{ base: '16px', md: '40px' }}
                         py={{ base: '16px', md: '32px' }}
-                        flex={1}
+
                         bg="white"
                         boxShadow={`7px 7px ${chakraTheme.colors.brand.primary}`}
                         borderRadius="12px"
                         border={`1px solid ${chakraTheme.colors.brand.primary}`}
-                        justifyContent="center"
-                        flexDir="column"
+                        w="100%"
                         m="0 auto"
                         className="tabs_dw"
                     >
@@ -811,7 +805,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                                     setProveTxns([...tmpProven]);
                                                                 }}
                                                                 onClickSwitchNetwork={async () => {
-                                                                    await switchNetwork(l1ChainId)
+                                                                    switchNetwork(l1ChainId)
                                                                 }}
                                                             />
                                                         </>}
@@ -850,7 +844,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                                     setRelayTxns([...tmpRelayed]);
                                                                 }}
                                                                 onClickSwitchNetwork={async () => {
-                                                                    await switchNetwork(l1ChainId)
+                                                                    switchNetwork(l1ChainId)
                                                                 }}
                                                             />
                                                         </>}
@@ -941,11 +935,12 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                 </TabPanel>
                             </TabPanels>
                         </Tabs>
-                    </Flex>
+                    </Box>
 
                     {!account && <ConnectionWarning />}
                 </Flex>
-            </VStack>
+                <Spacer />
+            </HStack>
 
         </>
     )
