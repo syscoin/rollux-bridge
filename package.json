@@ -14,6 +14,7 @@
     "@chainge/sdk": "^1.0.7",
     "@chakra-ui/icons": "^2.0.17",
     "@chakra-ui/react": "^2.5.1",
+    "@chakra-ui/stepper": "^2.2.0",
     "@download/blockies": "^1.0.3",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",

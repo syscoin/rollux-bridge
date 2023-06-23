@@ -2579,6 +2579,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@chakra-ui/react-context@npm:2.0.8":
+  version: 2.0.8
+  resolution: "@chakra-ui/react-context@npm:2.0.8"
+  peerDependencies:
+    react: ">=18"
+  checksum: 4513f6cc218c45665398fd60b688c5966c84433f33248703a16ac4efc4291a95427bf66581adeb0b5d8c4301ecd48582c4a1ad81a6b1cbfe006dc97580ac5b04
+  languageName: node
+  linkType: hard
+
 "@chakra-ui/react-env@npm:3.0.0":
   version: 3.0.0
   resolution: "@chakra-ui/react-env@npm:3.0.0"
@@ -2934,6 +2943,20 @@ __metadata:
     "@chakra-ui/system": ">=2.0.0"
     react: ">=18"
   checksum: 1fa7defc7bf86674cfdca5c95143067fecc6ea248e1378f5b4661f7904d0582d5616abe03fc95742624d80034d8c82aeb018134af0239d03c054ecd50ee3eeb7
+  languageName: node
+  linkType: hard
+
+"@chakra-ui/stepper@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@chakra-ui/stepper@npm:2.2.0"
+  dependencies:
+    "@chakra-ui/icon": 3.0.16
+    "@chakra-ui/react-context": 2.0.8
+    "@chakra-ui/shared-utils": 2.0.5
+  peerDependencies:
+    "@chakra-ui/system": ">=2.0.0"
+    react: ">=18"
+  checksum: b999cd21152c463f3d42b2e67e2c1c2c3d320734332227c9c66c5bf3a3e1f31bf1137a64047ee23668e46887bc55c6c444d892571da9f7da5331241f5969faa5
   languageName: node
   linkType: hard
 
@@ -24720,6 +24743,7 @@ __metadata:
     "@chainge/sdk": ^1.0.7
     "@chakra-ui/icons": ^2.0.17
     "@chakra-ui/react": ^2.5.1
+    "@chakra-ui/stepper": ^2.2.0
     "@download/blockies": ^1.0.3
     "@emotion/react": ^11.10.6
     "@emotion/styled": ^11.10.6

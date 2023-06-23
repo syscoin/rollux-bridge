@@ -18,6 +18,7 @@ import { DirectionSwitcherArrow } from '../DirectionSwitcherArrow';
 import SelectTokenModal from './SelectTokenModal';
 import { RolluxLogo } from 'components/Icons/RolluxLogo';
 import { MaxBalance } from '../MaxBalance';
+import { ReviewWithdrawal } from '../Withdraw/ReviewWithdrawal';
 
 export type WithdrawPartProps = {
     onClickWithdrawButton: (amount: string) => void;
@@ -315,7 +316,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                 </>}
 
                 {('SYS' === currency && account && (chainId && chainId === l2ChainId)) && <>
-                    <Button
+                    {/* <Button
                         isDisabled={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}
                         variant="primary"
                         onClick={async () => {
@@ -324,7 +325,25 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                         }}
                     >
                         Withdraw
-                    </Button>
+                    </Button> */}
+
+                    <ReviewWithdrawal
+                        amountToWithdraw={amountToSwap}
+                        tokenSymbol={currency}
+                        totalEstimatedFeeUsd={10}
+                        initiateFeeUsd={0}
+                        proveFeeUsd={3}
+                        claimFeeUsd={7}
+                        onClickWithdrawal={async () => {
+                            await preCheckNetwork(l2ChainId, chainId as number);
+                            onClickWithdrawButton(amountToSwap);
+                        }}
+                        onClickUseThirdPartyBridge={() => {
+                            console.log('Not implemented');
+                        }}
+                        isDisabled={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals)) || amountToSwap.length === 0}
+
+                    />
                 </>}
             </Flex>
         </Flex >
