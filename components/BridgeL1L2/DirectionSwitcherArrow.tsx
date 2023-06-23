@@ -4,7 +4,7 @@ import React, { FC } from 'react'
 
 export const DirectionSwitcherArrow: FC<{ onClick: () => void }> = ({ onClick }) => {
     return (<>
-        <Flex mt={4} justifyContent={'center'} alignContent={'center'} flexDirection={'row'}>
+        <Flex mt={1} justifyContent={'center'} alignContent={'center'} flexDirection={'row'}>
             <ArrowDownIcon onClick={onClick} sx={{ cursor: 'pointer', color: 'green.300' }} fontSize={'lg'} />
         </Flex>
     </>);

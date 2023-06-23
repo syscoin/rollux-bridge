@@ -288,24 +288,37 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                         <Spacer />
 
                     </Flex>
-                    <HStack borderRadius="6px" mt={1} minH="48px" pl="19px" pr={'0px'} border={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? '2px solid' : 'none'} borderColor="red.400">
-                        <NumberInput w={'100%'} value={(amountToSwap.length > 0) ? amountToSwap : ''} variant="secondary" size="lg" onChange={(valueAsString) => {
+                    <HStack borderRadius="6px" mt={1} minH="48px" pr={'0px'} >
+                        <NumberInput sx={{
+                            border: '1px solid',
+                            borderColor: parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? 'red.300' : 'gray.300',
+                            borderRadius: '6px',
+                            _hover: {
+                                borderColor: parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? 'red.400' : 'gray.400'
+                            },
+                        }} w={'100%'} value={(amountToSwap.length > 0) ? amountToSwap : ''} variant="secondary" size="md" onChange={(valueAsString) => {
 
                             setAmountToSwap(valueAsString)
 
                         }}>
-                            <NumberInputField placeholder='0.00' />
+                            <HStack>
+                                <NumberInputField placeholder='0.00' />
+
+                                <SelectTokenModal
+                                    tokens={l1ERC20Tokens}
+                                    onSelect={(token) => {
+                                        setCurrency(token.symbol);
+                                        setAmountToSwap('0.00');
+                                    }}
+                                    chainId={l1ChainId}
+                                    selectedToken={selectedToken !== undefined ? selectedToken : { address: '', chainId: l1ChainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }}
+                                />
+                            </HStack>
+
+
+
                         </NumberInput>
-                        <Spacer />
-                        <SelectTokenModal
-                            tokens={l1ERC20Tokens}
-                            onSelect={(token) => {
-                                setCurrency(token.symbol);
-                                setAmountToSwap('0.00');
-                            }}
-                            chainId={l1ChainId}
-                            selectedToken={selectedToken !== undefined ? selectedToken : { address: '', chainId: l1ChainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }}
-                        />
+
 
                     </HStack>
 
@@ -315,10 +328,10 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 <HStack ml={1} mt={2}>
                     {
                         selectedToken && selectedToken?.symbol !== 'SYS' ?
-                            <><Text textAlign={'right'} mr={3} opacity={.5}>Available {balanceToDisplay} </Text><MaxBalance onClick={() => {
+                            <><Text textAlign={'right'} opacity={.5}>Available {balanceToDisplay} </Text><MaxBalance onClick={() => {
                                 setAmountToSwap(balanceToDisplay);
                             }} /></> : selectedToken ?
-                                <><Text textAlign={'right'} mr={3} opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'} </Text><MaxBalance onClick={() => {
+                                <><Text textAlign={'right'} opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'} </Text><MaxBalance onClick={() => {
                                     setAmountToSwap(balanceNativeToken ? formatEther(balanceNativeToken).toString() : '0.00');
                                 }} /></> : <></>
                     }

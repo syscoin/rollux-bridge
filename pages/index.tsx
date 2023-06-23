@@ -605,10 +605,10 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     maxW={{ base: '300px', md: '400px' }}
                     lineHeight="135.69%"
                     position={{ base: 'initial', xl: 'absolute' }}
-                    top={{ base: '30%' }}
+                    top={{ base: '30%', xl: '35%' }}
                     w="100%"
                     transform={{ base: undefined, xl: 'translateY(-50%)' }}
-                    mt={{ base: 10, lg: 20 }}
+                    mt={{ base: 5, sm: 6, md: 8, lg: 20 }}
                     ml={{ base: 0, md: 0 }}
                 >
                     <Highlight
@@ -628,8 +628,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 <Flex
                     as="main"
 
-                    p={{ base: '16px' }}
-                    mt={{ base: '9', xl: '10' }}
+                    p={{ base: '6px' }}
+                    mt={{ base: '9' }}
                     align="center"
 
                     maxW={{ 'sm': '520px', base: '583px' }}
@@ -638,11 +638,11 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     className="main_container"
                 >
                     <VStack
-                        ml={{ base: 0, md: 10, lg: 10, xl: 8 }}
+                        ml={{ base: 1, md: 10, lg: 10, xl: 8 }}
                     >
-                        <Spacer />
+
                         <Box
-                            px={{ base: '16px', md: '40px' }}
+                            px={{ base: '6px', md: '15px' }}
                             py={{ base: '16px', md: '32px' }}
                             mb={5}
 
@@ -650,8 +650,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                             boxShadow={`7px 7px ${chakraTheme.colors.brand.primary}`}
                             borderRadius="12px"
                             border={`1px solid ${chakraTheme.colors.brand.primary}`}
-                            w="100%"
-
                             className="tabs_dw"
                         >
                             <Tabs
@@ -664,8 +662,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                 index={tablIndex}
                             >
 
-                                <TabList justifyContent="center" bg="#f4fadb" w="max-content" m="0 auto" borderRadius="6px">
+                                <TabList justifyContent="center" bg="#f4fadb" w={'max-content'} m="0 auto" borderRadius="6px">
                                     <Tab
+
                                         borderRadius="6px"
                                         px="36px"
                                         _selected={{
@@ -676,6 +675,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                         Deposit
                                     </Tab>
                                     <Tab
+
                                         px="36px"
                                         borderRadius="6px"
                                         _selected={{
@@ -690,7 +690,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
 
                                 <TabPanels>
-                                    <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
+                                    <TabPanel p={{ base: 2, md: 4 }}>
                                         {/* <SwitcherOtherProviders onSwitch={handleSwitchProvidrs} /> */}
 
                                         {showOtherProviders === true ?

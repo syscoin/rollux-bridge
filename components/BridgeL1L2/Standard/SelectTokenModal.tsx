@@ -116,6 +116,7 @@ export const SelectTokenModal: FC<SelectTokenModalProps> = ({ tokens, chainId, o
             variant={'primary'}
             onClick={onOpen}
             minW={'fit-content'}
+            ml={0}
             mr={0}
         >
             <HStack>
