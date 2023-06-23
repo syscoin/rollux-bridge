@@ -1,5 +1,5 @@
 import React, { FC } from "react"
-import { Flex, Heading, AlertIcon, Box, useDisclosure, Modal, ModalBody, ModalOverlay, ModalHeader, ModalCloseButton, ModalContent, Alert } from "@chakra-ui/react"
+import { Flex, Heading, AlertIcon, Box, useDisclosure, Modal, ModalBody, ModalOverlay, ModalHeader, ModalCloseButton, ModalContent, Alert, Divider } from "@chakra-ui/react"
 import { chakraTheme } from 'components/chakraTheme';
 
 export type UnfinishedWithdrawalsModalProps = {
@@ -15,25 +15,21 @@ export const UnfinishedWithdrawalsModal: FC<UnfinishedWithdrawalsModalProps> = (
                 <AlertIcon />
                 <Heading size="sm">Manage pending withdrawals</Heading>
             </Alert>
-            <Modal isOpen={isOpen} onClose={onClose} size={'sm'}>
+            <Modal isOpen={isOpen} onClose={onClose} size={'lg'}>
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader fontStyle={'italic'}>Manage pending withdrawals</ModalHeader>
                     <ModalCloseButton />
+                    <Divider />
                     <ModalBody>
                         <Flex
                             px={{ base: '8px', md: '20px' }}
                             py={{ base: '8px', md: '16px' }}
                             flex={1}
                             bg="white"
-                            boxShadow={`7px 7px ${chakraTheme.colors.brand.primary}`}
-                            borderRadius="12px"
-                            border={`1px solid ${chakraTheme.colors.brand.primary}`}
                             justifyContent="center"
                             flexDir="column"
                             m="0 0 30px 0"
-
-
                             overflow={"scroll-y"}
                             z-index={1}
                         >
