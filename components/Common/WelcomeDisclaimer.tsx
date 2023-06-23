@@ -85,6 +85,14 @@ export const WelcomeDisclaimer: FC<WelcomeDisclaimerProps> = ({ }) => {
                             </Text>
                         </HStack>
                     </Box>
+                    <Box mb={1}>
+                        <HStack p={2}>
+                            <Text>
+                                By clicking the button below, you agree to our
+                                <Text as={'a'} href={'https://sys-labs.github.io/community-hub/docs/terms-and-conditions'} textDecoration={'underline'} fontWeight={700} target={'_blank'} color={'brand.secondary'}> Terms and Conditions</Text>.
+                            </Text>
+                        </HStack>
+                    </Box>
 
                     <HStack mb={2} mt={3}>
 
