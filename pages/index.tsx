@@ -624,7 +624,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 <Spacer />
                 <Flex
                     as="main"
-                    ml={3}
+                    ml={{ base: 3, md: 6, lg: 7, xl: 8 }}
                     p={{ base: '16px' }}
                     mt={{ base: '9', xl: '10' }}
                     align="center"

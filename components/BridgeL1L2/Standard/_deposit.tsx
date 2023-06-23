@@ -1,6 +1,6 @@
 import { ChevronDownIcon, ChevronRightIcon, InfoIcon, RepeatClockIcon } from '@chakra-ui/icons';
 import {
-    Button, Flex, FormControl, Spacer, Skeleton, FormErrorMessage, FormLabel, HStack, Image, NumberInput, NumberInputField, Text, useBreakpointValue, useToast, VStack, Wrap
+    Button, Flex, FormControl, Spacer, Skeleton, FormErrorMessage, FormLabel, HStack, Image, NumberInput, NumberInputField, Text, useBreakpointValue, useToast, VStack, Wrap, Link
 } from '@chakra-ui/react';
 import { ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
 import { NEVMChain, TanenbaumChain } from 'blockchain/NevmRolluxBridge/config/chainsUseDapp';
@@ -322,60 +322,28 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             {selectedToken && (
                 <Flex flexDir="column" maxW="100%" mt={3} backgroundColor={'brand.lightPrimary'} borderRadius={'4px'} p={3}>
                     <HStack mt={{ base: '3px', md: '12px' }} ml={2}>
-                        <Text fontWeight={700} >
+                        <Text color={'gray.500'}>
                             To
                         </Text>
                         <RolluxLogo width={20} height={20} />
-                        <Text fontWeight={700}>
+                        <Text as={Link} href="https://rollux.com" fontWeight={700}>
                             Rollux
                         </Text>
                     </HStack>
-
-
-
-
-                    <HStack mt={2} ml={2} alignItems="center">
-                        <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>You will receive</Text>
-                        <Text fontWeight={'700'}>{amountToSwap || '0'}</Text>
-
-
-                        <Image
-                            alt="coin logo"
-                            boxSize="24px"
-                            borderRadius="full"
-                            src={selectedToken.logoURI}
-                        />
-                        <Text>{selectedToken.symbol}</Text>
+                    <HStack mt={1} ml={2} color={'gray.500'}>
+                        <Text>You will receive: </Text>
+                        <Text>{amountToSwap || '0'} {selectedToken.symbol}</Text>
                     </HStack>
-
-
                     {account && <>
-                        <HStack mt={3} alignItems={'center'}>
-                            <Image
-                                alt="coin logo"
-                                boxSize="24px"
-                                borderRadius="full"
-                                src={selectedToken.logoURI}
-                            />
-                            <Text>Balance {parseFloat(ethers.utils.formatUnits(currency === 'SYS' ? balanceNativeTokenL2 : balanceERC20TokenL2,
+                        <HStack mt={2} ml={2} color={'gray.500'}>
+                            <Text>Balance:  {parseFloat(ethers.utils.formatUnits(currency === 'SYS' ? balanceNativeTokenL2 : balanceERC20TokenL2,
                                 selectedTokenDecimals
-                            )).toFixed(6)} {selectedToken.symbol}</Text>
+                            )).toFixed(4)} {selectedToken.symbol}</Text>
                         </HStack>
                     </>}
 
                 </Flex>
             )}
-
-            {/* {(account && selectedToken && selectedToken.symbol === 'SYS') && (<>
-                <Flex flexDir={'column'} mt={4}>
-                    <WarningInfoBlock warningText='In case if You want to use other provider instead of Standard Bridge for deposit SYS please click button below.'>
-                        <Button variant={'primary'} onClick={() => onSelectBridgeProvider('SYS', true)}>
-                            Select other provider
-                        </Button>
-                    </WarningInfoBlock>
-                </Flex>
-
-            </>)} */}
 
             <Flex
                 mt={{ base: '32px', md: '44px' }}
@@ -483,7 +451,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                         <Skeleton isLoaded={estimatedTxPrice.usdEstimate !== undefined && estimatedTxPrice.weiEstimate !== undefined}>
                             <Text
                                 color={'gray.500'}>
-                                {estimatedTxPrice.weiEstimate?.toFixed(6)} SYS ( ~{estimatedTxPrice.usdEstimate?.toFixed(7)} $)
+                                {estimatedTxPrice.weiEstimate?.toFixed(4)} SYS ( ~{estimatedTxPrice.usdEstimate?.toFixed(7)} $)
                             </Text>
                         </Skeleton>
 
