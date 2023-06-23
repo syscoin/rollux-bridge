@@ -15,7 +15,7 @@ export type RolluxPageWrapperProps = {
 
 export const RolluxPageWrapper: FC<RolluxPageWrapperProps> = ({ title, description, blockerText = null, children }) => {
     return (
-        <ChakraProvider theme={theme}>
+        <>
             <Head>
                 <title>Syscoin Bridge | Rollux & NEVM | {title}</title>
                 <link rel="shortcut icon" href="/favicon.ico" />
@@ -66,6 +66,6 @@ export const RolluxPageWrapper: FC<RolluxPageWrapperProps> = ({ title, descripti
 
                 {null === blockerText && children}
             </Container>
-        </ChakraProvider>
+        </>
     )
 }

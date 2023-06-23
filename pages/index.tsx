@@ -576,7 +576,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     return (
 
-        <ChakraProvider theme={chakraTheme}>
+        <>
             <Head>
                 <title>Syscoin Bridge | Rollux & NEVM </title>
                 <link rel="shortcut icon" href="/favicon-rollux.ico" />
@@ -947,7 +947,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 </Flex>
             </VStack>
 
-        </ChakraProvider >
+        </>
     )
 }
 

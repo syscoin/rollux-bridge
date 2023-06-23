@@ -94,7 +94,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     selectedTokenAddress,
                     selectedTokenAddressL2,
                     ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals)
-                ) : messenger.estimateGas.depositETH(ethers.utils.parseUnits(amountToSwap, 18))
+                ) : messenger.estimateGas.depositETH(ethers.utils.parseUnits(amountToSwap || '0', 18))
 
             gasLimit.then(async (gasLimit) => {
                 const estimateResult = await calculateEstimate(

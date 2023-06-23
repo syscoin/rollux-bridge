@@ -9,6 +9,8 @@ import "../styles/globals.css";
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from "components/Common/ErrorFallback";
 import { provider } from "web3-core";
+import { WelcomeDisclaimer } from "components/Common/WelcomeDisclaimer";
+import { chakraTheme } from 'components/chakraTheme';
 
 const queryClient = new QueryClient();
 
@@ -59,15 +61,18 @@ declare global {
 
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const { pathname } = useRouter()
-
-
 
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <DAppProvider config={dappConfig}>
-          <Component {...pageProps} />
+          <ChakraProvider theme={chakraTheme}>
+
+
+            <Component {...pageProps} />
+            <WelcomeDisclaimer />
+          </ChakraProvider>
+
         </DAppProvider>
       </ErrorBoundary>
     </QueryClientProvider>
