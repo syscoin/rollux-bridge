@@ -29,16 +29,17 @@ export type DepositPartProps = {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     onSelectBridgeProvider: (provider: string, force: boolean) => void;
     onSwapDirection: () => void;
+    depositTx: string | undefined;
+    setDepositTx: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClickApproveERC20, onClickDepositERC20, setIsLoading, onSelectBridgeProvider, onSwapDirection }) => {
+export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClickApproveERC20, onClickDepositERC20, setIsLoading, onSelectBridgeProvider, onSwapDirection, depositTx, setDepositTx }) => {
     const [currency, setCurrency] = useState<string>('SYS');
     const [selectedTokenAddress, setSelectedTokenAddress] = useState<string | undefined>(undefined);
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
     const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
     const [amountToSwap, setAmountToSwap] = useState<string>('');
-    const [isDepositLoading, setIsDepositLoading] = useState<boolean>(false);
 
     const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork, contractsL1 } = useSelectedNetwork();
 
@@ -68,6 +69,9 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
         { address: '', chainId: l1ChainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }
 
     const messenger = useCrossChainMessenger();
+
+    const [showDepositSent, setShowDepositSent] = useState<boolean>(false);
+    const [showTxDetails, setShowTxDetails] = useState<boolean>(false);
 
     const { calculateEstimate } = useEstimateTransaction();
     useEffect(() => {
@@ -112,6 +116,12 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
     }, [messenger, amountToSwap, selectedTokenDecimals, selectedTokenAddress, selectedTokenAddressL2, calculateEstimate]);
 
+    useEffect(() => {
+        if (showDepositSent && depositTx) {
+            setShowDepositSent(false);
+            setShowTxDetails(true);
+        }
+    }, [showDepositSent, depositTx])
 
     // balance hook
 
@@ -271,83 +281,20 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
                     <OtherProvidersMenuSelector preSelectLabel={'From'} onSelect={(provider) => onSelectBridgeProvider(provider, false)} />
                     <Spacer />
-                    {
-                        selectedToken && selectedToken?.symbol !== 'SYS' ?
-                            <><Text textAlign={'right'} mr={3} opacity={.5}>Available {balanceToDisplay} </Text><MaxBalance onClick={() => {
-                                setAmountToSwap(balanceToDisplay);
-                            }} /></> : selectedToken ?
-                                <><Text textAlign={'right'} mr={3} opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'} </Text><MaxBalance onClick={() => {
-                                    setAmountToSwap(balanceNativeToken ? formatEther(balanceNativeToken).toString() : '0.00');
-                                }} /></> : <></>
-                    }
+
                 </Flex>
                 <HStack bg="brand.lightPrimary" borderRadius="6px" mt={1} minH="48px" pl="19px" pr={'0px'} border={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? '2px solid' : 'none'} borderColor="red.400">
                     <NumberInput w={'100%'} value={(amountToSwap.length > 0) ? amountToSwap : ''} variant="unstyled" size="lg" onChange={(valueAsString) => {
-                        if (valueAsString.length > 0) {
-                            setAmountToSwap(valueAsString)
-                        }
+
+                        setAmountToSwap(valueAsString)
+
                     }}>
                         <NumberInputField placeholder='0.00' />
                     </NumberInput>
                     <Spacer />
-                    {/* <Menu isLazy lazyBehavior="unmount" placement="top-start" autoSelect={false}>
-                        <MenuButton minW="fit-content">
-                            <HStack>
-                                {
-                                    selectedToken && (
-                                        <>
-                                            <Image
-                                                borderRadius="full"
-                                                src={selectedToken.logoURI}
-                                                alt={`${selectedToken.name} logo`}
-                                                boxSize="6"
-                                            />
-                                            <Text>
-                                                {selectedToken ? selectedToken.symbol : ''}
-                                            </Text>
-                                        </>
-                                    )
-                                }
-                                <ChevronDownIcon fontSize="xl" />
-                            </HStack>
-                        </MenuButton>
-
-                        <MenuList maxH="300px" overflow="scroll" position="absolute" left="-100px" top="50px">
-                            <MenuItem
-                                onClick={() => setCurrency('SYS')}
-                            >
-                                <HStack>
-                                    <Image
-                                        borderRadius="full"
-                                        src="/syscoin-logo.svg"
-                                        alt={`SYS logo`}
-                                        boxSize="6"
-                                    />
-                                    <Text>SYS</Text>
-                                </HStack>
-                            </MenuItem>
-                            {l1ERC20Tokens?.map((token) => (
-                                <MenuItem
-                                    key={token.address + token.name}
-                                    onClick={() => setCurrency(token.symbol)}
-                                >
-                                    <HStack>
-                                        <Image
-                                            borderRadius="full"
-                                            src={token.logoURI}
-                                            alt={`${token.name} logo`}
-                                            boxSize="6"
-                                        />
-                                        <Text>{token.name}</Text>
-                                    </HStack>
-                                </MenuItem>
-                            ))}
-                        </MenuList>
-                    </Menu> */}
                     <SelectTokenModal
                         tokens={l1ERC20Tokens}
                         onSelect={(token) => {
-                            console.log(token);
                             setCurrency(token.symbol);
                             setAmountToSwap('0.00');
                         }}
@@ -358,7 +305,19 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 </HStack>
 
                 <FormErrorMessage>Invalid amount</FormErrorMessage>
+
             </FormControl>
+            <HStack ml={1} mt={2}>
+                {
+                    selectedToken && selectedToken?.symbol !== 'SYS' ?
+                        <><Text textAlign={'right'} mr={3} opacity={.5}>Available {balanceToDisplay} </Text><MaxBalance onClick={() => {
+                            setAmountToSwap(balanceToDisplay);
+                        }} /></> : selectedToken ?
+                            <><Text textAlign={'right'} mr={3} opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'} </Text><MaxBalance onClick={() => {
+                                setAmountToSwap(balanceNativeToken ? formatEther(balanceNativeToken).toString() : '0.00');
+                            }} /></> : <></>
+                }
+            </HStack>
             <DirectionSwitcherArrow onClick={onSwapDirection} />
             {selectedToken && (
                 <Flex flexDir="column" maxW="100%" mt={3} backgroundColor={'brand.lightPrimary'} borderRadius={'4px'} p={3}>
@@ -373,8 +332,10 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     </HStack>
 
 
-                    <Wrap alignItems="center" mt="15px" spacing="27px" maxW="calc(100vw - 70px)" ml={2}>
-                        <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>You will receive {amountToSwap}</Text>
+
+                    <Wrap alignItems="center" mt={1} ml={3} spacing="27px" maxW="calc(100vw - 70px)">
+                        <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>You will receive</Text>
+                        <Text fontWeight={'700'}>{amountToSwap || '0'}</Text>
 
                         <HStack mt="44px" alignItems="center">
                             <Image
@@ -386,6 +347,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                             <Text>{selectedToken.symbol}</Text>
                         </HStack>
                     </Wrap>
+
 
                     {account && <>
                         <HStack mt={3} alignItems={'center'}>
@@ -480,19 +442,27 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                         amount={parseFloat(amountToSwap)}
                         coinName={currency}
                         gasFee={estimatedTxPrice.weiEstimate ?? 0}
-                        isDepositLoading={isDepositLoading}
+                        isDepositLoading={showDepositSent}
+                        depositTxHash={depositTx}
+                        onOpenModal={() => {
+                            setDepositTx(undefined);
+                            setShowDepositSent(false);
+                        }}
                         estimatedFiatFee={estimatedTxPrice.usdEstimate ?? 0}
                         isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) || !parseFloat(amountToSwap)}
                     >
                         <>
+
+
+
                             <Button
-                                isLoading={isDepositLoading}
+                                isLoading={showDepositSent || depositTx !== undefined}
                                 width={'100%'}
+                                loadingText="Depositing..."
                                 variant="primary"
                                 onClick={() => {
-
+                                    setShowDepositSent(true);
                                     onClickDepositButton(amountToSwap);
-
                                 }}
                             >
                                 Deposit
@@ -523,10 +493,12 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                             <RepeatClockIcon /> Time to transfer
                         </Text>
                         <Spacer />
-                        <Text
-                            color={'gray.500'}>
-                            ~ 2-5 minutes
-                        </Text>
+                        <Skeleton isLoaded={estimatedTxPrice.usdEstimate !== undefined && estimatedTxPrice.weiEstimate !== undefined}>
+                            <Text
+                                color={'gray.500'}>
+                                ~ 2-5 minutes
+                            </Text>
+                        </Skeleton>
                     </HStack>
                 </>}
 

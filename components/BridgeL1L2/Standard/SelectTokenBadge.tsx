@@ -13,7 +13,7 @@ export const SelectTokenBadge: FC<SelectTokenBadgeProps> = ({ token, onSelect })
             borderRadius={'md'}
             onClick={() => onSelect(token)}
         >
-            <HStack>
+            <HStack justifyContent={'center'}>
                 <Image
                     borderRadius="full"
                     src={token.logoURI}

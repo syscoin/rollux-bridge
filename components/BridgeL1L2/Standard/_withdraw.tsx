@@ -1,7 +1,7 @@
 import { ArrowRightIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import {
     Box,
-    Button, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Image, Input, Menu,
+    Button, Divider, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Image, Input, Menu,
     MenuButton, MenuItem, MenuList, NumberInput, NumberInputField, PlacementWithLogical, Spacer, Text, useBreakpointValue, Wrap
 } from '@chakra-ui/react';
 import { ERC20Interface, useEtherBalance, useEthers, useTokenAllowance, useTokenBalance } from '@usedapp/core';
@@ -190,81 +190,16 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
                     </FormLabel>
                     <Spacer />
-                    {
-                        selectedToken && selectedToken?.symbol !== 'SYS' ?
-                            <><Text mr={1} opacity={.5}>Available {parseFloat(ethers.utils.formatUnits(balanceERC20Token || BigNumber.from('0'), selectedTokenDecimals)).toFixed(2) || '0.00'}</Text>
-                                <MaxBalance onClick={() => {
-                                    setAmountToSwap(balanceToDisplay);
-                                }} />
-                            </> : selectedToken ?
-                                <><Text mr={1} opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'}</Text><MaxBalance onClick={() => {
-                                    setAmountToSwap(balanceToDisplay);
-                                }} /></> : <></>
-                    }
+
                 </Flex>
                 <HStack bg="brand.lightPrimary" borderRadius="6px" minH="48px" pl="19px" pr={'0px'} border={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals)) ? '2px solid' : 'none'} borderColor="red.400">
                     <NumberInput variant="unstyled" value={(amountToSwap.length > 0) ? amountToSwap : ''} size="lg" onChange={(valueAsString) => {
-                        if (valueAsString.length > 0 && parseFloat(valueAsString) >= 0) {
-                            setAmountToSwap(valueAsString)
-                        }
+
+                        setAmountToSwap(valueAsString)
+
                     }}>
                         <NumberInputField placeholder='0.00' />
                     </NumberInput>
-
-                    {/* <Menu isLazy lazyBehavior="unmount" placement="top-start" autoSelect={false}>
-                        <MenuButton minW="fit-content">
-                            <HStack>
-                                {
-                                    selectedToken && (
-                                        <>
-                                            <Image
-                                                borderRadius="full"
-                                                src={selectedToken.logoURI}
-                                                alt={`${selectedToken.name} logo`}
-                                                boxSize="6"
-                                            />
-                                            <Text>
-                                                {selectedToken ? selectedToken.symbol : ''}
-                                            </Text>
-                                        </>
-                                    )
-                                }
-                                <ChevronDownIcon fontSize="xl" />
-                            </HStack>
-                        </MenuButton>
-
-                        <MenuList maxH="300px" overflow="scroll" position="absolute" left="-100px" top="50px">
-                            <MenuItem
-                                onClick={() => setCurrency('SYS')}
-                            >
-                                <HStack>
-                                    <Image
-                                        borderRadius="full"
-                                        src="/syscoin-logo.svg"
-                                        alt={`SYS logo`}
-                                        boxSize="6"
-                                    />
-                                    <Text>SYS</Text>
-                                </HStack>
-                            </MenuItem>
-                            {l2ERC20Tokens?.map((token) => (
-                                <MenuItem
-                                    key={token.address + token.name}
-                                    onClick={() => setCurrency(token.symbol)}
-                                >
-                                    <HStack>
-                                        <Image
-                                            borderRadius="full"
-                                            src={token.logoURI}
-                                            alt={`${token.name} logo`}
-                                            boxSize="6"
-                                        />
-                                        <Text>{token.name}</Text>
-                                    </HStack>
-                                </MenuItem>
-                            ))}
-                        </MenuList>
-                    </Menu> */}
                     <Spacer />
                     <SelectTokenModal
                         tokens={l2ERC20Tokens}
@@ -279,10 +214,24 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                 </HStack>
 
                 <FormErrorMessage>Invalid amount</FormErrorMessage>
+                <HStack mt={1}>
+                    {
+                        selectedToken && selectedToken?.symbol !== 'SYS' ?
+                            <><Text mr={1} opacity={.5}>Available {parseFloat(ethers.utils.formatUnits(balanceERC20Token || BigNumber.from('0'), selectedTokenDecimals)).toFixed(2) || '0.00'}</Text>
+                                <MaxBalance onClick={() => {
+                                    setAmountToSwap(balanceToDisplay);
+                                }} />
+                            </> : selectedToken ?
+                                <><Text mr={1} opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'}</Text><MaxBalance onClick={() => {
+                                    setAmountToSwap(balanceToDisplay);
+                                }} /></> : <></>
+                    }
+                </HStack>
             </FormControl>
             <DirectionSwitcherArrow onClick={onSwapDirection} />
+
             {selectedToken && (
-                <Flex flexDir="column" maxW="100%" backgroundColor={'brand.lightPrimary'}>
+                <Flex flexDir="column" maxW="100%" mt={3} backgroundColor={'brand.lightPrimary'}>
                     <Box mt={{ base: '3px', md: '12px' }} ml={2}>
                         <OtherProvidersMenuSelector preSelectLabel={'To '} onSelect={(provider) => {
                             setOutputNetwork(provider);
@@ -290,8 +239,10 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                         }} />
                     </Box>
 
+
                     <Wrap alignItems="center" mt={1} ml={3} spacing="27px" maxW="calc(100vw - 70px)">
-                        <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>You will receive {amountToSwap}</Text>
+                        <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>You will receive</Text>
+                        <Text fontWeight={'700'}>{amountToSwap || '0'}</Text>
 
                         <HStack mt="44px" alignItems="center">
                             <Image
@@ -304,8 +255,10 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                         </HStack>
                     </Wrap>
 
+
+
                     {account && <>
-                        <HStack mt={3} ml={1} alignItems={'center'}>
+                        <HStack mt={3} mb={3} ml={3} alignItems={'center'}>
                             <Image
                                 alt="coin logo"
                                 boxSize="24px"

@@ -1,4 +1,5 @@
 import {
+    Box,
     ChakraProvider,
     Flex, Grid, Heading,
     Highlight, Icon, Spinner, Tab,
@@ -38,6 +39,7 @@ import { OtherProvidersListing } from '../components/BridgeL1L2/OtherProviders/O
 import { BridgedNetwork, FiatOrBridged } from '../blockchain/NevmRolluxBridge/bridgeProviders/types';
 import { BridgeTypeSelector } from '../components/BridgeL1L2/Withdraw/BridgeTypeSelector';
 import { MdShield, MdRunCircle } from "react-icons/md";
+import { UnfinishedWithdrawalsModal } from 'components/BridgeL1L2/Withdraw/UnfinishedWithdrawalsModal';
 
 
 type BridgeNevmRolluxProps = {}
@@ -71,6 +73,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const [selectedIOCurrency, setSelectedIOCurrency] = useState<string>('SYS');
 
     const [tablIndex, setTabIndex] = useState<number>(0);
+
+    const [depositTxHash, setDepositTxHash] = useState<string | undefined>(undefined);
 
     // todo refactor this 2 similar functions
     const getProveTxn = (withdrawTxHash: string, data: { withdrawTx: string, proveTx: string }[]): string | null => {
@@ -233,6 +237,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             })
             const tx = await crossChainMessenger.depositERC20(l1Token, l2Token, amount);
 
+            setDepositTxHash(tx.hash);
+
             toast({
                 title: 'Deposit confirmation.',
                 description: "Waiting for deposit confirmation",
@@ -243,6 +249,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             await tx.wait();
             await crossChainMessenger.waitForMessageStatus(tx.hash,
                 MessageStatus.RELAYED)
+
 
             toast({
                 title: 'Deposit confirmed.',
@@ -350,6 +357,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 const depositTx = await crossChainMessenger.depositETH(
                     ethers.utils.parseEther(amount)
                 );
+
+                setDepositTxHash(depositTx.hash);
 
                 const _confirmationToast = toast({
                     title: 'Deposit confirmation.',
@@ -577,7 +586,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
             <RolluxHeader />
 
-            <VStack spacing={{ base: '5', xl: currentDisplay === CurrentDisplayView.deposit ? '5' : '20' }} pb="50px">
+            <VStack spacing={{ base: '5', xl: currentDisplay === CurrentDisplayView.deposit ? '5' : '20vh', '2xl': currentDisplay === CurrentDisplayView.deposit ? '5' : '10vh' }} pb="50px" mb={5}>
                 <Flex
                     id="bg"
                     boxSize={{ base: undefined, xl: '100%' }}
@@ -693,6 +702,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                         :
 
                                         <DepositPart
+                                            setDepositTx={setDepositTxHash}
+                                            depositTx={depositTxHash}
                                             onSwapDirection={() => {
                                                 setTabIndex(1);
                                                 setCurrentDisplay(CurrentDisplayView.withdraw);
@@ -849,7 +860,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                 </>}
 
 
-                                                <Flex
+                                                {/* <Flex
                                                     px={{ base: '8px', md: '20px' }}
                                                     py={{ base: '8px', md: '16px' }}
                                                     flex={1}
@@ -860,13 +871,32 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                     justifyContent="center"
                                                     flexDir="column"
                                                     m="0 0 30px 0"
-                                                    maxW="380px"
-                                                    maxH={"400px"}
+
+
                                                     overflow={"scroll-y"}
+                                                    z-index={1}
                                                 >
                                                     <Heading size="s" sx={{ marginBottom: 5 }}>
                                                         You have unfinished withdrawals
                                                     </Heading>
+                                                    <Box overflow={'scroll'} height='200px'>
+                                                        {unfinishedWithdrawals.map((item) => {
+                                                            return <UnfinishedWithdrawalItem key={item.txHash} status={item.status} txHash={item.txHash}
+                                                                onClickView={() => {
+                                                                    setWithdrawalModalData({
+                                                                        status: item.status,
+                                                                        txHash: item.txHash
+                                                                    })
+
+
+                                                                    withdrawOnOpen();
+                                                                }}
+                                                            />
+                                                        })}
+                                                    </Box>
+                                                </Flex> */}
+
+                                                <UnfinishedWithdrawalsModal>
                                                     {unfinishedWithdrawals.map((item) => {
                                                         return <UnfinishedWithdrawalItem key={item.txHash} status={item.status} txHash={item.txHash}
                                                             onClickView={() => {
@@ -880,7 +910,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                             }}
                                                         />
                                                     })}
-                                                </Flex>
+                                                </UnfinishedWithdrawalsModal>
 
                                             </>}
 
