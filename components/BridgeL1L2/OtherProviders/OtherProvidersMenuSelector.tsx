@@ -48,7 +48,14 @@ export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = (
         <HStack>
             <Text ml={3}>{preSelectLabel}</Text>
             <Menu isLazy lazyBehavior="unmount" placement={placement as PlacementWithLogical} autoSelect={false}>
-                <MenuButton>
+                <MenuButton sx={{
+                    borderRadius: "10px",
+                    border: "1px solid #E2E8F0",
+                    p: 1,
+                    _hover: {
+                        bg: "gray.100",
+                    },
+                }}>
                     <HStack>
                         <Spacer />
                         <Image
