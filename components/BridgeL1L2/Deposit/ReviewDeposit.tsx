@@ -42,7 +42,7 @@ export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled, am
                         <HStack mb={2}>
                             <Text>Estimated fee:</Text>
                             <Spacer />
-                            <Text>{gasFee} ETH</Text>
+                            <Text>{gasFee} SYS</Text>
                         </HStack>
                         <Divider />
                         <HStack mb={2}>

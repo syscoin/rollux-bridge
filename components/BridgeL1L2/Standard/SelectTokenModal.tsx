@@ -116,8 +116,17 @@ export const SelectTokenModal: FC<SelectTokenModalProps> = ({ tokens, chainId, o
             variant={'primary'}
             onClick={onOpen}
             minW={'fit-content'}
-            ml={0}
-            mr={0}
+            sx={{
+                margin: '0 !important',  // reset all margins
+                marginInlineStart: '0px !important',  // reset margin-start
+                borderLeftRadius: '0px !important',
+                borderLeft: '1px solid !important',
+                borderLeftColor: 'gray.300 !important',
+                '&:hover': {
+                    backgroundColor: 'brand.secondary',
+                    color: 'black.200',
+                }
+            }}
         >
             <HStack>
                 <Image
