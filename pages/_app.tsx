@@ -23,26 +23,16 @@ const dappConfig: Config = {
     [NEVMChain.chainId]: NEVMChain.rpcUrl || '',
   },
   multicallAddresses: {
-    [RolluxChainMainnet.chainId]: '0xC8A22F92Dd4A50f56Ab1309ea686A4c08d630180',
+    [RolluxChainMainnet.chainId]: RolluxChainMainnet.multicall2Address || '',
     [NEVMChain.chainId]: '0x0c457A8E4bD35eA571956d6bb7443c5C661d7607',
     [5700]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697', // multicall 2 address.
     [57000]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697',
 
   },
-  networks: [RolluxChain, TanenbaumChain, NEVMChain, RolluxChainMainnet, Mainnet],
+  networks: [RolluxChain, TanenbaumChain, NEVMChain, RolluxChainMainnet],
   connectors: {
     metamask: new MetamaskConnector(),
     coinBase: new CoinbaseWalletConnector(),
-    // walletConnectV2: new WalletConnectV2Connector.WalletConnectV2Connector({
-    //   projectId: '6b7e7faf5a9e54e3c5f22289efa5975b',
-    //   chains: [RolluxChain, TanenbaumChain, NEVMChain, RolluxChainMainnet],
-    //   rpcMap: {
-    //     57000: RolluxChain.rpcUrl || '',
-    //     5700: TanenbaumChain.rpcUrl || '',
-    //     57: NEVMChain.rpcUrl || '',
-    //     570: RolluxChainMainnet.rpcUrl || '',
-    //   }
-    // })
   }
 }
 

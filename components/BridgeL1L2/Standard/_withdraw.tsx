@@ -45,7 +45,6 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
     const [allERC20Tokens, setAllERC20Tokens] = useState<TokenListToken[]>([]);
     const [l1ERC20Tokens, setL1ERC20Tokens] = useState<TokenListToken[]>([]);
     const [l2ERC20Tokens, setL2ERC20Tokens] = useState<TokenListToken[]>([]);
-
     const selectedToken = currency !== 'SYS' ?
         l2ERC20Tokens?.find(token => token.symbol === currency) :
         { address: '', chainId: l2ChainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }

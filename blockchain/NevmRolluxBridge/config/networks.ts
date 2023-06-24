@@ -1,4 +1,3 @@
-import { Network } from "bitcoinjs-lib";
 import contractsDev from "./contracts";
 
 export type NetworkData = {
@@ -48,7 +47,7 @@ export const networks: { [key: string]: NetworkData } = {
     L2: {
         rpcAddress: 'https://rpc.rollux.com',
         name: 'Rollux',
-        explorerUrl: 'https://explorer.testnet.rollux.com',
+        explorerUrl: 'https://explorer.rollux.com',
         chainId: 570,
         layer: 2,
         contracts: contractsDev.l2,

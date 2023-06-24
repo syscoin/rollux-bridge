@@ -6,11 +6,12 @@ export const RolluxChainMainnet: Chain = {
     isLocalChain: false,
     isTestChain: false,
     nativeCurrency: {
-        name: "tSyscoin",
-        symbol: "tSYS",
+        name: "Syscoin",
+        symbol: "SYS",
         decimals: 18,
     },
-    multicallAddress: '',
+    multicallAddress: '0xC8A22F92Dd4A50f56Ab1309ea686A4c08d630180',
+    multicall2Address: '0xC8A22F92Dd4A50f56Ab1309ea686A4c08d630180',
     getExplorerAddressLink: (address: string) => {
         return address;
     },
@@ -18,7 +19,7 @@ export const RolluxChainMainnet: Chain = {
         return address;
     },
     rpcUrl: "https://rpc.rollux.com",
-    blockExplorerUrl: "https://explorer.syscoin.org/",
+    blockExplorerUrl: "https://explorer.rollux.com/",
 }
 
 export const NEVMChain: Chain = {
