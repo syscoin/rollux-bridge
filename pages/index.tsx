@@ -602,14 +602,31 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 <Heading
                     color="white"
                     fontSize={{ base: '33px', xl: '5xl' }}
-                    maxW={{ base: '300px', md: '400px' }}
+                    maxW={{ base: '350px', xl: '400px' }}
                     lineHeight="135.69%"
                     position={{ base: 'initial', xl: 'absolute' }}
                     top={{ base: '30%', xl: '35%' }}
                     w="100%"
+                    display={{ base: 'none', xl: 'block' }}
                     transform={{ base: undefined, xl: 'translateY(-50%)' }}
-                    mt={{ base: 5, sm: 6, md: 8, lg: 20 }}
-                    ml={{ base: 0, md: 0 }}
+                    mt={20}
+                    ml={0}
+                    mr={5}
+                >
+                    <Highlight
+
+                        query={['L1 NEVM', 'L2 Rollux']}
+                        styles={{ bg: 'brand.primary', textShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)' }}
+                    >
+                        Bridge your $ SYS between L1 NEVM and L2 Rollux
+                    </Highlight>
+                </Heading>
+
+                <Heading
+                    color={'white'}
+                    textAlign="center"
+                    display={{ base: 'block', xl: 'none' }}
+                    m={'auto'}
                 >
                     <Highlight
 
@@ -621,6 +638,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 </Heading>
             </Flex>
 
+
+
             <HStack mt={{ md: 0, base: 5 }} pb="50px" mb={5}
                 position={{ base: 'initial', md: 'relative', xl: 'initial' }}
             >
@@ -631,14 +650,15 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     p={{ base: '6px' }}
                     mt={{ base: '9' }}
                     align="center"
-
-                    maxW={{ 'sm': '520px', base: '583px' }}
-                    minW={{ 'sm': '350px', base: '383px' }}
+                    ml={{ base: 1, md: 10, lg: 15, xl: '18px !important' }}
+                    marginInlineStart={{ base: '0px !important', md: '0px !important', lg: '0px !important', xl: '0px !important' }}
+                    maxW={{ 'sm': '620px', base: '683px', 'xl': '520px' }}
+                    minW={{ 'sm': '383px', base: '383px', 'xl': '420px' }}
 
                     className="main_container"
                 >
                     <VStack
-                        ml={{ base: 1, md: 10, lg: 10, xl: 8 }}
+                        ml={{ base: 1, md: 10, lg: 15, xl: 18 }}
                     >
 
                         <Box

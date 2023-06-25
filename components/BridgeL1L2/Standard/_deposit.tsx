@@ -328,10 +328,10 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 <HStack ml={1} mt={2}>
                     {
                         selectedToken && selectedToken?.symbol !== 'SYS' ?
-                            <><Text textAlign={'right'} opacity={.5}>Available {balanceToDisplay} </Text><MaxBalance onClick={() => {
+                            <><Text textAlign={'right'} color={'gray.500'}>Available {balanceToDisplay} </Text><MaxBalance onClick={() => {
                                 setAmountToSwap(balanceToDisplay);
                             }} /></> : selectedToken ?
-                                <><Text textAlign={'right'} opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'} </Text><MaxBalance onClick={() => {
+                                <><Text textAlign={'right'} color={'gray.500'}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'} </Text><MaxBalance onClick={() => {
                                     setAmountToSwap(balanceNativeToken ? formatEther(balanceNativeToken).toString() : '0.00');
                                 }} /></> : <></>
                     }
@@ -340,7 +340,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             <DirectionSwitcherArrow onClick={onSwapDirection} />
             {selectedToken && (
                 <Flex flexDir="column" maxW="100%" mt={1} backgroundColor={'brand.lightPrimary'} borderRadius={'4px'} p={3}>
-                    <HStack mt={1} ml={2}>
+                    <HStack mt={0.5} ml={2}>
                         <Text color={'gray.500'}>
                             To
                         </Text>
@@ -349,12 +349,12 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                             Rollux
                         </Text>
                     </HStack>
-                    <HStack mt={1} ml={2} color={'gray.500'}>
+                    <HStack mt={0.5} ml={2} color={'gray.500'}>
                         <Text>You will receive: </Text>
                         <Text>{amountToSwap || '0'} {selectedToken.symbol}</Text>
                     </HStack>
                     {account && <>
-                        <HStack mt={1} ml={2} color={'gray.500'}>
+                        <HStack mt={0.5} ml={2} color={'gray.500'}>
                             <Text>Balance:  {parseFloat(ethers.utils.formatUnits(currency === 'SYS' ? balanceNativeTokenL2 : balanceERC20TokenL2,
                                 selectedTokenDecimals
                             )).toFixed(4)} {selectedToken.symbol}</Text>

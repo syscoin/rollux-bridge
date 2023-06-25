@@ -1,10 +1,11 @@
 import React, { FC, useState, useEffect } from "react";
 import TokenListToken from "blockchain/NevmRolluxBridge/interfaces/TokenListToken";
-import { Button, Modal, Image, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, SimpleGrid, Spacer, Text, useDisclosure, HStack, List, ListItem, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import { Button, Modal, Image, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, SimpleGrid, Spacer, Text, useDisclosure, HStack, List, ListItem, FormControl, FormLabel, Input, Icon } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import SelectTokenModalItem from "./SelectTokenModalItem";
 import { ethers } from "ethers";
 import SelectTokenBadge from "./SelectTokenBadge";
+import { FaChevronDown } from "react-icons/fa"
 
 export type SelectTokenModalProps = {
     tokens: TokenListToken[],
@@ -138,7 +139,7 @@ export const SelectTokenModal: FC<SelectTokenModalProps> = ({ tokens, chainId, o
                 <Text>
                     {selectedToken ? selectedToken.symbol : ''}
                 </Text>
-                <ChevronDownIcon fontSize="xl" />
+                <Icon as={FaChevronDown} color={'gray.500'} fontSize={12} />
             </HStack>
         </Button>
     </>);

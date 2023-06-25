@@ -1,8 +1,10 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
-import { Divider, Box, MenuItem, Menu, MenuButton, MenuList, HStack, Image, Text, Input, useBreakpointValue, PlacementWithLogical, Spacer } from '@chakra-ui/react';
+import { Divider, Box, MenuItem, Menu, MenuButton, Icon, MenuList, HStack, Image, Text, Input, useBreakpointValue, PlacementWithLogical, Spacer } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { BridgedNetwork, FiatMethod } from '../../../blockchain/NevmRolluxBridge/bridgeProviders/types'; // replace this with the actual path to your enums
 import { getKeyValue } from 'blockchain/NevmRolluxBridge/bridgeProviders/helpers';
+import { FaChevronDown } from 'react-icons/fa';
+
 
 export type OtherProvidersMenuSelectorProps = {
     onSelect: (provider: string) => void;
@@ -46,7 +48,7 @@ export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = (
 
     return (<>
         <HStack>
-            <Text>{preSelectLabel}</Text>
+            <Text color={'gray.500'}>{preSelectLabel}</Text>
             <Menu isLazy lazyBehavior="unmount" placement={placement as PlacementWithLogical} autoSelect={false}>
                 <MenuButton sx={{
                     borderRadius: "10px",
@@ -72,7 +74,8 @@ export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = (
                             {getKeyValue(selectedInput)}
                         </Text>
                         <Spacer />
-                        <ChevronDownIcon fontSize="xl" />
+                        <Icon as={FaChevronDown} color={'gray.500'} fontSize={12} mr={1} />
+                        <Spacer />
                     </HStack>
                 </MenuButton>
 

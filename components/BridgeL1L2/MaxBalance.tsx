@@ -13,6 +13,6 @@ export const MaxBalance: FC<{ onClick: () => void }> = ({ onClick }) => {
     }
 
     return (<>
-        <Text size={'xs'} onClick={onClick} sx={{ cursor: 'pointer' }} color="brand.secondary">( Max )</Text>
+        <Text size={'xs'} fontWeight={700} onClick={onClick} sx={{ cursor: 'pointer' }} color="green.400">( Max )</Text>
     </>);
 }
