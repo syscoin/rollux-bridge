@@ -301,7 +301,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                             setAmountToSwap(valueAsString)
 
                         }}>
-                            <HStack>
+                            <HStack gap={0}>
                                 <NumberInputField placeholder='0.00' />
 
                                 <SelectTokenModal

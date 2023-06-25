@@ -1,4 +1,4 @@
-import { Box, Button, Flex, HStack, Img, IconButton, useBreakpointValue, useDisclosure, Spacer } from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, Img, IconButton, useBreakpointValue, useDisclosure, Spacer, Link } from "@chakra-ui/react";
 import { HamburgerIcon } from '@chakra-ui/icons';
 import { ConnectButton } from "./ConnectButton";
 import NetworkSwitcher from "./HeaderElements/NetworkSwitcher";
@@ -26,7 +26,7 @@ export const RolluxHeader: React.FC = () => {
       {isSmallScreen ? (
         <>
           <HStack spacing={4}>
-            <Img src={src} />
+            <Img as={Link} href={'/'} src={src} />
             <Spacer />
             <IconButton variant={'primary'} aria-label="OpenMenu" icon={<HamburgerIcon />} onClick={onOpen} />
           </HStack>
