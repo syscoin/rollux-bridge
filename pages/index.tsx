@@ -601,8 +601,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             >
                 <Heading
                     color="white"
-                    fontSize={{ base: '33px', xl: '5xl' }}
-                    maxW={{ base: '350px', xl: '400px' }}
+                    fontSize={{ base: '33px', xl: '3xl' }}
+                    maxW={{ base: '350px', xl: '350px' }}
                     lineHeight="135.69%"
                     position={{ base: 'initial', xl: 'absolute' }}
                     top={{ base: '30%', xl: '35%' }}
