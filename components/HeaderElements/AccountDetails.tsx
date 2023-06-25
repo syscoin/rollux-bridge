@@ -1,9 +1,11 @@
 import { Box, Grid, Typography, Button } from "@mui/material";
 import { Chain, useEthers } from "@usedapp/core";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useCallback, useEffect, useState } from "react";
 import { useEtherBalance } from "@usedapp/core";
 import { BigNumber, ethers } from "ethers";
-import { RolluxChain, TanenbaumChain, RolluxChainMainnet, NEVMChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
+import { RolluxChain, TanenbaumChain, RolluxChainMainnet, NEVMChain, networks } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
+import { useSelectedNetwork } from "hooks/rolluxBridge/useSelectedNetwork";
+import { SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks";
 
 const styleModal = {
     position: 'absolute' as 'absolute',
@@ -33,23 +35,32 @@ interface AddEthereumChainParameter {
 export const AccountDetails: FC = () => {
     const { account, library, deactivate, chainId, switchNetwork } = useEthers();
     const balance = useEtherBalance(account, { chainId: chainId });
+    const { selectedNetwork } = useSelectedNetwork();
 
 
     const [currentNetwork, setCurrentNetwork] = useState<'L1' | 'L2' | 'N/A'>('L1');
 
 
-    const addNetwork = async (layer: number = 2) => {
+    const addNetwork = useCallback(async (layer: number = 2) => {
         if (!library) {
+            console.warn('No library');
             return; // no connected wallet
         }
 
-        const chainToLayerMap: { [key: number]: Chain } = {
-            1: TanenbaumChain,
-            2: RolluxChain,
+        const chainIdsMap = {
+            l1: selectedNetwork === SelectedNetworkType.Mainnet ? NEVMChain.chainId : TanenbaumChain.chainId,
+            l2: selectedNetwork === SelectedNetworkType.Mainnet ? RolluxChainMainnet.chainId : RolluxChain.chainId
         }
 
-        const chainToAdd = chainToLayerMap[layer];
+        console.log(chainIdsMap);
 
+        const chainIdToAdd = layer === 1 ? chainIdsMap.l1 : chainIdsMap.l2;
+        const chainToAdd = networks[chainIdToAdd] ?? false;
+
+        if (!chainToAdd) {
+            console.warn('No chain to add');
+            return;
+        }
 
         try {
             await switchNetwork(chainToAdd.chainId);
@@ -63,26 +74,7 @@ export const AccountDetails: FC = () => {
                 blockExplorerUrls: [chainToAdd.blockExplorerUrl]
             } as AddEthereumChainParameter])
         }
-    }
-
-
-    useEffect(() => {
-
-        let network: 'L1' | 'L2' | 'N/A' = 'N/A';
-
-
-        if (chainId === RolluxChain.chainId) {
-            network = 'L2'
-        }
-
-        if (chainId === TanenbaumChain.chainId) {
-            network = 'L1'
-        }
-
-        setCurrentNetwork(network);
-
-    }, [chainId])
-
+    }, [library, switchNetwork, selectedNetwork]);
 
 
 

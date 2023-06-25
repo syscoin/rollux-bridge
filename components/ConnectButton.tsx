@@ -2,12 +2,12 @@ import { ArrowBackIcon, ArrowForwardIcon, ChevronRightIcon } from "@chakra-ui/ic
 import { Avatar, Button, ButtonGroup, ButtonProps, Box, Flex, List, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure, VStack, Heading, StackDivider, Link, Spacer } from "@chakra-ui/react"
 // import { useConnectedWallet } from "@contexts/ConnectedWallet/useConnectedWallet";
 import { useEtherBalance, useEthers, useSigner } from "@usedapp/core";
-import { RolluxChain, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
+import { RolluxChain, TanenbaumChain, networks, NEVMChain, RolluxChainMainnet } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
 import { SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks";
 import { ethers } from "ethers";
 import { formatEther } from "ethers/lib/utils";
 import { useSelectedNetwork } from "hooks/rolluxBridge/useSelectedNetwork";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import NextLink from "next/link"
 //@ts-ignore
 import { createIcon } from '@download/blockies';
@@ -17,14 +17,29 @@ import { ConnectWalletModal } from "./BridgeL1L2/ConnectWalletModal/ConnectWalle
 interface ConnectButtonProps extends ButtonProps {
 }
 
+interface AddEthereumChainParameter {
+  chainId: string; // A 0x-prefixed hexadecimal string
+  chainName: string;
+  nativeCurrency: {
+    name: string;
+    symbol: string; // 2-6 characters long
+    decimals: 18;
+  };
+  rpcUrls: string[];
+  blockExplorerUrls?: string[];
+  iconUrls?: string[]; // Currently ignored.
+}
+
 export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
   const { isOpen: isOpenConnect, onClose: onCloseConnect, onOpen: onOpenConnect } = useDisclosure()
 
-  const { account, deactivate, switchNetwork, chainId } = useEthers();
+  const { account, deactivate, switchNetwork, library } = useEthers();
   const { selectedNetwork } = useSelectedNetwork();
   const [avatar, setAvatar] = useState<string>('');
 
   const { isOpen, onClose, onOpen } = useDisclosure()
+
+
 
 
   const getAvatar = (address: string) => {
@@ -49,6 +64,44 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
       setAvatar(getAvatar(account));
     }
   }, [account])
+
+  const addNetwork = async (layer: number = 2) => {
+    if (!library) {
+      console.warn('No library');
+      return; // no connected wallet
+    }
+
+    const chainIdsMap = {
+      l1: selectedNetwork === SelectedNetworkType.Mainnet ? NEVMChain.chainId : TanenbaumChain.chainId,
+      l2: selectedNetwork === SelectedNetworkType.Mainnet ? RolluxChainMainnet.chainId : RolluxChain.chainId
+    }
+
+    console.log(chainIdsMap);
+
+    const chainIdToAdd = layer === 1 ? chainIdsMap.l1 : chainIdsMap.l2;
+    const chainToAdd = networks[chainIdToAdd] ?? false;
+
+    if (!chainToAdd) {
+      console.warn('No chain to add');
+      return;
+    }
+
+    console.log('here');
+
+    try {
+      await switchNetwork(chainToAdd.chainId);
+    } catch (e) {
+      console.log(e);
+      const provider = library as ethers.providers.JsonRpcProvider;
+      await provider.send('wallet_addEthereumChain', [{
+        chainId: ethers.utils.hexValue(chainToAdd.chainId),
+        chainName: chainToAdd.chainName,
+        nativeCurrency: chainToAdd.nativeCurrency,
+        rpcUrls: [chainToAdd.rpcUrl],
+        blockExplorerUrls: [chainToAdd.blockExplorerUrl]
+      } as AddEthereumChainParameter])
+    }
+  }
 
 
   return <>
@@ -104,7 +157,7 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
               <ChevronRightIcon /> Networks
             </Heading>
             <ButtonGroup variant="outline" w="100%" my="12px" spacing={{ base: '20px', xl: '44px' }} px="24px">
-              <Button w="100%" py="12px" h="min" onClick={() => switchNetwork(TanenbaumChain.chainId)}>
+              <Button w="100%" py="12px" h="min" onClick={() => addNetwork(1)}>
                 <VStack>
                   <Text bg="brand.primary" borderRadius="full" boxSize="44px" display="flex" alignItems="center" justifyContent="center" fontWeight="bold" fontSize="xl">
                     L1
@@ -113,7 +166,7 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
                 </VStack>
               </Button>
 
-              <Button w="100%" py="12px" h="min" onClick={() => switchNetwork(RolluxChain.chainId)}>
+              <Button w="100%" py="12px" h="min" onClick={() => addNetwork(2)}>
                 <VStack>
                   <Text bg="brand.primary" borderRadius="full" boxSize="44px" display="flex" alignItems="center" justifyContent="center" fontWeight="bold" fontSize="xl">
                     L2
@@ -133,13 +186,13 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
 
             >
               <NextLink href={"/bridge-nevm-rollux/deposits"} style={{ width: '100%' }} passHref>
-                <Button padding={4} width={'100%'} justifyContent={'flex-start'}>
+                <Button padding={4} width={'100%'} justifyContent={'flex-start'} isDisabled={true}>
                   <ArrowForwardIcon /> Deposits
                 </Button>
               </NextLink>
 
               <NextLink href={"/bridge-nevm-rollux/withdrawals"} style={{ width: '100%' }} passHref>
-                <Button padding={4} width={'100%'} justifyContent={'flex-start'}>
+                <Button padding={4} width={'100%'} justifyContent={'flex-start'} isDisabled={true}>
                   <ArrowBackIcon /> Withdrawals
                 </Button>
               </NextLink>

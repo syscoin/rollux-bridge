@@ -86,3 +86,10 @@ export const RolluxChain: Chain = {
     rpcUrl: "https://rpc-tanenbaum.rollux.com/",
     blockExplorerUrl: "https://rollux.tanenbaum.io",
 }
+
+export const networks: { [key: string]: Chain } = {
+    [RolluxChainMainnet.chainId]: RolluxChainMainnet,
+    [NEVMChain.chainId]: NEVMChain,
+    [TanenbaumChain.chainId]: TanenbaumChain,
+    [RolluxChain.chainId]: RolluxChain,
+}
