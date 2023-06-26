@@ -109,7 +109,13 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
         <Button
           variant="primary"
           px="32.5px"
-          onClick={() => onOpenConnect()}
+          onClick={() => {
+            if (isOpenConnect) {
+              onCloseConnect();
+            }
+
+            onOpenConnect();
+          }}
           {...rest}
         >
           Connect Wallet

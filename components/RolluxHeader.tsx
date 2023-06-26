@@ -37,10 +37,10 @@ export const RolluxHeader: React.FC = () => {
               <Flex direction="column" bg="#28282F" position="fixed" right={0} top={0} width="80vw" height="100vh" zIndex={10} p={4} boxShadow="xl">
                 <Img mb={3} src={src} />
 
-                <NextLink href={"/bridge-nevm-rollux/"} passHref>
+                <NextLink href={"/"} passHref>
                   <Button variant={'primary'} width={'100%'} mb={3} onClick={onClose}>Tokens</Button>
                 </NextLink>
-                <NextLink href={"/bridge-nevm-rollux/nft"} passHref>
+                <NextLink href={"/nft"} passHref>
                   <Button variant={'primary'} width={'100%'} mb={3} onClick={onClose}>NFT</Button>
                 </NextLink>
 
@@ -54,12 +54,12 @@ export const RolluxHeader: React.FC = () => {
       ) : (
         <HStack spacing={4}>
           <Link href={'/'}><Img src={src} /></Link>
-          <NextLink href={"/bridge-nevm-rollux/"} passHref>
+          <NextLink href={"/"} passHref>
             <Button variant={'primary'} >
               Tokens
             </Button>
           </NextLink>
-          <NextLink href={"/bridge-nevm-rollux/nft"} passHref>
+          <NextLink href={"/nft"} passHref>
             <Button variant={'primary'}>
               NFT
             </Button>
