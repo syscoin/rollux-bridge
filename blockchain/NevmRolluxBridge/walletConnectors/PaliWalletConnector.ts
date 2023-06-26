@@ -137,8 +137,35 @@ export class PaliWalletConnector implements Connector {
             console.log(chainId);
             const accounts: string[] = await this.provider!.send('eth_accounts', [])
             this.update.emit({ chainId: parseInt(chainId), accounts })
-        } catch (e) {
-            console.debug(e)
+        } catch (e: any) {
+            let resolved = false;
+
+            const errorMessage = (e.error.message || '');
+
+            if (errorMessage === 'The requested account and/or method has not been authorized by the user.'
+                || errorMessage === 'Method only available when connected on EVM chains'
+            ) {
+                // suppose we're at utxo
+
+
+
+                await this.provider!.send(
+                    "eth_changeUTXOEVM",
+                    [{ chainId: 57 }],
+                );
+
+                const chainId: string = await this.provider!.send('eth_chainId', [])
+                const accounts: string[] = await this.provider!.send('eth_requestAccounts', [])
+                console.log(chainId, accounts);
+                this.update.emit({ chainId: parseInt(chainId), accounts })
+
+                resolved = true;
+            }
+
+
+            if (!resolved) {
+                throw new Error('Could not activate connector: ' + (e.message ?? ''))
+            }
         }
     }
 
@@ -156,7 +183,35 @@ export class PaliWalletConnector implements Connector {
         } catch (e: any) {
             console.log(e)
 
-            throw new Error('Could not activate connector: ' + (e.message ?? ''))
+            let resolved = false;
+
+            const errorMessage = (e.error.message || '');
+
+            if (errorMessage === 'The requested account and/or method has not been authorized by the user.'
+                || errorMessage === 'Method only available when connected on EVM chains'
+            ) {
+                // suppose we're at utxo
+
+
+
+                await this.provider!.send(
+                    "eth_changeUTXOEVM",
+                    [{ chainId: 57 }],
+                );
+
+                const chainId: string = await this.provider!.send('eth_chainId', [])
+                console.log(chainId)
+                const accounts: string[] = await this.provider!.send('eth_requestAccounts', [])
+                console.log(chainId, accounts);
+                this.update.emit({ chainId: parseInt(chainId), accounts })
+
+                resolved = true;
+            }
+
+
+            if (!resolved) {
+                throw new Error('Could not activate connector: ' + (e.message ?? ''))
+            }
         }
     }
 

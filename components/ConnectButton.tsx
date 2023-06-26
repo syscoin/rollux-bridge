@@ -86,20 +86,19 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
       return;
     }
 
-    console.log('here');
-
     try {
       await switchNetwork(chainToAdd.chainId);
     } catch (e) {
       console.log(e);
       const provider = library as ethers.providers.JsonRpcProvider;
-      await provider.send('wallet_addEthereumChain', [{
+      const payload = {
         chainId: ethers.utils.hexValue(chainToAdd.chainId),
         chainName: chainToAdd.chainName,
         nativeCurrency: chainToAdd.nativeCurrency,
         rpcUrls: [chainToAdd.rpcUrl],
         blockExplorerUrls: [chainToAdd.blockExplorerUrl]
-      } as AddEthereumChainParameter])
+      };
+      await provider.send('wallet_addEthereumChain', [payload as AddEthereumChainParameter, account]);
     }
   }
 
@@ -185,13 +184,13 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
               spacing={2}
 
             >
-              <NextLink href={"/bridge-nevm-rollux/deposits"} style={{ width: '100%' }} passHref>
+              <NextLink href={"/"} style={{ width: '100%' }} passHref>
                 <Button padding={4} width={'100%'} justifyContent={'flex-start'} isDisabled={true}>
                   <ArrowForwardIcon /> Deposits
                 </Button>
               </NextLink>
 
-              <NextLink href={"/bridge-nevm-rollux/withdrawals"} style={{ width: '100%' }} passHref>
+              <NextLink href={"/"} style={{ width: '100%' }} passHref>
                 <Button padding={4} width={'100%'} justifyContent={'flex-start'} isDisabled={true}>
                   <ArrowBackIcon /> Withdrawals
                 </Button>
@@ -207,7 +206,7 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
             <VStack
               spacing={2}
               align={'flex-start'}>
-              <NextLink href={"/bridge-nevm-rollux/create-token"} style={{ width: '100%' }} passHref>
+              <NextLink href={"/create-token"} style={{ width: '100%' }} passHref>
                 <Button padding={4} width={'100%'} justifyContent={'flex-start'}>
                   <ArrowForwardIcon /> Bridge your token
                 </Button>
