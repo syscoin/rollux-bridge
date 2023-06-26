@@ -76,7 +76,7 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
       l2: selectedNetwork === SelectedNetworkType.Mainnet ? RolluxChainMainnet.chainId : RolluxChain.chainId
     }
 
-    console.log(chainIdsMap);
+    // console.log(chainIdsMap);
 
     const chainIdToAdd = layer === 1 ? chainIdsMap.l1 : chainIdsMap.l2;
     const chainToAdd = networks[chainIdToAdd] ?? false;

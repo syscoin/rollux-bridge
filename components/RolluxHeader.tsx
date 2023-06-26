@@ -26,7 +26,8 @@ export const RolluxHeader: React.FC = () => {
       {isSmallScreen ? (
         <>
           <HStack spacing={4}>
-            <Img as={Link} href={'/'} src={src} />
+            <Link href={'/'}><Img src={src} /></Link>
+
             <Spacer />
             <IconButton variant={'primary'} aria-label="OpenMenu" icon={<HamburgerIcon />} onClick={onOpen} />
           </HStack>
@@ -52,7 +53,7 @@ export const RolluxHeader: React.FC = () => {
         </>
       ) : (
         <HStack spacing={4}>
-          <Img src={src} />
+          <Link href={'/'}><Img src={src} /></Link>
           <NextLink href={"/bridge-nevm-rollux/"} passHref>
             <Button variant={'primary'} >
               Tokens
