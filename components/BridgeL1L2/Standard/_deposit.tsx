@@ -328,10 +328,10 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 <HStack ml={1} mt={2}>
                     {
                         selectedToken && selectedToken?.symbol !== 'SYS' ?
-                            <><Text textAlign={'right'} color={'gray.500'}>Available {balanceToDisplay} </Text><MaxBalance onClick={() => {
+                            <><Text textAlign={'right'} color={'gray.500'}>Balance: {balanceToDisplay} {selectedToken.symbol}</Text><MaxBalance onClick={() => {
                                 setAmountToSwap(balanceToDisplay);
                             }} /></> : selectedToken ?
-                                <><Text textAlign={'right'} color={'gray.500'}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'} </Text><MaxBalance onClick={() => {
+                                <><Text textAlign={'right'} color={'gray.500'}>Balance: {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'} {selectedToken.symbol}</Text><MaxBalance onClick={() => {
                                     setAmountToSwap(balanceNativeToken ? formatEther(balanceNativeToken).toString() : '0.00');
                                 }} /></> : <></>
                     }
