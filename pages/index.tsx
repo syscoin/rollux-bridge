@@ -550,7 +550,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
         } else {
 
-            if (selectedIOCurrency !== BridgedNetwork.SYS) {
+            if (selectedIOCurrency !== 'SYS') {
                 // if its sys we just want to display message about ability to use third party provider
                 setShowOtherProviders(true)
 
