@@ -107,7 +107,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         return null;
     }
 
-
     const getCrossChainMessenger = useCallback(async (signer: ethers.providers.JsonRpcSigner | undefined, currentDisplay: CurrentDisplayView) => {
         if (!signer) {
             console.warn("No Signer")
@@ -472,17 +471,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         }
     }
 
-    /**
-     *
-     * Hack for use useDapp
-     *
-     * todo : refactor whole app to useDapp instead of web3-react
-     */
-    // useEffect(() => {
-    //     if (!account && connectedWalletCtxt.nevm.account) {
-    //         activateBrowserWallet()
-    //     }
-    // }, [account, activateBrowserWallet, connectedWalletCtxt.nevm.account]);
 
     useEffect(() => {
 
@@ -936,6 +924,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                     </UnfinishedWithdrawalsModal>
 
                                                 </>}
+
+
+
 
                                                 <WithdrawPart
                                                     onSwapDirection={() => {

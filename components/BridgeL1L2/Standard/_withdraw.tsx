@@ -19,6 +19,8 @@ import SelectTokenModal from './SelectTokenModal';
 import { RolluxLogo } from 'components/Icons/RolluxLogo';
 import { MaxBalance } from '../MaxBalance';
 import { ReviewWithdrawal } from '../Withdraw/ReviewWithdrawal';
+import { useEstimateTransaction } from 'hooks/rolluxBridge/useEstimateTransaction';
+import { useCrossChainMessenger } from 'hooks/rolluxBridge/useCrossChainMessenger';
 
 export type WithdrawPartProps = {
     onClickWithdrawButton: (amount: string) => void;
@@ -26,6 +28,15 @@ export type WithdrawPartProps = {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     onSelectBridgeProvider: (provider: string, force: boolean) => void;
     onSwapDirection: () => void;
+}
+
+type EstimatedPrice = {
+    initGasPrice: number | undefined,
+    initUsdPrice: number | undefined,
+    proveGasPrice: number | undefined,
+    proveUsdPrice: number | undefined,
+    finalizeGasPrice: number | undefined,
+    finalizeUsdPrice: number | undefined,
 }
 
 export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onClickWithdrawERC20, setIsLoading, onSelectBridgeProvider, onSwapDirection }) => {
@@ -52,6 +63,23 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
     const balanceNativeTokenL1 = useEtherBalance(account, { chainId: l1ChainId });
     const balanceERC20TokenL1 = useTokenBalance(selectedToken?.address || ethers.constants.AddressZero, account, { chainId: l1ChainId });
 
+    const { calculateEstimate } = useEstimateTransaction();
+    const messenger = useCrossChainMessenger();
+
+    const [estimatedTxPrice, setEstimatedTxPrice] = useState<EstimatedPrice>({
+        initGasPrice: undefined,
+        initUsdPrice: undefined,
+        proveGasPrice: undefined,
+        proveUsdPrice: undefined,
+        finalizeGasPrice: undefined,
+        finalizeUsdPrice: undefined,
+    });
+
+    useEffect(() => {
+        if (!amountToSwap || !messenger) {
+            return;
+        }
+    }, [amountToSwap, messenger])
 
 
     const [outputNetwork, setOutputNetwork] = useState<string>('SYS');
@@ -173,7 +201,6 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
             onClickWithdrawERC20(selectedTokenAddressL2, selectedTokenAddress, ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals));
         }
     }
-
 
 
     return (

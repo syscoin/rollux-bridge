@@ -9,10 +9,16 @@ a {
   margin: 0;
 }
 
+.tabs_dw {
+  min-width: 490px;
+}
+
 .main_container,
 .tabs_dw {
-  @media only screen and (max-width: 483px) {
+  @media only screen and (max-width: 560px) {
     padding: 0;
     margin: 0;
+    min-width: auto;
+    width: 100%;
   }
 }

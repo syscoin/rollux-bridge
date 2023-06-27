@@ -74,6 +74,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     const [showTxDetails, setShowTxDetails] = useState<boolean>(false);
 
     const { calculateEstimate } = useEstimateTransaction();
+
     useEffect(() => {
         if (parseFloat(amountToSwap) == 0 || !messenger) {
             return; // break here
