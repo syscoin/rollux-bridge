@@ -489,6 +489,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 </>}
 
             </Flex>
+            <Spacer />
         </Flex>
     )
 }

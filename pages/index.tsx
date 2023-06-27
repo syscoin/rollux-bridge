@@ -710,7 +710,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
 
                                 <TabPanels>
-                                    <TabPanel p={{ base: 2, md: 4 }}>
+                                    <TabPanel p={{ base: 1, md: 2 }}>
                                         {/* <SwitcherOtherProviders onSwitch={handleSwitchProvidrs} /> */}
 
                                         {showOtherProviders === true ?
@@ -755,27 +755,27 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
                                     </TabPanel>
 
-                                    <TabPanel p={{ base: '32px 0 0 0', md: '43px 0 0 0' }}>
+                                    <TabPanel p={{ base: 1, md: 2 }}>
+                                        <VStack mb={3} mt={3}>
+                                            <BridgeTypeSelector onSelected={() => {
+                                                handleSwitchProviders('SYS', true);
+                                            }}
+                                                label="Use a third party bridge"
+                                                icon={<Icon as={MdRunCircle} />}
+                                                description="This usually takes under 20min. Bridge to multiple chains, limited to certain tokens."
+                                                defaultChecked={showOtherProviders === true}
+                                            />
 
-                                        {/* <SwitcherOtherProviders onSwitch={((enabled) => setShowOtherProviders(enabled))} /> */}
+                                            <BridgeTypeSelector onSelected={() => {
+                                                setShowOtherProviders(false);
+                                            }}
+                                                label="Use the official bridge"
+                                                icon={<Icon as={MdShield} />}
+                                                description="This usually takes 7days. Bridge any token to Syscoin NEVM."
+                                                defaultChecked={showOtherProviders === false}
+                                            />
+                                        </VStack>
 
-                                        <BridgeTypeSelector onSelected={() => {
-                                            handleSwitchProviders('SYS', true);
-                                        }}
-                                            label="Use a third party bridge"
-                                            icon={<Icon as={MdRunCircle} />}
-                                            description="This usually takes under 20min. Bridge to multiple chains, limited to certain tokens."
-                                            defaultChecked={showOtherProviders === true}
-                                        />
-
-                                        <BridgeTypeSelector onSelected={() => {
-                                            setShowOtherProviders(false);
-                                        }}
-                                            label="Use the official bridge"
-                                            icon={<Icon as={MdShield} />}
-                                            description="This usually takes 7days. Bridge any token to Syscoin NEVM."
-                                            defaultChecked={showOtherProviders === false}
-                                        />
 
                                         {showOtherProviders === true ? <OtherProvidersListing
                                             selectedIOCurrency={selectedIOCurrency}
@@ -937,9 +937,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
                                                 </>}
 
-
-
-
                                                 <WithdrawPart
                                                     onSwapDirection={() => {
                                                         setTabIndex(0);
@@ -959,8 +956,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                 />
                                             </>
                                         }
-
-
                                     </TabPanel>
                                 </TabPanels>
                             </Tabs>

@@ -1,6 +1,7 @@
 import { Modal, ModalBody, Button, Text, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, useDisclosure, ModalFooter, Flex, HStack, Spacer, Divider, VStack, Spinner, Link } from "@chakra-ui/react";
+import { useNotifications } from "@usedapp/core";
 import { useSelectedNetwork } from "hooks/rolluxBridge/useSelectedNetwork";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 
 export type ReviewDepositProps = {
     children: React.ReactNode;
@@ -18,6 +19,12 @@ export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled, am
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const { selectedNetwork, getExplorerLink } = useSelectedNetwork();
+
+    const { notifications } = useNotifications();
+
+    useEffect(() => {
+        console.log(notifications);
+    }, [notifications])
 
 
     const handleOpen = () => {

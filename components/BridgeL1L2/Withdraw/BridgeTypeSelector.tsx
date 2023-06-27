@@ -1,5 +1,5 @@
 import { SunIcon } from "@chakra-ui/icons";
-import { Box, HStack, Radio, Text, Spacer, Checkbox, CheckboxIcon, Icon } from "@chakra-ui/react";
+import { Box, HStack, Radio, Text, Spacer, Checkbox, CheckboxIcon, Icon, VStack } from "@chakra-ui/react";
 import React, { FC } from "react"
 import { MdCheckCircle } from "react-icons/md";
 
@@ -29,8 +29,9 @@ export const BridgeTypeSelector: FC<BridgeTypeSelectorProps> = ({ onSelected, ic
                 backgroundColor: 'white.300',
                 borderRadius: '8px',
                 border: '1px solid #E2E8F0',
-                padding: '12px',
+                padding: 3,
                 marginBottom: '10px',
+                width: '100%',
             }
         }>
             <HStack spacing={3} mb={3} mt={1}>
@@ -43,9 +44,11 @@ export const BridgeTypeSelector: FC<BridgeTypeSelectorProps> = ({ onSelected, ic
                     <Icon as={MdCheckCircle} color={'green.500'} />
                 }
             </HStack>
-            <Text fontSize={'sm'}>
-                {description}
-            </Text>
+            <HStack h={5}>
+                <Text fontSize={'sm'}>
+                    {description}
+                </Text>
+            </HStack>
         </Box>
     </>);
 }

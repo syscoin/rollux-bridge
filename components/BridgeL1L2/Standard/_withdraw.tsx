@@ -177,110 +177,108 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
 
     return (
-        <Flex flexDir="column">
+        <Flex flexDir="column" pb={4} pr={1} pl={1}>
 
-            <FormControl isInvalid={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}>
-                <Flex justifyContent="space-between">
-                    <FormLabel fontWeight="700">
-                        <HStack>
+            <Box sx={{
+                backgroundColor: 'brand.lightPrimary',
+                borderRadius: '4px',
+                p: 3
+            }}>
+                <FormControl isInvalid={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}>
+                    <Flex justifyContent="space-between">
+
+                        <HStack mb={0} color={'gray.500'}>
                             <Text>From</Text>
                             <RolluxLogo width={20} height={20} />
                             <Text> Rollux</Text>
+                            <Spacer />
                         </HStack>
 
-                    </FormLabel>
-                    <Spacer />
 
-                </Flex>
-                <HStack bg="brand.lightPrimary" borderRadius="6px" minH="48px" pl="19px" pr={'0px'} border={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals)) ? '2px solid' : 'none'} borderColor="red.400">
-                    <NumberInput variant="unstyled" value={(amountToSwap.length > 0) ? amountToSwap : ''} size="lg" onChange={(valueAsString) => {
+                        <Spacer />
 
-                        setAmountToSwap(valueAsString)
+                    </Flex>
 
-                    }}>
-                        <NumberInputField placeholder='0.00' />
-                    </NumberInput>
-                    <Spacer />
-                    <SelectTokenModal
-                        tokens={l2ERC20Tokens}
-                        onSelect={(token) => {
-                            console.log(token);
-                            setCurrency(token.symbol);
-                            setAmountToSwap('0.00');
-                        }}
-                        chainId={l2ChainId}
-                        selectedToken={selectedToken !== undefined ? selectedToken : { address: '', chainId: l1ChainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }}
-                    />
-                </HStack>
+                    <HStack borderRadius="6px" mt={1} minH="48px" pr={'0px'} >
+                        <NumberInput sx={{
+                            border: '1px solid',
+                            borderColor: parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? 'red.300' : 'gray.300',
+                            borderRadius: '6px',
+                            _hover: {
+                                borderColor: parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? 'red.400' : 'gray.400'
+                            },
+                        }} w={'100%'} value={(amountToSwap.length > 0) ? amountToSwap : ''} variant="secondary" size="md" onChange={(valueAsString) => {
 
-                <FormErrorMessage>Invalid amount</FormErrorMessage>
-                <HStack mt={1}>
-                    {
-                        selectedToken && selectedToken?.symbol !== 'SYS' ?
-                            <><Text mr={1} opacity={.5}>Available {parseFloat(ethers.utils.formatUnits(balanceERC20Token || BigNumber.from('0'), selectedTokenDecimals)).toFixed(2) || '0.00'}</Text>
-                                <MaxBalance onClick={() => {
-                                    setAmountToSwap(balanceToDisplay);
-                                }} />
-                            </> : selectedToken ?
-                                <><Text mr={1} opacity={.5}>Available {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'}</Text><MaxBalance onClick={() => {
-                                    setAmountToSwap(balanceToDisplay);
-                                }} /></> : <></>
-                    }
-                </HStack>
-            </FormControl>
+                            setAmountToSwap(valueAsString)
+
+                        }}>
+                            <HStack gap={0}>
+                                <NumberInputField placeholder='0.00' />
+
+                                <SelectTokenModal
+                                    tokens={l2ERC20Tokens}
+                                    onSelect={(token) => {
+                                        setCurrency(token.symbol);
+                                        setAmountToSwap('0.00');
+                                    }}
+                                    chainId={l2ChainId}
+                                    selectedToken={selectedToken !== undefined ? selectedToken : { address: '', chainId: l1ChainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }}
+                                />
+                            </HStack>
+
+
+
+                        </NumberInput>
+
+
+                    </HStack>
+
+                    <FormErrorMessage>Invalid amount</FormErrorMessage>
+                    <HStack mt={1}>
+                        {
+                            selectedToken && selectedToken?.symbol !== 'SYS' ?
+                                <><Text mr={1} color={'gray.500'}>Balance: {parseFloat(ethers.utils.formatUnits(balanceERC20Token || BigNumber.from('0'), selectedTokenDecimals)).toFixed(2) || '0.00'} {selectedToken.symbol}</Text>
+                                    <MaxBalance onClick={() => {
+                                        setAmountToSwap(balanceToDisplay);
+                                    }} />
+                                </> : selectedToken ?
+                                    <><Text mr={1} color={'gray.500'}>Balance: {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'} SYS</Text><MaxBalance onClick={() => {
+                                        setAmountToSwap(balanceToDisplay);
+                                    }} /></> : <></>
+                        }
+                    </HStack>
+                </FormControl>
+            </Box>
             <DirectionSwitcherArrow onClick={onSwapDirection} />
 
             {selectedToken && (
-                <Flex flexDir="column" maxW="100%" mt={3} backgroundColor={'brand.lightPrimary'}>
-                    <Box mt={{ base: '3px', md: '12px' }} ml={2}>
+                <Flex flexDir="column" maxW="100%" mt={1} backgroundColor={'brand.lightPrimary'} borderRadius={'4px'} p={3}>
+                    <HStack mt={0} ml={2}>
                         <OtherProvidersMenuSelector preSelectLabel={'To '} onSelect={(provider) => {
                             setOutputNetwork(provider);
                             onSelectBridgeProvider(provider, false);
                         }} />
-                    </Box>
-
-
-                    <Wrap alignItems="center" mt={1} ml={3} spacing="27px" maxW="calc(100vw - 70px)">
-                        <Text noOfLines={1} maxW={{ base: '60%', md: '70%' }}>You will receive</Text>
-                        <Text fontWeight={'700'}>{amountToSwap || '0'}</Text>
-
-                        <HStack mt="44px" alignItems="center">
-                            <Image
-                                alt="coin logo"
-                                boxSize="24px"
-                                borderRadius="full"
-                                src={selectedToken.logoURI}
-                            />
-                            <Text>{selectedToken.symbol}</Text>
-                        </HStack>
-                    </Wrap>
-
-
-
+                    </HStack>
+                    <HStack mt={0} ml={2} color={'gray.500'}>
+                        <Text>You will receive: {amountToSwap || '0'} {selectedToken.symbol}</Text>
+                    </HStack>
                     {account && <>
-                        <HStack mt={3} mb={3} ml={3} alignItems={'center'}>
-                            <Image
-                                alt="coin logo"
-                                boxSize="24px"
-                                borderRadius="full"
-                                src={selectedToken.logoURI}
-                            />
-                            <Text>Balance {parseFloat(ethers.utils.formatUnits(currency === 'SYS' ? (balanceNativeTokenL1 ?? BigNumber.from("0")) : (balanceERC20TokenL1 ?? BigNumber.from("0")),
+                        <HStack mt={0} ml={2} color={'gray.500'}>
+                            <Text>Balance:  {parseFloat(ethers.utils.formatUnits(currency === 'SYS' ? (balanceNativeTokenL1 ?? BigNumber.from('0')) : (balanceERC20TokenL1 ?? BigNumber.from("0")),
                                 selectedTokenDecimals
-                            )).toFixed(6)} {selectedToken.symbol}</Text>
+                            )).toFixed(4)} {selectedToken.symbol}</Text>
                         </HStack>
                     </>}
-
                 </Flex>
             )}
 
             <Flex
-                mt={{ base: '32px', md: '44px' }}
+                mt={3}
                 w="100%"
                 __css={{
                     button: {
-                        w: '100%',
-                    },
+                        w: '100%'
+                    }
                 }}
             >
                 {!account && (
