@@ -18,7 +18,7 @@
     "@download/blockies": "^1.0.3",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
-    "@eth-optimism/sdk": "3.0.0",
+    "@eth-optimism/sdk": "2.1.0",
     "@mui/icons-material": "^5.8.0",
     "@mui/lab": "^5.0.0-alpha.89",
     "@mui/material": "^5.7.0",

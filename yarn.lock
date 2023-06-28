@@ -3738,15 +3738,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eth-optimism/contracts-bedrock@npm:0.15.0":
-  version: 0.15.0
-  resolution: "@eth-optimism/contracts-bedrock@npm:0.15.0"
+"@eth-optimism/contracts-bedrock@npm:0.14.0":
+  version: 0.14.0
+  resolution: "@eth-optimism/contracts-bedrock@npm:0.14.0"
   dependencies:
-    "@eth-optimism/core-utils": ^0.12.1
+    "@eth-optimism/core-utils": ^0.12.0
     "@openzeppelin/contracts": 4.7.3
     "@openzeppelin/contracts-upgradeable": 4.7.3
     ethers: ^5.7.0
-  checksum: 654bcac2bc88c9feb3aac032aa78b7a710c0148c1bec593e97772daf9f56fa6c471ba580062246342340e87e429acf253d4bd50cf25f13a8012a217cf96e540c
+  checksum: ca9abf55660573b0dbd701d5154d8d083b7fdb4e49951678e30acf97e5e161d202e62a17fbff7fbdbe36dd61128598b169d7c8c8cd913db80adaaa6b5a5ac79c
   languageName: node
   linkType: hard
 
@@ -3787,7 +3787,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eth-optimism/core-utils@npm:0.12.1, @eth-optimism/core-utils@npm:^0.12.1":
+"@eth-optimism/core-utils@npm:^0.12.0":
   version: 0.12.1
   resolution: "@eth-optimism/core-utils@npm:0.12.1"
   dependencies:
@@ -3807,19 +3807,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eth-optimism/sdk@npm:3.0.0":
-  version: 3.0.0
-  resolution: "@eth-optimism/sdk@npm:3.0.0"
+"@eth-optimism/sdk@npm:2.1.0":
+  version: 2.1.0
+  resolution: "@eth-optimism/sdk@npm:2.1.0"
   dependencies:
     "@eth-optimism/contracts": 0.6.0
-    "@eth-optimism/contracts-bedrock": 0.15.0
-    "@eth-optimism/core-utils": 0.12.1
+    "@eth-optimism/contracts-bedrock": 0.14.0
+    "@eth-optimism/core-utils": 0.12.0
     lodash: ^4.17.21
     merkletreejs: ^0.2.27
     rlp: ^2.2.7
   peerDependencies:
     ethers: ^5
-  checksum: aa0325ae27bbe97ddb7008efac8cefd09600326bcb883781dbe49b4b1911b3a0a8e2b684390ab6f3ace51d597d625acc3333f48678aab200abdb313bbd28a689
+  checksum: 8002d32734cde69524b23ec79e5b9dfeb56994ef65008f94c73067b2d391aa70f4b9cca5313e617c3391ae6547dce78a3c12a6898748295b04ee67448a9ddc4d
   languageName: node
   linkType: hard
 
@@ -23759,7 +23759,7 @@ __metadata:
     "@download/blockies": ^1.0.3
     "@emotion/react": ^11.10.6
     "@emotion/styled": ^11.10.6
-    "@eth-optimism/sdk": 3.0.0
+    "@eth-optimism/sdk": 2.1.0
     "@mui/icons-material": ^5.8.0
     "@mui/lab": ^5.0.0-alpha.89
     "@mui/material": ^5.7.0

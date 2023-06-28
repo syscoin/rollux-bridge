@@ -77,6 +77,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
     useEffect(() => {
         if (parseFloat(amountToSwap) == 0 || !messenger) {
+            console.warn('No messenger');
             return; // break here
         }
 
@@ -89,25 +90,26 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
         try {
 
+            console.log(account);
             const gasLimit = (selectedTokenAddress !== ethers.constants.AddressZero && selectedTokenAddress
                 && selectedTokenAddressL2 && selectedTokenDecimals
             ) ?
                 ((allowanceERC20Token && allowanceERC20Token.gte(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals))) ? messenger.estimateGas.depositERC20(
                     selectedTokenAddress,
                     selectedTokenAddressL2,
-                    ethers.utils.parseUnits('0.1', selectedTokenDecimals),
+                    ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals),
                     {
                         overrides: { from: account }
                     }
                 ) : messenger.estimateGas.approveERC20(
                     selectedTokenAddress,
                     selectedTokenAddressL2,
-                    ethers.utils.parseUnits('0.1', selectedTokenDecimals),
+                    ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals),
                     {
                         overrides: { from: account }
                     }
                 )
-                ) : messenger.estimateGas.depositETH(ethers.utils.parseUnits('0.1', 18), {
+                ) : messenger.estimateGas.depositETH(ethers.utils.parseUnits(amountToSwap || '0', 18), {
                     overrides: { from: account }
                 })
 
