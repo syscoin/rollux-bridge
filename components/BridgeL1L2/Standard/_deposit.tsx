@@ -113,9 +113,11 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     overrides: { from: account }
                 })
 
-            gasLimit.then(async (gasLimit) => {
+            gasLimit.then(async (_gasLimit) => {
+                const gasLimitNew = BigNumber.from(Math.round(parseFloat(_gasLimit.toString()) * 1.5));
+                console.log(gasLimitNew.toString());
                 const estimateResult = await calculateEstimate(
-                    gasLimit,
+                    gasLimitNew,
                     1);
 
                 if (estimateResult === undefined) {

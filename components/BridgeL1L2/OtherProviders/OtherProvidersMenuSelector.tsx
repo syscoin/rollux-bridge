@@ -117,7 +117,7 @@ export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = (
                     <Divider />
 
                     {/* Fiat Currencies */}
-                    <Box pl={4} py={2}>
+                    {/* <Box pl={4} py={2}>
                         <Text fontWeight="bold">Fiat Currencies</Text>
                     </Box>
 
@@ -141,7 +141,7 @@ export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = (
                         </MenuItem>
                     ))}
 
-                    <Divider />
+                    <Divider /> */}
 
                     {/* CEX Ways */}
                     <Box pl={4} py={2}>
