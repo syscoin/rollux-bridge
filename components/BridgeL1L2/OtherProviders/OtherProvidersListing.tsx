@@ -122,13 +122,15 @@ export const OtherProvidersListing: FC<OtherProvidersListingProps> = ({ currentV
             <Box sx={{
                 textAlign: 'center',
                 width: '100%',
-                backgroundColor: 'brand.lightPrimary',
-                borderRadius: '4px',
-                p: 3,
+                backgroundColor: 'gray.50',
+                borderRadius: 'lg',
+                border: '1px solid',
+                borderColor: 'gray.200',
+                p: 5,
                 pb: 5
             }}>
-                <Text fontSize={'xl'} color={'gray.500'}>No results</Text>
-                <Text color={'gray.500'}>
+                <Text mt={5} fontSize={'xl'} fontWeight={'bold'} color={'gray.500'}>No results</Text>
+                <Text mb={5} color={'gray.500'}>
                     There are no bridges to directly transfer {selectedToken.symbol} from at the moment.
                 </Text>
             </Box>

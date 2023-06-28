@@ -95,19 +95,21 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 ((allowanceERC20Token && allowanceERC20Token.gte(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals))) ? messenger.estimateGas.depositERC20(
                     selectedTokenAddress,
                     selectedTokenAddressL2,
-                    ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals),
+                    ethers.utils.parseUnits('0.1', selectedTokenDecimals),
                     {
                         overrides: { from: account }
                     }
                 ) : messenger.estimateGas.approveERC20(
                     selectedTokenAddress,
                     selectedTokenAddressL2,
-                    ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals),
+                    ethers.utils.parseUnits('0.1', selectedTokenDecimals),
                     {
                         overrides: { from: account }
                     }
                 )
-                ) : messenger.estimateGas.depositETH(ethers.utils.parseUnits(amountToSwap || '0', 18))
+                ) : messenger.estimateGas.depositETH(ethers.utils.parseUnits('0.1', 18), {
+                    overrides: { from: account }
+                })
 
             gasLimit.then(async (gasLimit) => {
                 const estimateResult = await calculateEstimate(
