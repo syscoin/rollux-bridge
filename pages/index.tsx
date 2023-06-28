@@ -117,7 +117,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
         const currentChainId: number = await signer.getChainId();
 
-        console.log(currentChainId);
+        // console.log(currentChainId);
 
         const network: NetworkData | undefined = getNetworkByChainId(currentChainId, networks);
 
@@ -127,7 +127,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         }
 
         const netMap = networksMap[network.name] ?? undefined;
-        console.log(network.name);
+        // console.log(network.name);
 
         if (!netMap) {
             console.warn("Cant not find net mapping")
