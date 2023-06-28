@@ -356,9 +356,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 })
 
                 const depositTx = await crossChainMessenger.depositETH(
-                    ethers.utils.parseEther(amount), {
-                        overrides: {from: account }
-                    }
+                    ethers.utils.parseEther(amount)
                 );
 
                 setDepositTxHash(depositTx.hash);
