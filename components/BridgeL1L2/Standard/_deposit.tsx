@@ -88,13 +88,25 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
         console.log(selectedTokenAddress, selectedTokenAddressL2, amountToSwap, selectedTokenDecimals)
 
         try {
+
             const gasLimit = (selectedTokenAddress !== ethers.constants.AddressZero && selectedTokenAddress
                 && selectedTokenAddressL2 && selectedTokenDecimals
             ) ?
-                messenger.estimateGas.depositERC20(
+                ((allowanceERC20Token && allowanceERC20Token.gte(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals))) ? messenger.estimateGas.depositERC20(
                     selectedTokenAddress,
                     selectedTokenAddressL2,
-                    ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals)
+                    ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals),
+                    {
+                        overrides: { from: account }
+                    }
+                ) : messenger.estimateGas.approveERC20(
+                    selectedTokenAddress,
+                    selectedTokenAddressL2,
+                    ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals),
+                    {
+                        overrides: { from: account }
+                    }
+                )
                 ) : messenger.estimateGas.depositETH(ethers.utils.parseUnits(amountToSwap || '0', 18))
 
             gasLimit.then(async (gasLimit) => {
@@ -115,7 +127,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             console.warn(e);
         }
 
-    }, [messenger, amountToSwap, selectedTokenDecimals, selectedTokenAddress, selectedTokenAddressL2, calculateEstimate]);
+    }, [messenger, amountToSwap, selectedTokenDecimals, selectedTokenAddress, selectedTokenAddressL2, calculateEstimate, allowanceERC20Token, account]);
 
     useEffect(() => {
         if (showDepositSent && depositTx) {
@@ -386,7 +398,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                         </Text>
                     </Flex>
 
-                    {(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals))) && <>
+                    {(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))) && <>
                         <Button
                             variant="primary"
                             onClick={() => {
@@ -397,7 +409,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                         </Button>
                     </>}
 
-                    {(allowanceERC20Token?.gte(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals)) && parseFloat(amountToSwap) > 0) && <>
+                    {(allowanceERC20Token?.gte(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals)) && parseFloat(amountToSwap) > 0) && <>
                         <Button
                             variant="primary"
                             onClick={() => {
