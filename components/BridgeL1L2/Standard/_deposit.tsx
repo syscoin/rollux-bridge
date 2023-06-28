@@ -90,7 +90,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
         try {
 
-            console.log(account);
+            // console.log(account);
             const gasLimit = (selectedTokenAddress !== ethers.constants.AddressZero && selectedTokenAddress
                 && selectedTokenAddressL2 && selectedTokenDecimals
             ) ?
@@ -110,10 +110,12 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     }
                 )
                 ) : messenger.estimateGas.depositETH(ethers.utils.parseUnits(amountToSwap || '0', 18), {
-                    overrides: {from: account }
+                    overrides: { from: account }
                 })
 
             gasLimit.then(async (_gasLimit) => {
+                const gasLimitNew = BigNumber.from(Math.round(parseFloat(_gasLimit.toString()) * 1.5));
+                // console.log(gasLimitNew.toString());
                 const estimateResult = await calculateEstimate(
                     _gasLimit,
                     1);
