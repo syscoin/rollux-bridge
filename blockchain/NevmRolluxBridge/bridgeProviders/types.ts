@@ -16,12 +16,17 @@ export enum BridgedNetwork {
     MATIC = 'Polygon', // Polygon
 }
 
-export type FiatOrBridged = FiatMethod | BridgedNetwork;
+export enum BridgedCEX {
+    BINANCE = 'Binance', // Binance
+}
+
+export type FiatOrBridged = FiatMethod | BridgedNetwork | BridgedCEX;
 
 export type OtherBridgeComponentBaseProps = {
     bridgeDetails: OtherBridgeProvider,
     mode: CurrentDisplayView,
     payload: any,
+    key: any
 }
 
 export interface OtherBridgeProvider {
@@ -39,6 +44,7 @@ export interface OtherBridgeProvider {
     supportsWithdrawals: boolean,
     supportedInputs: FiatOrBridged[],
     supportedOutputs: FiatOrBridged[],
+    supportedTokens: string[],
 }
 
 export type OtherBridgeProviderComponentProps<T> = {

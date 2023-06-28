@@ -27,6 +27,12 @@ export const providers: OtherBridgeProvider[] = [
             BridgedNetwork.ETH,
             BridgedNetwork.BSC,
             BridgedNetwork.MATIC,
+        ],
+        supportedTokens: [
+            'ETH',
+            'USDT',
+            'USDC',
+            'BTC',
         ]
     },
     {
@@ -55,6 +61,7 @@ export const providers: OtherBridgeProvider[] = [
             FiatMethod.CNY,
             FiatMethod.PLN,
             FiatMethod.JPY,
-        ]
+        ],
+        supportedTokens: [],
     }
 ]

@@ -7,7 +7,15 @@ import { getKeyValue } from "./helpers";
 
 export const useOtherProviders = (
     mode: CurrentDisplayView,
-    selectedCurrency: FiatOrBridged
+    selectedCurrency: FiatOrBridged,
+    selectedToken: {
+        name: string,
+        symbol: string,
+        decimals: number,
+        address: string,
+        logoURI: string,
+        chainId: number,
+    }
 ) => {
     const [all, setAll] = useState<OtherBridgeProvider[]>([]);
 
@@ -38,8 +46,14 @@ export const useOtherProviders = (
                 return false;
             }
         }
-        )
-    }, [mode, selectedCurrency, all])
+        ).filter(provider => {
+
+            if (provider.supportsCrypto && provider.supportedTokens.includes(selectedToken.symbol)) {
+                return true;
+            }
+            return false;
+        });
+    }, [mode, selectedCurrency, selectedToken, all])
 }
 
 export default useOtherProviders;

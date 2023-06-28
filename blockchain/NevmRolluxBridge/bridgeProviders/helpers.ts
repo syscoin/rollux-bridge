@@ -1,4 +1,4 @@
-import { BridgedNetwork, FiatMethod } from "./types";
+import { BridgedCEX, BridgedNetwork, FiatMethod } from "./types";
 
 
 export const getKeyValue = (keyValue: string) => {
@@ -8,5 +8,19 @@ export const getKeyValue = (keyValue: string) => {
     if (value) return value;
     value = FiatMethod[keyValue as keyof typeof FiatMethod];
     if (value) return value;
+
+    value = BridgedCEX[keyValue as keyof typeof BridgedCEX];
+    if (value) return value;
+
     return keyValue;
+}
+
+export const isCryptoProvider = (keyValue: string): boolean => {
+    let value = '';
+    value = BridgedNetwork[keyValue as keyof typeof BridgedNetwork];
+
+    if (value) {
+        return true;
+    }
+    return false;
 }

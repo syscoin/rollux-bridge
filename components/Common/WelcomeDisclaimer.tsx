@@ -34,7 +34,7 @@ export const WelcomeDisclaimer: FC<WelcomeDisclaimerProps> = ({ }) => {
 
     useEffect(() => {
         const termsAccepted = getAcceptedTerms();
-        console.log(termsAccepted);
+        // console.log(termsAccepted);
         if (termsAccepted) {
             setAcceptedTerms(true);
             onClose();

@@ -12,7 +12,6 @@ export const ChaingeProvider: FC<OtherBridgeComponentBaseProps> = ({
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handleButtonClick = () => {
-        console.log('1');
         onOpen();
     };
 

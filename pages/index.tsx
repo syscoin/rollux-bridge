@@ -76,6 +76,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     const [depositTxHash, setDepositTxHash] = useState<string | undefined>(undefined);
 
+    const [selectedOtherNetwork, setSelectedOtherNetwork] = useState<FiatOrBridged>(BridgedNetwork.SYS);
+
     // todo refactor this 2 similar functions
     const getProveTxn = (withdrawTxHash: string, data: { withdrawTx: string, proveTx: string }[]): string | null => {
         try {
@@ -548,6 +550,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             setShowOtherProviders(true);
             setSelectedIOCurrency(selectedIOCurrency);
 
+
         } else {
 
             if (selectedIOCurrency !== 'SYS') {
@@ -704,6 +707,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                         {showOtherProviders === true ?
                                             <OtherProvidersListing
                                                 currentView={currentDisplay}
+                                                selectedNetwork={selectedOtherNetwork}
                                                 selectedIOCurrency={selectedIOCurrency}
                                                 onClickUseStandardBridge={() => {
                                                     setShowOtherProviders(false);
@@ -768,6 +772,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                         {showOtherProviders === true ? <OtherProvidersListing
                                             selectedIOCurrency={selectedIOCurrency}
                                             currentView={currentDisplay}
+                                            selectedNetwork={selectedOtherNetwork}
                                             onClickUseStandardBridge={() => {
                                                 setShowOtherProviders(false);
                                                 setSelectedIOCurrency(BridgedNetwork.SYS);

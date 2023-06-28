@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Divider, Box, MenuItem, Menu, MenuButton, Icon, MenuList, HStack, Image, Text, Input, useBreakpointValue, PlacementWithLogical, Spacer } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
-import { BridgedNetwork, FiatMethod } from '../../../blockchain/NevmRolluxBridge/bridgeProviders/types'; // replace this with the actual path to your enums
+import { BridgedCEX, BridgedNetwork, FiatMethod } from '../../../blockchain/NevmRolluxBridge/bridgeProviders/types'; // replace this with the actual path to your enums
 import { getKeyValue } from 'blockchain/NevmRolluxBridge/bridgeProviders/helpers';
 import { FaChevronDown } from 'react-icons/fa';
 
@@ -9,16 +9,18 @@ import { FaChevronDown } from 'react-icons/fa';
 export type OtherProvidersMenuSelectorProps = {
     onSelect: (provider: string) => void;
     preSelectLabel: string,
+    preSelectedNetwork?: string,
 }
 
 // Enum keys
 let cryptoKeys: string[] = Object.keys(BridgedNetwork).filter(k => isNaN(Number(k)));
 let fiatKeys: string[] = Object.keys(FiatMethod).filter(k => isNaN(Number(k)));
+let cexKeys: string[] = Object.keys(BridgedCEX).filter(k => isNaN(Number(k)));
 
 
 
-export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = ({ onSelect, preSelectLabel }) => {
-    const [selectedInput, setSelectedInput] = useState<string>('SYS');
+export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = ({ onSelect, preSelectLabel, preSelectedNetwork = 'SYS' }) => {
+    const [selectedInput, setSelectedInput] = useState<string>(preSelectedNetwork);
     const [searchTerm, setSearchTerm] = useState<string>('');
 
     const filteredCryptoKeys = useMemo(() => cryptoKeys.filter(crypto =>
@@ -26,6 +28,10 @@ export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = (
     ), [searchTerm]);
 
     const filteredFiatKeys = useMemo(() => fiatKeys.filter(fiat =>
+        fiat.toLowerCase().includes(searchTerm.toLowerCase()) || getKeyValue(fiat).toLowerCase().includes(searchTerm.toLowerCase())
+    ), [searchTerm]);
+
+    const filteredCEX = useMemo(() => cexKeys.filter(fiat =>
         fiat.toLowerCase().includes(searchTerm.toLowerCase()) || getKeyValue(fiat).toLowerCase().includes(searchTerm.toLowerCase())
     ), [searchTerm]);
 
@@ -115,6 +121,8 @@ export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = (
                         <Text fontWeight="bold">Fiat Currencies</Text>
                     </Box>
 
+                    <Divider />
+
                     {filteredFiatKeys.map((fiat) => (
                         <MenuItem
                             key={fiat}
@@ -128,7 +136,34 @@ export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = (
                                     alt={`${fiat} logo`}
                                     boxSize={boxSize}
                                 />
-                                <Text>{fiat}</Text>
+                                <Text>{getKeyValue(fiat)}</Text>
+                            </HStack>
+                        </MenuItem>
+                    ))}
+
+                    <Divider />
+
+                    {/* CEX Ways */}
+                    <Box pl={4} py={2}>
+                        <Text fontWeight="bold">Centralized Exchanges</Text>
+                    </Box>
+
+                    <Divider />
+
+                    {filteredCEX.map((item) => (
+                        <MenuItem
+                            key={item}
+                            onClick={() => handleSelect(item)}
+                        >
+                            <HStack>
+                                <Image
+                                    borderRadius="full"
+                                    src={`/providers/icons/${item}.png`}
+                                    fallbackSrc="https://via.placeholder.com/40"
+                                    alt={`${item} logo`}
+                                    boxSize={boxSize}
+                                />
+                                <Text>{getKeyValue(item)}</Text>
                             </HStack>
                         </MenuItem>
                     ))}

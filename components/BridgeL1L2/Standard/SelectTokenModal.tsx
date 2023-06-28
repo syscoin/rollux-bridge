@@ -12,9 +12,10 @@ export type SelectTokenModalProps = {
     onSelect: (token: { address: string, chainId: number, decimals: number, name: string, symbol: string, logoURI: string }) => void,
     chainId: number,
     selectedToken: { address: string, chainId: number, decimals: number, name: string, symbol: string, logoURI: string } | undefined,
+    disableAdditionalStyling?: boolean,
 }
 
-export const SelectTokenModal: FC<SelectTokenModalProps> = ({ tokens, chainId, onSelect, selectedToken }) => {
+export const SelectTokenModal: FC<SelectTokenModalProps> = ({ tokens, disableAdditionalStyling = false, chainId, onSelect, selectedToken }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [searchTerm, setSearchTerm] = useState<string>('')
@@ -117,7 +118,7 @@ export const SelectTokenModal: FC<SelectTokenModalProps> = ({ tokens, chainId, o
             variant={'primary'}
             onClick={onOpen}
             minW={'fit-content'}
-            sx={{
+            sx={disableAdditionalStyling ? {} : {
                 margin: '0 !important',  // reset all margins
                 marginInlineStart: '0px !important',  // reset margin-start
                 borderLeftRadius: '0px !important',
