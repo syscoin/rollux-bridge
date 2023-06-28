@@ -20,13 +20,6 @@ export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled, am
 
     const { selectedNetwork, getExplorerLink } = useSelectedNetwork();
 
-    const { notifications } = useNotifications();
-
-    useEffect(() => {
-        console.log(notifications);
-    }, [notifications])
-
-
     const handleOpen = () => {
         onOpen()
         onOpenModal();
