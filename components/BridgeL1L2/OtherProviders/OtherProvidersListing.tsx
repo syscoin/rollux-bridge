@@ -108,7 +108,11 @@ export const OtherProvidersListing: FC<OtherProvidersListingProps> = ({ currentV
                     if (null === ComponentToRender) return;
 
                     return (
-                        <ComponentToRender key={index} payload={{}} mode={currentView} bridgeDetails={value} />
+                        <ComponentToRender key={index} payload={{
+                            token: selectedToken,
+                            inputNetwork: selectedInputNetwork,
+                            direction: currentView === CurrentDisplayView.deposit ? 'deposit' : 'withdraw',
+                        }} mode={currentView} bridgeDetails={value} />
                     );
                 })}
             </Flex>

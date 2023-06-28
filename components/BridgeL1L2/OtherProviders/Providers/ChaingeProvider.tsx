@@ -9,10 +9,18 @@ export const ChaingeProvider: FC<OtherBridgeComponentBaseProps> = ({
     mode,
     payload,
 }) => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handleButtonClick = () => {
-        onOpen();
+        const fromChain = payload.direction === 'deposit' ? payload.inputNetwork : 'ROLLUX';
+        const toChain = payload.direction === 'deposit' ? 'ROLLUX' : payload.inputNetwork;
+        const fromToken = payload.token.symbol;
+        const toToken = payload.token.symbol;
+
+        const baseUrl = `https://dapp.chainge.finance/?fromChain=${fromChain}&toChain=${toChain}&fromToken=${fromToken}&toToken=${toToken}`;
+
+        console.log(baseUrl);
+
+        window.open(baseUrl, '_blank');
     };
 
     return (
@@ -21,7 +29,7 @@ export const ChaingeProvider: FC<OtherBridgeComponentBaseProps> = ({
                 config={bridgeDetails}
                 onButtonClick={handleButtonClick}
             />
-            <Modal isOpen={isOpen} onClose={onClose} size={'3xl'}>
+            {/* <Modal isOpen={isOpen} onClose={onClose} size={'3xl'}>
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Chainge Bridge</ModalHeader>
@@ -40,7 +48,7 @@ export const ChaingeProvider: FC<OtherBridgeComponentBaseProps> = ({
                         ></Bridge>
                     </ModalBody>
                 </ModalContent>
-            </Modal>
+            </Modal> */}
         </Box>
     );
 }
