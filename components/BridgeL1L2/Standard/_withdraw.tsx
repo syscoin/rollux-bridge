@@ -355,7 +355,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                         amountToWithdraw={amountToSwap}
                         tokenSymbol={currency}
                         totalEstimatedFeeUsd={10}
-                        initiateFeeUsd={0}
+                        initiateFeeUsd={0.0001}
                         proveFeeUsd={3}
                         claimFeeUsd={7}
                         onClickWithdrawal={async () => {
@@ -363,7 +363,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                             onClickWithdrawButton(amountToSwap);
                         }}
                         onClickUseThirdPartyBridge={() => {
-                            console.log('Not implemented');
+                            console.log('closed modal just.')
                         }}
                         isDisabled={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals)) || amountToSwap.length === 0}
 

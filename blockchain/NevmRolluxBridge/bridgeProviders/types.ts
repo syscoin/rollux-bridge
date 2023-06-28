@@ -17,7 +17,7 @@ export enum BridgedNetwork {
 }
 
 export enum BridgedCEX {
-    BINANCE = 'Binance', // Binance
+    DIGIFINEX = 'Digifinex', // Binance
 }
 
 export type FiatOrBridged = FiatMethod | BridgedNetwork | BridgedCEX;
@@ -35,6 +35,7 @@ export interface OtherBridgeProvider {
     description: string,
     url: string | null,
     logoUrl: string | null,
+    isCex: boolean,
     supportsFiat: boolean,
     supportsCrypto: boolean,
     enabled: boolean,

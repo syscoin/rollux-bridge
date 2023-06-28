@@ -6,6 +6,7 @@ export const providers: OtherBridgeProvider[] = [
     {
         label: 'Chainge',
         code: 'chainge',
+        isCex: false,
         description: 'Chainge',
         url: 'chainge.io',
         logoUrl: '/bridge-providers/chainge-logo.png',
@@ -38,6 +39,7 @@ export const providers: OtherBridgeProvider[] = [
     {
         label: 'Coinify',
         code: 'coinify',
+        isCex: false,
         description: 'Coinify',
         url: 'coinify.com',
         logoUrl: '/bridge-providers/coinify-logo.png',
@@ -63,5 +65,40 @@ export const providers: OtherBridgeProvider[] = [
             FiatMethod.JPY,
         ],
         supportedTokens: [],
+    },
+    {
+        label: 'Digifinex',
+        code: 'digifinex',
+        isCex: true,
+        description: 'Digifinex',
+        url: 'digifinex.com',
+        logoUrl: '/bridge-providers/digifinex-logo.png',
+        supportsCrypto: true,
+        supportsFiat: true,
+        enabled: true,
+        component: CoinifyProvider,
+        askOpenInNewTab: false,
+        supportsDeposits: true,
+        supportsWithdrawals: true,
+        supportedInputs: [
+            FiatMethod.USD,
+            FiatMethod.EUR,
+            FiatMethod.CNY,
+            FiatMethod.PLN,
+            FiatMethod.JPY,
+        ],
+        supportedOutputs: [
+            FiatMethod.USD,
+            FiatMethod.EUR,
+            FiatMethod.CNY,
+            FiatMethod.PLN,
+            FiatMethod.JPY,
+        ],
+        supportedTokens: [
+            'SYS',
+            'USDT',
+            'USDC',
+
+        ],
     }
 ]
