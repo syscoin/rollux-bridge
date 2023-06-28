@@ -1,8 +1,7 @@
-import { Box, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { OtherBridgeComponentBaseProps } from "blockchain/NevmRolluxBridge/bridgeProviders/types";
 import React, { FC } from "react";
 import { ProviderCard } from "../ProviderCard";
-import Bridge from "@chainge/plugin"
 
 export const ChaingeProvider: FC<OtherBridgeComponentBaseProps> = ({
     bridgeDetails,
