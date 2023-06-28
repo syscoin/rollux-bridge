@@ -64,6 +64,13 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
     const balanceNativeTokenL1 = useEtherBalance(account, { chainId: l1ChainId });
     const balanceERC20TokenL1 = useTokenBalance(selectedToken?.address || ethers.constants.AddressZero, account, { chainId: l1ChainId });
 
+    const handleSwitchNetwork = async () => {
+        if (l2ChainId === 570 || l2ChainId === 57000) {
+            switchNetwork(l2ChainId)
+        }
+
+    }
+
     const messenger = useCrossChainMessenger();
 
     const [estimatedTxPrice, setEstimatedTxPrice] = useState<EstimatedPrice>({
@@ -414,21 +421,17 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                     <ConnectButton />
                 )}
 
-                {('SYS' !== currency && account) && <>
 
-                    {((chainId !== l2ChainId)) && <>
-                        <Button
-                            variant="primary"
-                            onClick={() => {
-                                switchNetwork(l2ChainId);
-                            }}
-                        >
-                            {'Switch to Rollux'}
-                        </Button>
-                    </>}
+                {((account && chainId !== l2ChainId)) && <>
+                    <Button
+                        variant="primary"
+                        onClick={handleSwitchNetwork}
+                    >
+                        {'Switch to Rollux'}
+                    </Button>
                 </>}
 
-                {('SYS' === currency && account && (chainId !== l2ChainId)) && <>
+                {/* {('SYS' === currency && account && (chainId !== l2ChainId)) && <>
                     <Button
                         isDisabled={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}
                         variant="primary"
@@ -438,7 +441,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                     >
                         Switch to Rollux Chain
                     </Button>
-                </>}
+                </>} */}
 
                 {(account && (chainId && chainId === l2ChainId)) && <>
                     {/* <Button
