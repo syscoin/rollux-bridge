@@ -40,7 +40,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
     const [amountToSwap, setAmountToSwap] = useState<string>('');
-
+    const [maxAmount, setMaxAmount] = useState<string>('0.00');
     const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork, contractsL1 } = useSelectedNetwork();
 
     const { account, chainId, switchNetwork } = useEthers();
@@ -127,7 +127,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             console.warn(e);
         }
 
-    }, [messenger, amountToSwap, selectedTokenDecimals, selectedTokenAddress, selectedTokenAddressL2, calculateEstimate, allowanceERC20Token, account]);
+    }, [messenger, amountToSwap, selectedTokenDecimals, selectedTokenAddress, selectedTokenAddressL2, calculateEstimate, allowanceERC20Token, account, balanceToDisplay, balanceNativeToken]);
 
     useEffect(() => {
         if (showDepositSent && depositTx) {
@@ -154,6 +154,8 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 setBalanceToDisplay(
                     ethers.utils.formatEther(balanceNativeToken)
                 )
+
+                setMaxAmount(ethers.utils.formatEther(balanceNativeToken));
             }
         } else {
             try {
@@ -162,8 +164,11 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     setBalanceToDisplay(
                         ethers.utils.formatUnits(balanceERC20Token, selectedTokenDecimals)
                     )
+
+                    setMaxAmount(ethers.utils.formatUnits(balanceERC20Token, selectedTokenDecimals));
                 } else {
                     setBalanceToDisplay('0.00');
+
                 }
             } catch (e) {
                 console.warn("Failed to load token balance");
@@ -342,10 +347,10 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                     {
                         selectedToken && selectedToken?.symbol !== 'SYS' ?
                             <><Text textAlign={'right'} color={'gray.500'}>Balance: {balanceToDisplay} {selectedToken.symbol}</Text><MaxBalance onClick={() => {
-                                setAmountToSwap(balanceToDisplay);
+                                setAmountToSwap(maxAmount);
                             }} /></> : selectedToken ?
                                 <><Text textAlign={'right'} color={'gray.500'}>Balance: {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'} {selectedToken.symbol}</Text><MaxBalance onClick={() => {
-                                    setAmountToSwap(balanceNativeToken ? formatEther(balanceNativeToken).toString() : '0.00');
+                                    setAmountToSwap(maxAmount);
                                 }} /></> : <></>
                     }
                 </HStack>
