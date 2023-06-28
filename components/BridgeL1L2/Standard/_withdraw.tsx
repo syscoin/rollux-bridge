@@ -37,6 +37,7 @@ type EstimatedPrice = {
     proveUsdPrice: number | undefined,
     finalizeGasPrice: number | undefined,
     finalizeUsdPrice: number | undefined,
+    estimatedForAmount: number,
 }
 
 export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onClickWithdrawERC20, setIsLoading, onSelectBridgeProvider, onSwapDirection }) => {
@@ -63,7 +64,6 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
     const balanceNativeTokenL1 = useEtherBalance(account, { chainId: l1ChainId });
     const balanceERC20TokenL1 = useTokenBalance(selectedToken?.address || ethers.constants.AddressZero, account, { chainId: l1ChainId });
 
-    const { calculateEstimate } = useEstimateTransaction();
     const messenger = useCrossChainMessenger();
 
     const [estimatedTxPrice, setEstimatedTxPrice] = useState<EstimatedPrice>({
@@ -73,13 +73,115 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
         proveUsdPrice: undefined,
         finalizeGasPrice: undefined,
         finalizeUsdPrice: undefined,
+        estimatedForAmount: 0,
     });
 
-    useEffect(() => {
-        if (!amountToSwap || !messenger) {
-            return;
-        }
-    }, [amountToSwap, messenger])
+    const { calculateEstimate } = useEstimateTransaction();
+
+    // useEffect(() => {
+    //     if (parseFloat(amountToSwap) == 0 || !messenger) {
+    //         return; // break here
+    //     }
+
+    //     if (estimatedTxPrice.estimatedForAmount === parseFloat(amountToSwap)) {
+    //         return; // skip if already calculated
+    //     }
+
+    //     setEstimatedTxPrice({
+    //         initGasPrice: undefined,
+    //         initUsdPrice: undefined,
+    //         proveGasPrice: undefined,
+    //         proveUsdPrice: undefined,
+    //         finalizeGasPrice: undefined,
+    //         finalizeUsdPrice: undefined,
+    //         estimatedForAmount: 0,
+    //     })
+
+    //     const estimateInit = async () => {
+    //         try {
+
+    //             const gasLimit = (selectedTokenAddress !== ethers.constants.AddressZero && selectedTokenAddress
+    //                 && selectedTokenAddressL2 && selectedTokenDecimals
+    //             ) ?
+    //                 await messenger.estimateGas.withdrawERC20(
+    //                     selectedTokenAddressL2,
+    //                     selectedTokenAddress,
+    //                     ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals),
+    //                     {
+    //                         overrides: { from: account }
+    //                     }
+    //                 )
+    //                 : await messenger.estimateGas.withdrawETH(ethers.utils.parseUnits(amountToSwap || '0', 18), {
+    //                     overrides: { from: account }
+    //                 })
+
+    //             const initTxDraft = (selectedTokenAddress !== ethers.constants.AddressZero && selectedTokenAddress
+    //                 && selectedTokenAddressL2 && selectedTokenDecimals
+    //             ) ?
+    //                 await messenger.populateTransaction.withdrawERC20(
+    //                     selectedTokenAddressL2,
+    //                     selectedTokenAddress,
+    //                     ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals),
+    //                     {
+    //                         overrides: { from: account }
+    //                     }
+    //                 )
+    //                 : await messenger.populateTransaction.withdrawETH(ethers.utils.parseUnits(amountToSwap || '0', 18), {
+    //                     overrides: { from: account }
+    //                 })
+
+
+    //             const estimateResult = await calculateEstimate(
+    //                 gasLimit,
+    //                 2);
+
+    //             if (estimateResult === undefined) {
+    //                 console.warn('Failed to estimate transaction price.');
+    //                 return undefined;
+    //             }
+
+    //             return { estimateResult, initTxDraft };
+    //         } catch (e) {
+    //             console.warn('Failed to estimate transaction price.', e);
+    //             return undefined;
+    //         }
+    //     };
+
+    //     const estimateProve = async () => {
+    //         try {
+
+    //             const gasLimit = await messenger.estimateGas.proveMessage(
+    //                 '',
+    //                 {
+    //                     overrides: { from: account }
+    //                 })
+
+
+
+    //             const estimateResult = await calculateEstimate(
+    //                 gasLimit,
+    //                 1);
+
+    //             if (estimateResult === undefined) {
+    //                 console.warn('Failed to estimate transaction price.');
+    //                 return undefined;
+    //             }
+
+    //             return estimateResult;
+    //         } catch (e) {
+    //             console.warn('Failed to estimate transaction price.', e);
+    //             return undefined;
+    //         }
+    //     };
+
+    //     const main = async () => {
+    //         console.log(await estimateInit());
+    //     };
+
+    //     // main();
+
+    // }, [messenger, amountToSwap, selectedTokenDecimals, selectedTokenAddress, selectedTokenAddressL2, calculateEstimate, balanceERC20Token, account, balanceToDisplay, balanceNativeToken, estimatedTxPrice.estimatedForAmount]);
+
 
 
     const [outputNetwork, setOutputNetwork] = useState<string>('SYS');
@@ -139,7 +241,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
         })
 
         if (findToken) {
-            console.log(findToken);
+            // console.log(findToken);
             // @ts-ignore
             setSelectedTokenAddress(findToken.address);
             // @ts-ignore
@@ -314,15 +416,14 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
                 {('SYS' !== currency && account) && <>
 
-                    {((balanceERC20Token && balanceERC20Token.gte(ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals)))) && <>
+                    {((chainId !== l2ChainId)) && <>
                         <Button
                             variant="primary"
                             onClick={() => {
-                                handleERC20Withdraw()
+                                switchNetwork(l2ChainId);
                             }}
                         >
-                            {chainId !== l2ChainId && 'Switch to Rollux'}
-                            {chainId === l2ChainId && 'Withdraw'}
+                            {'Switch to Rollux'}
                         </Button>
                     </>}
                 </>}
@@ -339,7 +440,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                     </Button>
                 </>}
 
-                {('SYS' === currency && account && (chainId && chainId === l2ChainId)) && <>
+                {(account && (chainId && chainId === l2ChainId)) && <>
                     {/* <Button
                         isDisabled={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}
                         variant="primary"

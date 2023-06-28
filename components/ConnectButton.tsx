@@ -46,7 +46,6 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
     if (!address) return '';
 
     if (localStorage.getItem(`avatar-${address}`) !== null) {
-      console.log('cache');
       return localStorage.getItem(`avatar-${address}`);
     }
 

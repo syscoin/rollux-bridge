@@ -39,12 +39,12 @@ export const ReviewWithdrawalStep: FC<ReviewWithdrawalStepProps> = ({
                     window.open(externalLink, '_blank')
                 }} icon={<Icon as={MdLink} />} aria-label={""} />
             </>}
-            {gasPrice && <>
+            {/* {gasPrice && <>
                 <Spacer />
                 <Text>
                     est: ${gasPrice} <Icon as={MdLocalGasStation} />
                 </Text>
-            </>}
+            </>} */}
         </HStack>
     </Box>);
 

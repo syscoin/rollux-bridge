@@ -85,7 +85,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             weiEstimate: undefined
         })
 
-        console.log(selectedTokenAddress, selectedTokenAddressL2, amountToSwap, selectedTokenDecimals)
+        // console.log(selectedTokenAddress, selectedTokenAddressL2, amountToSwap, selectedTokenDecimals)
 
         try {
 

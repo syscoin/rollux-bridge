@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react"
+import React, { FC, useEffect, useState } from "react"
 import {
     Button,
     HStack,
@@ -47,6 +47,11 @@ export const ReviewWithdrawal: FC<ReviewWithdrawalProps> = ({
     const [acceptedTerms, setAcceptedTerms] = useState(false)
     const [acceptedTimer, setAcceptedTimer] = useState(false)
 
+    useEffect(() => {
+        setAcceptedTerms(false)
+        setAcceptedTimer(false)
+    }, [isOpen]);
+
     const handleUseThirdPartyBridgeButton = () => {
         onClickUseThirdPartyBridge()
         onClose()
@@ -58,7 +63,7 @@ export const ReviewWithdrawal: FC<ReviewWithdrawalProps> = ({
             onClick={() => {
                 onOpen()
             }}>
-            Review widthdraw
+            Review withdrawal
         </Button>
 
         <Modal size={'lg'} isOpen={isOpen} onClose={onClose}>
@@ -74,9 +79,9 @@ export const ReviewWithdrawal: FC<ReviewWithdrawalProps> = ({
                         <Text color={'gray.400'}>Amount to withdraw</Text>
                     </HStack>
                     <HStack mb={1} mt={1}>
-                        <Text fontSize={'xl'} fontWeight={'bold'}>{amountToWithdraw} {tokenSymbol}</Text>
-                        <Spacer />
-                        <Text fontSize={'xl'} color={'gray.400'}>${totalEstimatedFeeUsd}</Text>
+                        <Text fontSize={'md'} fontWeight={'bold'}>{amountToWithdraw} {tokenSymbol}</Text>
+                        {/* <Spacer />
+                        <Text fontSize={'xl'} color={'gray.400'}>${totalEstimatedFeeUsd}</Text> */}
                     </HStack>
 
                     <Spacer />
