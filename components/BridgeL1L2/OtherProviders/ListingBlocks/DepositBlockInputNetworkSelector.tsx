@@ -30,7 +30,7 @@ export const DepositBlockInputNetworkSelector: FC<DepositBlockInputNetworkSelect
                 <Text color={'gray.700'}>To move tokens from {getKeyValue(network)} to Rollux you can use one of the following third-party bridges.</Text>
             </HStack>
             <HStack ml={1} mb={2}>
-                <Text color={'gray.700'}>Please note that these are independent service providers that Optimism is linking to for your convenience - Optimism has no responsibility for their operation.</Text>
+                <Text color={'gray.700'}>Please note that these are independent service providers that Rollux is linking to for your convenience - Rollux has no responsibility for their operation.</Text>
             </HStack>
         </Box>
 
