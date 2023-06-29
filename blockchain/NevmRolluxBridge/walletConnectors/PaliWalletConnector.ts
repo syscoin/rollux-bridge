@@ -25,7 +25,11 @@ function detectEthereumProvider<T = MetaMaskEthereumProvider>({
     let handled = false;
 
     return new Promise((resolve) => {
-        if ((window as Window).ethereum && (window as any).pali) {
+
+        // @ts-ignore
+        let isReallyPali = String((window as Window).ethereum.wallet ?? '').includes('pali');
+
+        if ((window as Window).ethereum && (window as any).pali && isReallyPali) {
 
             handleEthereum();
 
@@ -53,9 +57,11 @@ function detectEthereumProvider<T = MetaMaskEthereumProvider>({
 
             const { ethereum } = window as Window;
             const { pali } = window as any;
-            console.log(ethereum);
 
-            if (ethereum && (!mustBeMetaMask || ethereum.isMetaMask) && pali) {
+            // @ts-ignore
+            let isReallyPali = String(ethereum.wallet ?? '').includes('pali');
+
+            if (ethereum && isReallyPali && (!mustBeMetaMask || ethereum.isMetaMask) && pali) {
                 resolve(ethereum as unknown as T);
             } else {
 
@@ -107,6 +113,7 @@ export async function getMetamaskProvider() {
     }
 
     const provider = new providers.Web3Provider(injectedProvider, 'any')
+
     return provider
 }
 
@@ -136,8 +143,10 @@ export class PaliWalletConnector implements Connector {
             const chainId: string = await this.provider!.send('eth_chainId', [])
             console.log(chainId);
             const accounts: string[] = await this.provider!.send('eth_accounts', [])
+            console.log(accounts);
             this.update.emit({ chainId: parseInt(chainId), accounts })
         } catch (e: any) {
+
             let resolved = false;
 
             const errorMessage = (e.error.message || '');
@@ -156,6 +165,10 @@ export class PaliWalletConnector implements Connector {
 
                 const chainId: string = await this.provider!.send('eth_chainId', [])
                 const accounts: string[] = await this.provider!.send('eth_requestAccounts', [])
+
+                if (!accounts) {
+                    throw new Error('Could not activate connector: no accounts');;
+                }
                 console.log(chainId, accounts);
                 this.update.emit({ chainId: parseInt(chainId), accounts })
 
@@ -179,6 +192,13 @@ export class PaliWalletConnector implements Connector {
         try {
             const chainId: string = await this.provider!.send('eth_chainId', [])
             const accounts: string[] = await this.provider!.send('eth_requestAccounts', [])
+
+
+            // @ts-ignore
+            if (accounts[0].success === false) {
+                throw new Error('Could not activate connector: no accounts');
+            }
+
             this.update.emit({ chainId: parseInt(chainId), accounts })
         } catch (e: any) {
             console.log(e)
