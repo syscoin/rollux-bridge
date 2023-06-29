@@ -99,7 +99,7 @@ export async function getMetamaskProvider() {
         injectedProviders.find((provider) => {
             console.log(provider);
             return provider.isMetaMask ?? false
-        }) ?? await detectEthereumProvider({ mustBeMetaMask: true })
+        }) ?? await detectEthereumProvider({ mustBeMetaMask: false })
 
     if (!injectedProvider) {
         console.log(`Pali wallet is not installed - you can get it under ${GET_PALI_LINK}`)
