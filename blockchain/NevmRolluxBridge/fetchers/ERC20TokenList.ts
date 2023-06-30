@@ -7,5 +7,7 @@ export const fetchERC20TokenList = async (): Promise<TokenListToken[]> => {
 
     return body.tokens.map((item: {}) => {
         return item as TokenListToken;
-    })
+    }).filter((item: TokenListToken) => {
+        return item.symbol !== 'SYS';
+    });
 }
