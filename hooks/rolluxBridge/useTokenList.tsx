@@ -16,8 +16,8 @@ export const useTokenList = (chainId: number) => {
     useEffect(() => {
         setLoading(true);
         const fetchTokenList = async () => {
-            const tokenList = await getTokenList();
-            setTokenList(tokenList);
+            const _tokenList = await getTokenList();
+            setTokenList(_tokenList.filter((token: { symbol: string; }) => token.symbol !== 'SYS'));
             setFilteredTokenList(tokenList.filter((token: { chainId: number; }) => token.chainId === chainId));
             setLoading(false);
         }
