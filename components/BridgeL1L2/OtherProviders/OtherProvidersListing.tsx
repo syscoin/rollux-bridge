@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Flex, HStack, Tab, TabList, Tabs, Text, VStack } from '@chakra-ui/react'
+import { Alert, Box, Button, Flex, HStack, StackDivider, Tab, TabList, Tabs, Text, VStack } from '@chakra-ui/react'
 import { useEthers } from '@usedapp/core'
 import { FiatOrBridged } from 'blockchain/NevmRolluxBridge/bridgeProviders/types'
 import { useOtherProviders } from 'blockchain/NevmRolluxBridge/bridgeProviders/useOtherProviders'
@@ -101,21 +101,25 @@ export const OtherProvidersListing: FC<OtherProvidersListingProps> = ({ currentV
         </>}
 
         {providers.length > 0 && <>
-            <Flex flex={1} direction={'row'} justifyContent={'center'}>
+            <VStack
+                spacing={1}
+            >
                 {providers.map((value, index) => {
                     const ComponentToRender = value.component;
 
                     if (null === ComponentToRender) return;
 
                     return (
+
                         <ComponentToRender key={index} payload={{
                             token: selectedToken,
                             inputNetwork: selectedInputNetwork,
                             direction: currentView === CurrentDisplayView.deposit ? 'deposit' : 'withdraw',
                         }} mode={currentView} bridgeDetails={value} />
+
                     );
                 })}
-            </Flex>
+            </VStack>
         </>}
 
         {providers.length === 0 && <>

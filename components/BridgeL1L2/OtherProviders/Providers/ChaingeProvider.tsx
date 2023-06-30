@@ -23,11 +23,11 @@ export const ChaingeProvider: FC<OtherBridgeComponentBaseProps> = ({
     };
 
     return (
-        <Box minW={'100%'}>
-            <ProviderCard
-                config={bridgeDetails}
-                onButtonClick={handleButtonClick}
-            />
-        </Box>
+
+        <ProviderCard
+            config={bridgeDetails}
+            onButtonClick={handleButtonClick}
+        />
+
     );
 }
