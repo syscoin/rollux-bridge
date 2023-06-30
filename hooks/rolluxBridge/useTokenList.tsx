@@ -22,7 +22,7 @@ export const useTokenList = (chainId: number) => {
             setLoading(false);
         }
         fetchTokenList();
-    }, [chainId]);
+    }, [chainId, tokenList]);
 
     return { tokenList, filteredTokenList, loading };
 }
