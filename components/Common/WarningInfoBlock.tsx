@@ -1,6 +1,5 @@
 import React, { FC } from "react";
 import { Flex, HStack, Text } from "@chakra-ui/react";
-import exp from "constants";
 
 export type WarningInfoBlockProps = {
     children: React.ReactNode;
