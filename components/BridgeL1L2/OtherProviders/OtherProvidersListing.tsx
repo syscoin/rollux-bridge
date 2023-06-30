@@ -131,7 +131,7 @@ export const OtherProvidersListing: FC<OtherProvidersListingProps> = ({ currentV
             }}>
                 <Text mt={5} fontSize={'xl'} fontWeight={'bold'} color={'gray.500'}>No results</Text>
                 <Text mb={5} color={'gray.500'}>
-                    There are no bridges to directly transfer {selectedToken.symbol} from at the moment.
+                    There are no bridges to directly transfer {selectedToken.symbol} from {currentView === CurrentDisplayView.deposit ? 'NEVM' : 'Rollux'} at the moment.
                 </Text>
             </Box>
         </>}

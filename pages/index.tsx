@@ -38,7 +38,8 @@ import { CurrentDisplayView } from "../components/BridgeL1L2/interfaces"
 import { OtherProvidersListing } from '../components/BridgeL1L2/OtherProviders/OtherProvidersListing';
 import { BridgedNetwork, FiatOrBridged } from '../blockchain/NevmRolluxBridge/bridgeProviders/types';
 import { BridgeTypeSelector } from '../components/BridgeL1L2/Withdraw/BridgeTypeSelector';
-import { MdShield, MdRunCircle } from "react-icons/md";
+import { MdOutlineShield, MdFastForward } from "react-icons/md";
+import { FaRunning, FaShippingFast } from "react-icons/fa"
 import { UnfinishedWithdrawalsModal } from 'components/BridgeL1L2/Withdraw/UnfinishedWithdrawalsModal';
 
 
@@ -757,7 +758,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                 handleSwitchProviders('SYS', true);
                                             }}
                                                 label="Use a third party bridge"
-                                                icon={<Icon as={MdRunCircle} />}
+                                                icon={<Icon as={FaShippingFast} />}
                                                 description="This usually takes under 20min. Bridge to multiple chains, limited to certain tokens."
                                                 defaultChecked={showOtherProviders === true}
                                             />
@@ -766,7 +767,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                 setShowOtherProviders(false);
                                             }}
                                                 label="Use the official bridge"
-                                                icon={<Icon as={MdShield} />}
+                                                icon={<Icon as={MdOutlineShield} />}
                                                 description="This usually takes 7days. Bridge any token to Syscoin NEVM."
                                                 defaultChecked={showOtherProviders === false}
                                             />

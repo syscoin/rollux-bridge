@@ -32,6 +32,7 @@ export const BridgeTypeSelector: FC<BridgeTypeSelectorProps> = ({ onSelected, ic
                 padding: 3,
                 marginBottom: '10px',
                 width: '100%',
+                boxShadow: defaultChecked ? '0 0 0 1px #68D391, 0 0 0 1px #68D391' : undefined,
             }
         }>
             <HStack spacing={3} mb={3} mt={1}>
@@ -45,7 +46,7 @@ export const BridgeTypeSelector: FC<BridgeTypeSelectorProps> = ({ onSelected, ic
                 }
             </HStack>
             <HStack h={5}>
-                <Text fontSize={'sm'}>
+                <Text fontSize={'sm'} color={'gray.500'}>
                     {description}
                 </Text>
             </HStack>
