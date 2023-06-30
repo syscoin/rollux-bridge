@@ -1,5 +1,4 @@
 import { ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
-import { ThemeProvider } from "@mui/material";
 import { Config, DAppProvider, MetamaskConnector, CoinbaseWalletConnector, Mainnet } from "@usedapp/core";
 import { NEVMChain, RolluxChain, RolluxChainMainnet, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
 import type { AppProps } from "next/app";
@@ -8,7 +7,6 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import "../styles/globals.css";
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from "components/Common/ErrorFallback";
-import { provider } from "web3-core";
 import { WelcomeDisclaimer } from "components/Common/WelcomeDisclaimer";
 import { chakraTheme } from 'components/chakraTheme';
 
@@ -45,7 +43,7 @@ declare global {
       selectedAddress: string;
       on: (event: string, callback: (...args: any[]) => void) => void;
       networkVersion: string;
-    } & provider;
+    }
   }
 }
 
