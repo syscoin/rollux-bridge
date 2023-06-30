@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
 import NFTSwapDirection from "blockchain/NevmRolluxBridge/enums/NFTSwapDirection"
-import { Select, Flex, Box, Card, CardBody, Heading, Button } from "@chakra-ui/react"
-import { SwapHorizRounded, SwapVerticalCircleOutlined } from "@mui/icons-material";
+import { Icon, Flex, Box, Card, CardBody, Heading, Button } from "@chakra-ui/react"
+import { MdSwapHoriz, MdOutlineSwapVerticalCircle } from "react-icons/md";
 
 export type SwapDirectionProps = {
     currentDirection: NFTSwapDirection;
@@ -32,7 +32,8 @@ export const SwapDirection: FC<SwapDirectionProps> = ({ currentDirection, onDire
                     </Box>
                     <Box>
                         <Button size={'sm'} onClick={() => onDirectionChanged(oppositeDirection)}>
-                            <SwapHorizRounded fontSize="small" />
+
+                            <Icon as={MdSwapHoriz} />
                         </Button>
                     </Box>
                 </Flex>

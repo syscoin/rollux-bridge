@@ -5,7 +5,7 @@ import { SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks
 import { useSelectedNetwork } from "hooks/rolluxBridge/useSelectedNetwork"
 import InputNFT from "components/NFT/InputNFT"
 import { Box, CardBody, Flex, Card, Heading, Button, Alert, AlertDescription, AlertDialog, AlertIcon, HStack, Divider } from "@chakra-ui/react"
-import { ArrowRight } from "@mui/icons-material"
+import { MdArrowRight } from "react-icons/md"
 import PreviewNFT from "components/NFT/PreviewNFT"
 import { CallResult, useCall, useContractFunction, useEthers } from "@usedapp/core"
 import ConnectedWalletButton from "components/Common/ConnectedWalletButton"
@@ -329,7 +329,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                 onClickProveMessage={handleProveMessage}
             />
 
-            <Flex direction={{md: 'row', sm: 'column'}} alignItems={'center'} gap={2} >
+            <Flex direction={{ md: 'row', sm: 'column' }} alignItems={'center'} gap={2} >
                 <InputNFT
                     contractAddressValue={nftAddress}
                     tokenIdValue={tokenId}
@@ -337,7 +337,7 @@ export const NFTPageIndex: NextPage<NFTPageIndexProps> = () => {
                     onChangeTokenId={(tokenId) => setTokenId(tokenId.toString().length > 0 ? tokenId : undefined)}
                 />
                 <Box w={'10%'} alignItems={'center'} justifyContent={'center'} textAlign={'center'}>
-                    <ArrowRight />
+                    <MdArrowRight />
                 </Box>
                 <PreviewNFT
                     isLoading={(nftAddress && nftMetadata && nftImageUrl) ? true : false}
