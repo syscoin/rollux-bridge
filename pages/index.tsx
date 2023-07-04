@@ -880,43 +880,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                         </ViewWithdrawalModal>
                                                     </>}
 
-
-                                                    {/* <Flex
-                                                    px={{ base: '8px', md: '20px' }}
-                                                    py={{ base: '8px', md: '16px' }}
-                                                    flex={1}
-                                                    bg="white"
-                                                    boxShadow={`7px 7px ${chakraTheme.colors.brand.primary}`}
-                                                    borderRadius="12px"
-                                                    border={`1px solid ${chakraTheme.colors.brand.primary}`}
-                                                    justifyContent="center"
-                                                    flexDir="column"
-                                                    m="0 0 30px 0"
-
-
-                                                    overflow={"scroll-y"}
-                                                    z-index={1}
-                                                >
-                                                    <Heading size="s" sx={{ marginBottom: 5 }}>
-                                                        You have unfinished withdrawals
-                                                    </Heading>
-                                                    <Box overflow={'scroll'} height='200px'>
-                                                        {unfinishedWithdrawals.map((item) => {
-                                                            return <UnfinishedWithdrawalItem key={item.txHash} status={item.status} txHash={item.txHash}
-                                                                onClickView={() => {
-                                                                    setWithdrawalModalData({
-                                                                        status: item.status,
-                                                                        txHash: item.txHash
-                                                                    })
-
-
-                                                                    withdrawOnOpen();
-                                                                }}
-                                                            />
-                                                        })}
-                                                    </Box>
-                                                </Flex> */}
-
                                                     <UnfinishedWithdrawalsModal>
                                                         {unfinishedWithdrawals.map((item) => {
                                                             return <UnfinishedWithdrawalItem key={item.txHash} status={item.status} txHash={item.txHash}
