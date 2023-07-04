@@ -41,11 +41,11 @@ export const ProviderCard: FC<ProviderCardProps> = ({ config, onButtonClick }) =
                             }}
                         />
                     </Box>
-                    <VStack>
-                        <Text fontSize={'xl'} ml={4}>
+                    <VStack gap={0} ml={2} alignItems={'left'}>
+                        <Text fontSize={'lg'} >
                             {config.description}
                         </Text>
-                        <Text fontSize={'sm'} ml={4} color={'gray.400'}>
+                        <Text fontSize={'sm'} color={'gray.400'}>
                             {config.url}
                         </Text>
                     </VStack>
