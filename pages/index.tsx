@@ -7,6 +7,7 @@ import {
     TabPanel,
     TabPanels,
     Tabs,
+    Text,
     useDisclosure,
     useToast,
     VStack
@@ -759,7 +760,12 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                             }}
                                                 label="Use a third party bridge"
                                                 icon={<Icon as={FaShippingFast} />}
-                                                description="This usually takes under 20min. Bridge to multiple chains, limited to certain tokens."
+                                                description={
+                                                    <>
+                                                        <Text fontSize={'sm'} color={'gray.400'}>This usually takes under 20min.</Text>
+                                                        <Text fontSize={'sm'} color={'gray.400'}>Bridge to multiple chains, limited to certain tokens.</Text>
+                                                    </>
+                                                }
                                                 defaultChecked={showOtherProviders === true}
                                             />
 
@@ -768,7 +774,12 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                             }}
                                                 label="Use the official bridge"
                                                 icon={<Icon as={MdOutlineShield} />}
-                                                description="This usually takes 7days. Bridge any token to Syscoin NEVM."
+                                                description={
+                                                    <>
+                                                        <Text fontSize={'sm'} color={'gray.400'}>This usually takes 7days</Text>
+                                                        <Text fontSize={'sm'} color={'gray.400'}>Bridge any token to Syscoin NEVM.</Text>
+                                                    </>
+                                                }
                                                 defaultChecked={showOtherProviders === false}
                                             />
                                         </VStack>

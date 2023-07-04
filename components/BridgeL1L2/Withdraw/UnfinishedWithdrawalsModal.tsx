@@ -1,6 +1,9 @@
 import React, { FC } from "react"
-import { Flex, Heading, AlertIcon, Box, useDisclosure, Modal, ModalBody, ModalOverlay, ModalHeader, ModalCloseButton, ModalContent, Alert, Divider } from "@chakra-ui/react"
+import { Flex, Heading, AlertIcon, Box, useDisclosure, Modal, ModalBody, ModalOverlay, ModalHeader, ModalCloseButton, ModalContent, Alert, Divider, Icon, HStack, Spacer } from "@chakra-ui/react"
 import { chakraTheme } from 'components/chakraTheme';
+import { MdCircle } from "react-icons/md";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
+import { FaExclamationCircle } from "react-icons/fa";
 
 export type UnfinishedWithdrawalsModalProps = {
     children: React.ReactNode;
@@ -11,10 +14,26 @@ export const UnfinishedWithdrawalsModal: FC<UnfinishedWithdrawalsModalProps> = (
 
     return (
         <>
-            <Alert cursor={'pointer'} status="warning" sx={{ marginBottom: 3 }} onClick={onOpen}>
-                <AlertIcon />
-                <Heading size="sm">Manage pending withdrawals</Heading>
-            </Alert>
+            <Flex flexDir="column" pb={4} pr={1} pl={1}>
+                <Box
+                    sx={{
+                        backgroundColor: 'orange.100',
+                        borderRadius: '4px',
+                        p: 3,
+                        pb: 4,
+                        pt: 4,
+                        cursor: 'pointer',
+                    }}
+                    onClick={onOpen}>
+                    <HStack w={'100%'} gap={1} spacing={3}>
+                        <Icon as={FaExclamationCircle} color={'orange.500'} />
+                        <Heading size="sm">Manage pending withdrawals</Heading>
+                        <Spacer />
+                        <Spacer />
+                        <Icon as={ExternalLinkIcon} color={'gray.500'} />
+                    </HStack>
+                </Box>
+            </Flex>
             <Modal isOpen={isOpen} onClose={onClose} size={'lg'}>
                 <ModalOverlay />
                 <ModalContent>

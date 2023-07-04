@@ -7,7 +7,7 @@ export type BridgeTypeSelectorProps = {
     onSelected: () => void;
     icon: React.ReactNode;
     label: string;
-    description: string;
+    description: React.ReactNode;
     defaultChecked?: boolean;
 }
 
@@ -49,11 +49,9 @@ export const BridgeTypeSelector: FC<BridgeTypeSelectorProps> = ({ onSelected, ic
                     <Icon as={MdCircle} color={'gray.300'} />
                 }
             </HStack>
-            <HStack h={6} mt={3}>
-                <Text fontSize={'sm'} color={'gray.500'}>
-                    {description}
-                </Text>
-            </HStack>
+            <VStack mt={2} gap={0} textAlign={'left'} alignItems={'flex-start'}>
+                {description}
+            </VStack>
 
         </Box>
     </>);
