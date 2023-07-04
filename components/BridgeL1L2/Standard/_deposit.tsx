@@ -76,7 +76,12 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     const { calculateEstimate } = useEstimateTransaction();
 
     useEffect(() => {
-        if (parseFloat(amountToSwap) == 0 || !messenger) {
+        if (parseFloat(amountToSwap) == 0) {
+            // console.warn('');
+            return; // break here
+        }
+
+        if (!messenger) {
             console.warn('No messenger');
             return; // break here
         }
