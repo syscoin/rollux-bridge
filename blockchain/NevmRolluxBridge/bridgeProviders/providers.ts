@@ -7,7 +7,7 @@ export const providers: OtherBridgeProvider[] = [
         label: 'Chainge',
         code: 'chainge',
         isCex: false,
-        description: 'Chainge Protocol',
+        description: 'Chainge Finance',
         url: 'chainge.io',
         logoUrl: '/bridge-providers/chainge-logo.png',
         supportsCrypto: true,
