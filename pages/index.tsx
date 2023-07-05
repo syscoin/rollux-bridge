@@ -762,8 +762,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                 icon={<Icon as={FaShippingFast} />}
                                                 description={
                                                     <>
-                                                        <Text fontSize={'sm'} color={'gray.400'}>This usually takes under 20min.</Text>
-                                                        <Text fontSize={'sm'} color={'gray.400'}>Bridge to multiple chains, limited to certain tokens.</Text>
+                                                        <Text fontSize={'sm'} color={'gray.400'}>This usually takes under 20 minutes</Text>
+                                                        <Text fontSize={'sm'} color={'gray.400'}>Bridge to multiple chains, limited to certain tokens</Text>
                                                     </>
                                                 }
                                                 defaultChecked={showOtherProviders === true}
@@ -776,8 +776,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                                                 icon={<Icon as={MdOutlineShield} />}
                                                 description={
                                                     <>
-                                                        <Text fontSize={'sm'} color={'gray.400'}>This usually takes 7days</Text>
-                                                        <Text fontSize={'sm'} color={'gray.400'}>Bridge any token to Syscoin NEVM.</Text>
+                                                        <Text fontSize={'sm'} color={'gray.400'}>This usually takes 7 days</Text>
+                                                        <Text fontSize={'sm'} color={'gray.400'}>Bridge any token to Syscoin NEVM</Text>
                                                     </>
                                                 }
                                                 defaultChecked={showOtherProviders === false}
