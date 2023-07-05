@@ -9,7 +9,7 @@ import { ChainIdsToNetworksMap, networks, NetworkSwitchMap, SelectedNetworkType 
 
 export const useSelectedNetwork = () => {
     const [selectedNetwork, setSelectedNetwork] = useState<SelectedNetworkType>(SelectedNetworkType.Unsupported);
-    const { chainId, switchNetwork } = useEthers();
+    const { chainId, switchNetwork, error } = useEthers();
     const [atWhichLayer, setAtWhichLayer] = useState<1 | 2 | undefined>(undefined);
 
     const {
@@ -75,10 +75,12 @@ export const useSelectedNetwork = () => {
         const targetNetwork: { L1: number, L2: number } | undefined = NetworkSwitchMap[newNetwork];
 
         if (!targetNetwork) {
+            console.error('No target network');
             return;
         }
 
         const targetChainID: number = currentLayer === 1 ? targetNetwork.L1 : targetNetwork.L2;
+
         await switchNetwork(targetChainID);
         // @ts-ignore
         setAtWhichLayer(currentLayer);

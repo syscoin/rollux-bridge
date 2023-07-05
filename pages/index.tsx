@@ -80,6 +80,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
     const [selectedOtherNetwork, setSelectedOtherNetwork] = useState<FiatOrBridged>(BridgedNetwork.SYS);
 
+    const messenger = useCrossChainMessenger();
+
     // todo refactor this 2 similar functions
     const getProveTxn = (withdrawTxHash: string, data: { withdrawTx: string, proveTx: string }[]): string | null => {
         try {
@@ -111,67 +113,67 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         return null;
     }
 
-    const getCrossChainMessenger = useCallback(async (signer: ethers.providers.JsonRpcSigner | undefined, currentDisplay: CurrentDisplayView) => {
-        if (!signer) {
-            console.warn("No Signer")
-            return undefined;
-        }
+    // const getCrossChainMessenger = useCallback(async (signer: ethers.providers.JsonRpcSigner | undefined, currentDisplay: CurrentDisplayView) => {
+    //     if (!signer) {
+    //         console.warn("No signer");
+    //         return undefined;
+    //     }
 
-        const currentChainId: number = await signer.getChainId();
+    //     const currentChainId: number = await signer.getChainId();
 
-        // console.log(currentChainId);
+    //     // console.log(currentChainId);
 
-        const network: NetworkData | undefined = getNetworkByChainId(currentChainId, networks);
+    //     const network: NetworkData | undefined = getNetworkByChainId(currentChainId, networks);
 
-        if (!network) {
-            console.warn("Can not detect network")
-            return undefined;
-        }
+    //     if (!network) {
+    //         console.warn("Can not detect network")
+    //         return undefined;
+    //     }
 
-        const netMap = networksMap[network.name] ?? undefined;
-        // console.log(network.name);
+    //     const netMap = networksMap[network.name] ?? undefined;
+    //     // console.log(network.name);
 
-        if (!netMap) {
-            console.warn("Cant not find net mapping")
+    //     if (!netMap) {
+    //         console.warn("Cant not find net mapping")
 
-            return undefined;
-        }
+    //         return undefined;
+    //     }
 
-        const secondNetwork: NetworkData | undefined = getNetworkByName(netMap, networks);
+    //     const secondNetwork: NetworkData | undefined = getNetworkByName(netMap, networks);
 
-        if (!secondNetwork) {
-            console.warn("Failed to fetch second network by name");
-            return undefined;
-        }
+    //     if (!secondNetwork) {
+    //         console.warn("Failed to fetch second network by name");
+    //         return undefined;
+    //     }
 
-        const l1Contracts = network.layer === 1 ? network : secondNetwork;
-        const l2Contracts = secondNetwork.layer === 2 ? secondNetwork : network;
-
-
-        if (currentDisplay === CurrentDisplayView.deposit) {
-
-            return crossChainMessengerFactory(
-                l1Contracts,
-                l2Contracts,
-                signer,
-                new ethers.providers.JsonRpcProvider(secondNetwork?.rpcAddress),
-                true
-            )
-
-        }
-
-        // withdraw
-
-        return crossChainMessengerFactory(
-            l1Contracts,
-            l2Contracts,
-            new ethers.providers.JsonRpcProvider(rpcL1),
-            signer,
-            true
-        )
+    //     const l1Contracts = network.layer === 1 ? network : secondNetwork;
+    //     const l2Contracts = secondNetwork.layer === 2 ? secondNetwork : network;
 
 
-    }, [rpcL1]);
+    //     if (currentDisplay === CurrentDisplayView.deposit) {
+
+    //         return crossChainMessengerFactory(
+    //             l1Contracts,
+    //             l2Contracts,
+    //             signer,
+    //             new ethers.providers.JsonRpcProvider(secondNetwork?.rpcAddress),
+    //             true
+    //         )
+
+    //     }
+
+    //     // withdraw
+
+    //     return crossChainMessengerFactory(
+    //         l1Contracts,
+    //         l2Contracts,
+    //         new ethers.providers.JsonRpcProvider(rpcL1),
+    //         signer,
+    //         true
+    //     )
+
+
+    // }, [rpcL1]);
 
     const handleERC20Approval = async (l1Token: string, l2Token: string, amount: BigNumber) => {
         if (!library) {
@@ -179,7 +181,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             return; // not connected wallet
         }
 
-        if (!crossChainMessenger) {
+        if (!messenger) {
             console.warn("approval:no-messenger")
             return; // no messenger initialized
         }
@@ -194,7 +196,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 isClosable: true,
             })
 
-            await crossChainMessenger.approveERC20(l1Token, l2Token, amount);
+            await messenger.approveERC20(l1Token, l2Token, amount);
 
             toast({
                 title: 'Approve ERC20.',
@@ -219,7 +221,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     }
 
     const handleERC20Deposit = async (l1Token: string, l2Token: string, amount: BigNumber) => {
-        if (!library || !crossChainMessenger) {
+        if (!library || !messenger) {
             toast({
                 title: 'Error.',
                 description: "Wallet not connected.",
@@ -238,7 +240,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 duration: 9000,
                 isClosable: true,
             })
-            const tx = await crossChainMessenger.depositERC20(l1Token, l2Token, amount);
+            const tx = await messenger.depositERC20(l1Token, l2Token, amount);
 
             setDepositTxHash(tx.hash);
 
@@ -250,7 +252,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             })
 
             await tx.wait();
-            await crossChainMessenger.waitForMessageStatus(tx.hash,
+            await messenger.waitForMessageStatus(tx.hash,
                 MessageStatus.RELAYED)
 
 
@@ -282,7 +284,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     }
 
     const handleWithdrawMainCurrency = async (amount: string) => {
-        if (!library || !crossChainMessenger) {
+        if (!library || !messenger) {
             console.log('no lib or messenger')
             toast({
                 title: 'Error.',
@@ -303,7 +305,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 duration: 9000,
                 isClosable: true,
             })
-            const withdrawTx = await crossChainMessenger.withdrawETH(
+            const withdrawTx = await messenger.withdrawETH(
                 ethers.utils.parseEther(amount)
             );
 
@@ -344,7 +346,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             return;
         }
 
-        if (crossChainMessenger) {
+        if (messenger) {
             try {
 
                 setIsLoading(true);
@@ -357,7 +359,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     isClosable: true,
                 })
 
-                const depositTx = await crossChainMessenger.depositETH(
+                const depositTx = await messenger.depositETH(
                     ethers.utils.parseEther(amount),
                     {
                         // @ts-ignore
@@ -374,7 +376,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     isClosable: false,
                 })
 
-                const confirmation = await crossChainMessenger.waitForMessageReceipt(depositTx);
+                const confirmation = await messenger.waitForMessageReceipt(depositTx);
 
 
                 toast.close(_confirmationToast);
@@ -423,7 +425,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
 
 
     const handleWithdrawERC20Token = async (l1Token: string, l2Token: string, amount: BigNumber) => {
-        if (!library || !crossChainMessenger) {
+        if (!library || !messenger) {
             toast({
                 title: 'Error.',
                 description: "Wallet not connected.",
@@ -448,7 +450,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             })
 
 
-            const withDrawERC20Tx = await crossChainMessenger.withdrawERC20(
+            const withDrawERC20Tx = await messenger.withdrawERC20(
                 l1Token, l2Token, amount
             );
 
@@ -480,17 +482,17 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     }
 
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        if (account) {
+    //     if (account) {
 
-            getCrossChainMessenger(signer, currentDisplay).then((messenger) => {
+    //         getCrossChainMessenger(signer, currentDisplay).then((messenger) => {
 
-                setCrossChainMessenger(messenger);
-            })
-        }
+    //             setCrossChainMessenger(messenger);
+    //         })
+    //     }
 
-    }, [signer, account, currentDisplay, getCrossChainMessenger])
+    // }, [signer, account, currentDisplay, getCrossChainMessenger])
 
 
 
@@ -670,6 +672,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                             className="tabs_dw"
                         >
                             <Tabs
+                                isLazy
                                 variant="soft-rounded"
                                 onChange={(index) => {
                                     setCurrentDisplay(index === 0 ? CurrentDisplayView.deposit : CurrentDisplayView.withdraw)

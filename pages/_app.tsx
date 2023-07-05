@@ -13,25 +13,28 @@ import { chakraTheme } from 'components/chakraTheme';
 const queryClient = new QueryClient();
 
 const dappConfig: Config = {
-  readOnlyChainId: 5700,
+  readOnlyChainId: 57,
+  noMetamaskDeactivate: true,
+  pollingIntervals: {
+    [RolluxChain.chainId]: 30000,
+    [TanenbaumChain.chainId]: 30000,
+    [RolluxChainMainnet.chainId]: 30000,
+    [NEVMChain.chainId]: 30000,
+  },
   readOnlyUrls: {
-    [5700]: 'https://rpc.tanenbaum.io',
-    [57000]: 'https://rpc-tanenbaum.rollux.com/',
+    [TanenbaumChain.chainId]: TanenbaumChain.rpcUrl || '',
+    [RolluxChain.chainId]: RolluxChain.rpcUrl || '',
     [RolluxChainMainnet.chainId]: RolluxChainMainnet.rpcUrl || '',
     [NEVMChain.chainId]: NEVMChain.rpcUrl || '',
   },
   multicallAddresses: {
     [RolluxChainMainnet.chainId]: RolluxChainMainnet.multicall2Address || '',
     [NEVMChain.chainId]: '0x0c457A8E4bD35eA571956d6bb7443c5C661d7607',
-    [5700]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697', // multicall 2 address.
-    [57000]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697',
+    [TanenbaumChain.chainId]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697', // multicall 2 address.
+    [RolluxChain.chainId]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697',
 
   },
-  networks: [RolluxChain, TanenbaumChain, NEVMChain, RolluxChainMainnet],
-  connectors: {
-    metamask: new MetamaskConnector(),
-    coinBase: new CoinbaseWalletConnector(),
-  }
+  networks: [RolluxChain, TanenbaumChain, NEVMChain, RolluxChainMainnet]
 }
 
 declare global {

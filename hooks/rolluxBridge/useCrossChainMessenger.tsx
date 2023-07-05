@@ -12,9 +12,11 @@ export const useCrossChainMessenger = () => {
     const signer = useSigner();
     const { contractsL1, contractsL2, atWhichLayer, rpcL1, rpcL2, l1ChainId, l2ChainId } = useSelectedNetwork();
     const [messenger, setMessenger] = useState<CrossChainMessenger | undefined>(undefined);
+    const { chainId } = useEthers();
+
 
     useEffect(() => {
-        if (!signer || !atWhichLayer || !contractsL1 || !contractsL2 || !l1ChainId || !l2ChainId) {
+        if (!signer || !chainId || !atWhichLayer || !contractsL1 || !contractsL2 || !l1ChainId || !l2ChainId) {
             setMessenger(undefined);
 
             return;
@@ -38,7 +40,7 @@ export const useCrossChainMessenger = () => {
         );
 
         setMessenger(_tmpMessenger);
-    }, [signer, atWhichLayer, contractsL1, contractsL2, rpcL1, rpcL2, l1ChainId, l2ChainId]);
+    }, [signer, atWhichLayer, chainId, contractsL1, contractsL2, rpcL1, rpcL2, l1ChainId, l2ChainId]);
 
     return messenger;
 }

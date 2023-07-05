@@ -5,6 +5,7 @@ export const RolluxChainMainnet: Chain = {
     chainName: "Rollux Mainnet",
     isLocalChain: false,
     isTestChain: false,
+
     nativeCurrency: {
         name: "Syscoin",
         symbol: "SYS",
@@ -47,7 +48,7 @@ export const TanenbaumChain: Chain = {
     chainId: 5700,
     chainName: "Tanenbaum testnet",
     isLocalChain: false,
-    isTestChain: false,
+    isTestChain: true,
     nativeCurrency: {
         name: "tSyscoin",
         symbol: "tSYS",
@@ -69,10 +70,10 @@ export const RolluxChain: Chain = {
     chainId: 57000,
     chainName: "Rollux Bedrock Testnet",
     isLocalChain: false,
-    isTestChain: false,
+    isTestChain: true,
     nativeCurrency: {
-        name: "bSyscoin",
-        symbol: "bSYS",
+        name: "tSyscoin",
+        symbol: "TSYS",
         decimals: 18,
     },
     multicallAddress: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697',

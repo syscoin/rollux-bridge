@@ -64,11 +64,8 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
     const balanceNativeTokenL1 = useEtherBalance(account, { chainId: l1ChainId });
     const balanceERC20TokenL1 = useTokenBalance(selectedToken?.address || ethers.constants.AddressZero, account, { chainId: l1ChainId });
 
-    const handleSwitchNetwork = async () => {
-        if (l2ChainId === 570 || l2ChainId === 57000) {
-            switchNetwork(l2ChainId)
-        }
-
+    const handleSwitchNetwork = async (_toSwitch: number) => {
+        await switchNetwork(_toSwitch);
     }
 
     const messenger = useCrossChainMessenger();
@@ -197,7 +194,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
     const preCheckNetwork = async (neededNetwork: number, chainId: number) => {
         if (chainId !== neededNetwork) {
-            await switchNetwork(neededNetwork);
+            return switchNetwork(neededNetwork);
         }
     }
 
@@ -298,7 +295,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
 
             setIsLoading(false);
         })
-    }, [setIsLoading, account, l1ChainId, l2ChainId]);
+    }, [setIsLoading, l1ChainId, l2ChainId]);
 
 
     const handleERC20Withdraw = async () => {
@@ -425,7 +422,11 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                 {((account && chainId !== l2ChainId)) && <>
                     <Button
                         variant="primary"
-                        onClick={handleSwitchNetwork}
+                        onClick={() => {
+                            handleSwitchNetwork(
+                                [570, 57000].includes(l2ChainId) ? l2ChainId : 570,
+                            )
+                        }}
                     >
                         {'Switch to Rollux'}
                     </Button>
