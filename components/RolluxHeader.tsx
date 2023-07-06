@@ -40,9 +40,6 @@ export const RolluxHeader: React.FC = () => {
                 <NextLink href={"/"} passHref>
                   <Button variant={'primary'} width={'100%'} mb={3} onClick={onClose}>Tokens</Button>
                 </NextLink>
-                <NextLink href={"/nft"} passHref>
-                  <Button variant={'primary'} width={'100%'} mb={3} onClick={onClose}>NFT</Button>
-                </NextLink>
 
                 <ConnectButton mb={3} variant="secondary" />
                 {account && <NetworkSwitcher />}
@@ -57,11 +54,6 @@ export const RolluxHeader: React.FC = () => {
           <NextLink href={"/"} passHref>
             <Button variant={'primary'} >
               Tokens
-            </Button>
-          </NextLink>
-          <NextLink href={"/nft"} passHref>
-            <Button variant={'primary'}>
-              NFT
             </Button>
           </NextLink>
           <ConnectButton variant="secondary" />

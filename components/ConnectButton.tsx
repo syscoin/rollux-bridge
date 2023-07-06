@@ -211,6 +211,11 @@ export const ConnectButton: React.FC<ConnectButtonProps> = ({ ...rest }) => {
             <VStack
               spacing={2}
               align={'flex-start'}>
+              <NextLink href={"/nft"} style={{ width: '100%' }} passHref>
+                <Button padding={4} width={'100%'} justifyContent={'flex-start'}>
+                  <ArrowForwardIcon /> NFT Bridge
+                </Button>
+              </NextLink>
               <NextLink href={"/create-token"} style={{ width: '100%' }} passHref>
                 <Button padding={4} width={'100%'} justifyContent={'flex-start'}>
                   <ArrowForwardIcon /> Bridge your token
