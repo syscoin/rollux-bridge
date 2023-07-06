@@ -376,7 +376,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                                     }} />
                                 </> : selectedToken ?
                                     <><Text mr={1} color={'gray.500'}>Balance: {balanceNativeToken ? (+formatEther(balanceNativeToken)).toFixed(4) : '0.00'} SYS</Text><MaxBalance onClick={() => {
-                                        const maxAmount = balanceNativeToken?.gt(BigNumber.from('0')) ? ethers.utils.formatEther(balanceNativeToken.sub(ethers.utils.parseEther('0.005'))) : '0.00';
+                                        const maxAmount = balanceNativeToken?.gt(BigNumber.from('0.005')) ? ethers.utils.formatEther(balanceNativeToken.sub(ethers.utils.parseEther('0.005'))) : '0.00';
                                         setAmountToSwap(maxAmount);
 
                                     }} /></> : <></>
