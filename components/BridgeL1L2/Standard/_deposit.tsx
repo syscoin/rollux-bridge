@@ -165,8 +165,8 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                 setBalanceToDisplay(
                     ethers.utils.formatEther(balanceNativeToken)
                 )
-
-                setMaxAmount(ethers.utils.formatEther(balanceNativeToken.sub(ethers.utils.parseEther('0.005'))) || '0.00');
+                const maxAmount = balanceNativeToken.gt(BigNumber.from('0')) ? ethers.utils.formatEther(balanceNativeToken.sub(ethers.utils.parseEther('0.005'))) : '0.00';
+                setMaxAmount(maxAmount);
             }
         } else {
             try {
