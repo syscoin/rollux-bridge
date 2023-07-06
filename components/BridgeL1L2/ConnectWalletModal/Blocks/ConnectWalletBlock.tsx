@@ -27,7 +27,7 @@ export type ConnectWalletBlockProps = {
 }
 
 export const ConnectWalletBlock: FC<ConnectWalletBlockProps> = ({ setScreen, onClose }) => {
-    const { activateBrowserWallet, activate } = useEthers();
+    const { activateBrowserWallet, activate, deactivate } = useEthers();
 
     return (<>
         <ModalHeader>
@@ -55,6 +55,12 @@ export const ConnectWalletBlock: FC<ConnectWalletBlockProps> = ({ setScreen, onC
                     logoPath={'/wallets/Metamask.svg'}
                     onClick={() => {
                         onClose();
+                        try {
+                            deactivate();
+                        } catch (e) {
+                            console.log("Already deactivated");
+                            console.log(e);
+                        }
                         activateBrowserWallet();
                     }}
                 />
