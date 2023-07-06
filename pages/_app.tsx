@@ -13,7 +13,7 @@ import { chakraTheme } from 'components/chakraTheme';
 const queryClient = new QueryClient();
 
 const dappConfig: Config = {
-  readOnlyChainId: 57,
+  autoConnect: true,
   noMetamaskDeactivate: true,
   pollingIntervals: {
     [RolluxChain.chainId]: 30000,
