@@ -8,9 +8,8 @@ import { SelectedNetworkType } from 'blockchain/NevmRolluxBridge/config/networks
 import { fetchERC20TokenList } from 'blockchain/NevmRolluxBridge/fetchers/ERC20TokenList';
 import TokenListToken from 'blockchain/NevmRolluxBridge/interfaces/TokenListToken';
 import { OtherProvidersMenuSelector } from 'components/BridgeL1L2/OtherProviders/OtherProvidersMenuSelector';
-import WarningInfoBlock from 'components/Common/WarningInfoBlock';
 import { ConnectButton } from 'components/ConnectButton';
-import { BigNumber, Contract, ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 import React, { FC, useEffect, useState, useCallback } from 'react';
 import { useSelectedNetwork } from "../../../hooks/rolluxBridge/useSelectedNetwork"
@@ -72,6 +71,8 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
     const [showDepositSent, setShowDepositSent] = useState<boolean>(false);
     const [showTxDetails, setShowTxDetails] = useState<boolean>(false);
+
+    const [isActionButtonLoading, setIsActionButtonLoading] = useState<boolean>(false);
 
     const { calculateEstimate } = useEstimateTransaction();
 
@@ -286,9 +287,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
             setIsLoading(true);
             onClickApproveERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals));
-
-
-
+            setIsActionButtonLoading(true);
         }
     }, [selectedTokenAddress, l1ChainId, selectedTokenAddressL2, preCheckNetwork, chainId, setIsLoading, onClickApproveERC20, amountToSwap, selectedTokenDecimals]);
 
@@ -298,7 +297,10 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             await preCheckNetwork(l1ChainId, chainId as number);
 
             setIsLoading(true);
+
+
             onClickDepositERC20(selectedTokenAddress, selectedTokenAddressL2, ethers.utils.parseUnits(amountToSwap, selectedTokenDecimals));
+            setIsActionButtonLoading(true);
         }
     }
 
@@ -416,6 +418,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
                     {(typeof allowanceERC20Token === 'undefined' || allowanceERC20Token?.lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))) && <>
                         <Button
+                            isLoading={isActionButtonLoading}
                             variant="primary"
                             onClick={() => {
                                 handleApproval();
