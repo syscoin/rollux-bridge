@@ -84,19 +84,23 @@ export const SelectTokenModal: FC<SelectTokenModalProps> = ({ tokens, disableAdd
                     <List justifyContent={'left'}
                         maxH={'400px'}
                         overflowY={'scroll'}
+                        gap={1}
                     >
-                        <SelectTokenModalItem
-                            selected={selectedToken?.symbol === 'SYS'}
-                            chainId={chainId}
-                            address={ethers.constants.AddressZero}
-                            decimals={18}
-                            symbol={'SYS'}
-                            name={'Syscoin'}
-                            logoURI={'/syscoin-logo.svg'}
-                            onSelect={handleSelect}
-                        />
+                        <ListItem textAlign={'left'} mb={1} key={'SYS'}>
+                            <SelectTokenModalItem
+                                selected={selectedToken?.symbol === 'SYS'}
+                                chainId={chainId}
+                                address={ethers.constants.AddressZero}
+                                decimals={18}
+                                symbol={'SYS'}
+                                name={'Syscoin'}
+                                logoURI={'/syscoin-logo.svg'}
+                                onSelect={handleSelect}
+                                disabledAdd={true}
+                            />
+                        </ListItem>
                         {filteredTokens.map((token) => (
-                            <ListItem textAlign={'left'} mb={3} key={token.symbol}>
+                            <ListItem textAlign={'left'} mb={1} key={token.symbol}>
                                 <SelectTokenModalItem
                                     selected={selectedToken?.symbol === token.symbol}
                                     chainId={chainId}
