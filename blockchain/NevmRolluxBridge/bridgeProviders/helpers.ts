@@ -24,3 +24,23 @@ export const isCryptoProvider = (keyValue: string): boolean => {
     }
     return false;
 }
+
+export const isFiatProvider = (keyValue: string): boolean => {
+    let value = '';
+    value = FiatMethod[keyValue as keyof typeof FiatMethod];
+
+    if (value) {
+        return true;
+    }
+    return false;
+}
+
+export const isCEXProvider = (keyValue: string): boolean => {
+    let value = '';
+    value = BridgedCEX[keyValue as keyof typeof BridgedCEX];
+
+    if (value) {
+        return true;
+    }
+    return false;
+}

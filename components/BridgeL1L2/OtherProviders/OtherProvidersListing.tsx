@@ -102,6 +102,7 @@ export const OtherProvidersListing: FC<OtherProvidersListingProps> = ({ currentV
 
         {providers.length > 0 && <>
             <VStack
+                mt={4}
                 spacing={1}
             >
                 {providers.map((value, index) => {
@@ -131,7 +132,8 @@ export const OtherProvidersListing: FC<OtherProvidersListingProps> = ({ currentV
                 border: '1px solid',
                 borderColor: 'gray.200',
                 p: 5,
-                pb: 5
+                pb: 5,
+                mt: 2,
             }}>
                 <Text mt={5} fontSize={'xl'} fontWeight={'bold'} color={'gray.500'}>No results</Text>
                 <Text mb={5} color={'gray.500'}>

@@ -3,7 +3,7 @@ import { OtherProviderBridgeMode } from "components/BridgeL1L2/OtherProviders/ty
 import { providers } from "./providers";
 import { useState, useEffect, useMemo } from "react";
 import { BridgedNetwork, FiatOrBridged, OtherBridgeProvider } from "./types";
-import { getKeyValue } from "./helpers";
+import { getKeyValue, isCEXProvider } from "./helpers";
 
 export const useOtherProviders = (
     mode: CurrentDisplayView,
@@ -25,6 +25,16 @@ export const useOtherProviders = (
     }, []);
 
     return useMemo(() => {
+
+        if (isCEXProvider(String(selectedCurrency))) {
+            return all.filter(provider => {
+                if (provider.code.toLowerCase() === String(selectedCurrency).toLowerCase()) {
+                    return true;
+                }
+            });
+        }
+
+
         return all.filter(provider => {
             if (mode === CurrentDisplayView.deposit) {
 

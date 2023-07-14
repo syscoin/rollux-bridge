@@ -9,15 +9,19 @@ export enum FiatMethod {
     PLN = 'PLN' // Polish Zloty
 }
 
+export enum BridgedCEX {
+    DIGIFINEX = 'Digifinex',
+    KUCOIN = 'Kucoin',
+    MEXC = 'Mexc',
+    LBank = 'LBank',
+    Bitmart = 'Bitmart',
+}
+
 export enum BridgedNetwork {
     SYS = 'Syscoin Mainnet', // Syscoin
     ETH = 'Ethereum Mainnet', // Ethereum
     BSC = 'Binance Smart Chain', // Binance Smart Chain
     MATIC = 'Polygon', // Polygon
-}
-
-export enum BridgedCEX {
-    DIGIFINEX = 'Digifinex', // Binance
 }
 
 export type FiatOrBridged = FiatMethod | BridgedNetwork | BridgedCEX;
