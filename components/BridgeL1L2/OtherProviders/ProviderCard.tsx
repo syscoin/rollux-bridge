@@ -46,7 +46,7 @@ export const ProviderCard: FC<ProviderCardProps> = ({ config, onButtonClick }) =
                             {config.description}
                         </Text>
                         <Text fontSize={'sm'} color={'gray.400'}>
-                            {config.url}
+                            {config.url?.replace('https://', '').replace('http://', '')}
                         </Text>
                     </VStack>
                     <Spacer />

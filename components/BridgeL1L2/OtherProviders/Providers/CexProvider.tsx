@@ -7,12 +7,16 @@ export const CexProvider: FC<OtherBridgeComponentBaseProps> = ({
     mode,
     payload,
 }) => {
-    console.log(bridgeDetails, mode, payload);
+
 
     return (
         <ProviderCard
             config={bridgeDetails}
-            onButtonClick={() => { }}
+            onButtonClick={() => {
+                if (bridgeDetails.url) {
+                    window.open(bridgeDetails.url, "_blank");
+                }
+            }}
         />
     )
 }

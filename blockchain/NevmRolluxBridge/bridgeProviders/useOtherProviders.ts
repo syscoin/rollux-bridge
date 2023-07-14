@@ -1,5 +1,4 @@
 import { CurrentDisplayView } from "components/BridgeL1L2/interfaces";
-import { OtherProviderBridgeMode } from "components/BridgeL1L2/OtherProviders/types";
 import { providers } from "./providers";
 import { useState, useEffect, useMemo } from "react";
 import { BridgedNetwork, FiatOrBridged, OtherBridgeProvider } from "./types";
@@ -25,7 +24,6 @@ export const useOtherProviders = (
     }, []);
 
     return useMemo(() => {
-
         if (isCEXProvider(String(selectedCurrency))) {
             return all.filter(provider => {
                 if (provider.code.toLowerCase() === String(selectedCurrency).toLowerCase()) {
