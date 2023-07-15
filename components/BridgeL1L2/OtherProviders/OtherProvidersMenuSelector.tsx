@@ -158,7 +158,7 @@ export const OtherProvidersMenuSelector: FC<OtherProvidersMenuSelectorProps> = (
                             <HStack>
                                 <Image
                                     borderRadius="full"
-                                    src={`/providers/icons/${item}.png`}
+                                    src={`/providers/icons/${item.toLowerCase()}.png`}
                                     fallbackSrc="https://via.placeholder.com/40"
                                     alt={`${item} logo`}
                                     boxSize={boxSize}
