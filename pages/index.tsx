@@ -13,16 +13,14 @@ import {
     VStack
 } from '@chakra-ui/react';
 import { chakraTheme } from 'components/chakraTheme';
-import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
+import { MessageStatus } from "@eth-optimism/sdk";
 import { useEthers, useSigner } from "@usedapp/core";
-import { getNetworkByChainId, getNetworkByName, NetworkData, networks, networksMap, SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks";
+import { getNetworkByName, NetworkData, networks, networksMap, SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks";
 import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
-import { ConnectionWarning } from 'components/ConnectionWarning';
 import { BigNumber, Contract, ethers } from "ethers";
 import { RolluxHeader } from 'components/RolluxHeader';
 import { NextPage } from "next";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import DepositPart from 'components/BridgeL1L2/Standard/_deposit';
 import WithdrawPart from 'components/BridgeL1L2/Standard/_withdraw';
@@ -40,8 +38,9 @@ import { OtherProvidersListing } from '../components/BridgeL1L2/OtherProviders/O
 import { BridgedNetwork, FiatOrBridged } from '../blockchain/NevmRolluxBridge/bridgeProviders/types';
 import { BridgeTypeSelector } from '../components/BridgeL1L2/Withdraw/BridgeTypeSelector';
 import { MdOutlineShield, MdFastForward } from "react-icons/md";
-import { FaRunning, FaShippingFast } from "react-icons/fa"
+import { FaShippingFast } from "react-icons/fa"
 import { UnfinishedWithdrawalsModal } from 'components/BridgeL1L2/Withdraw/UnfinishedWithdrawalsModal';
+import useTxState from 'hooks/rolluxBridge/useTxState';
 
 
 type BridgeNevmRolluxProps = {}
@@ -50,13 +49,10 @@ type BridgeNevmRolluxProps = {}
 
 
 export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
-    const router = useRouter();
     const [currentDisplay, setCurrentDisplay] = useState<CurrentDisplayView>(CurrentDisplayView.deposit);
-    // const metamask = useMetamask();
-    // const connectedWalletCtxt = useConnectedWallet();
-    // const isConnected = connectedWalletCtxt.nevm.account;
+
     const { account, activateBrowserWallet, library, switchNetwork, chainId } = useEthers();
-    const [crossChainMessenger, setCrossChainMessenger] = useState<CrossChainMessenger | undefined>(undefined);
+
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [unfinishedWithdrawals, setUnfinishedWithdrawals] = useState<{ status: MessageStatus, txHash: string }[]>([])
 
@@ -64,7 +60,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const toast = useToast();
     const [withdrawalModalData, setWithdrawalModalData] = useState<{ status: MessageStatus, txHash: string }>({ status: 0, txHash: '' });
     const signer = useSigner();
-    // [{withdrawTx, proveTx}]
     const [proveTxns, setProveTxns] = useLocalStorage<{ withdrawTx: string, proveTx: string }[]>('prove-txns', []);
     const [relayTxns, setRelayTxns] = useLocalStorage<{ withdrawTx: string, relayTx: string }[]>('relay-txns', []);
 
@@ -81,6 +76,16 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const [selectedOtherNetwork, setSelectedOtherNetwork] = useState<FiatOrBridged>(BridgedNetwork.SYS);
 
     const messenger = useCrossChainMessenger();
+
+    const {
+        setIsDepositTxSent,
+        setIsPendingDepositTx,
+        setIsDepositTxRejected,
+        setIsPendingWithdrawTx,
+        setIsWithdrawTxRejected,
+        setIsWithdrawTxSent,
+    } = useTxState();
+
 
     // todo refactor this 2 similar functions
     const getProveTxn = (withdrawTxHash: string, data: { withdrawTx: string, proveTx: string }[]): string | null => {
@@ -232,6 +237,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             return; // not connected or not initialized
         }
 
+
+
         try {
             toast({
                 title: 'Deposit.',
@@ -240,8 +247,11 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 duration: 9000,
                 isClosable: true,
             })
-            const tx = await messenger.depositERC20(l1Token, l2Token, amount);
 
+
+            await setIsPendingDepositTx(true);
+            const tx = await messenger.depositERC20(l1Token, l2Token, amount);
+            setIsDepositTxSent(true);
             setDepositTxHash(tx.hash);
 
             toast({
@@ -266,6 +276,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             setIsLoading(false);
         } catch (e) {
             setIsLoading(false);
+            setIsDepositTxRejected(true);
+            setIsPendingDepositTx(false);
             console.log(e);
         }
 
@@ -358,7 +370,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     duration: 9000,
                     isClosable: true,
                 })
-
+                setIsPendingDepositTx(true);
                 const depositTx = await messenger.depositETH(
                     ethers.utils.parseEther(amount),
                     {
@@ -368,6 +380,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 );
 
                 setDepositTxHash(depositTx.hash);
+                setIsDepositTxSent(true);
 
                 const _confirmationToast = toast({
                     title: 'Deposit confirmation.',
@@ -403,6 +416,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                         isClosable: true,
                     })
 
+
+
+
                     console.log('Deposit error');
                     console.log(confirmation);
                     setIsLoading(false);
@@ -417,6 +433,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                     isClosable: true,
                 })
                 console.log(e);
+
+                setIsDepositTxRejected(true);
+                setIsPendingDepositTx(false);
             }
 
         }

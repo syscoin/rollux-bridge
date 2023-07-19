@@ -9,6 +9,8 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from "components/Common/ErrorFallback";
 import { WelcomeDisclaimer } from "components/Common/WelcomeDisclaimer";
 import { chakraTheme } from 'components/chakraTheme';
+import { Provider } from "react-redux";
+import store from "store";
 
 const queryClient = new QueryClient();
 
@@ -55,17 +57,16 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <DAppProvider config={dappConfig}>
-          <ChakraProvider theme={chakraTheme}>
-
-
-            <Component {...pageProps} />
-            <WelcomeDisclaimer />
-          </ChakraProvider>
-
-        </DAppProvider>
-      </ErrorBoundary>
+      <Provider store={store}>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <DAppProvider config={dappConfig}>
+            <ChakraProvider theme={chakraTheme}>
+              <Component {...pageProps} />
+              <WelcomeDisclaimer />
+            </ChakraProvider>
+          </DAppProvider>
+        </ErrorBoundary>
+      </Provider>
     </QueryClientProvider>
   );
 }

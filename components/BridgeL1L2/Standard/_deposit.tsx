@@ -20,6 +20,8 @@ import { useCrossChainMessenger } from "../../../hooks/rolluxBridge/useCrossChai
 import { useEstimateTransaction } from 'hooks/rolluxBridge/useEstimateTransaction';
 import SelectTokenModal from './SelectTokenModal';
 import { RolluxLogo } from 'components/Icons/RolluxLogo';
+import useTxState from 'hooks/rolluxBridge/useTxState';
+import { useAppSelector } from 'store';
 
 export type DepositPartProps = {
     onClickDepositButton: (amount: string) => void;
@@ -41,6 +43,8 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     const [amountToSwap, setAmountToSwap] = useState<string>('');
     const [maxAmount, setMaxAmount] = useState<string>('0.00');
     const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork, contractsL1 } = useSelectedNetwork();
+
+    const isDepositTxSent = useAppSelector(state => state.rootReducer.AppState.isDepositTxSent);
 
     const { account, chainId, switchNetwork } = useEthers();
     const balanceNativeToken = useEtherBalance(account, { chainId: l1ChainId });
@@ -75,6 +79,8 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     const [isActionButtonLoading, setIsActionButtonLoading] = useState<boolean>(false);
 
     const { calculateEstimate } = useEstimateTransaction();
+
+
 
     useEffect(() => {
         if (parseFloat(amountToSwap) == 0) {
@@ -245,23 +251,6 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
             setL1ERC20Tokens(tokensL1);
 
-
-            if (account) {
-                /**
-                 * balances mapping
-                 */
-
-                const balancesInfo: { [key: string]: string } = {};
-
-                tokensL1.forEach((token) => {
-                    // viewTokenBalance(token.address, token.decimals, account).then((balance: string) => {
-                    //     balancesInfo[token.symbol] = balance;
-                    // })
-                })
-
-                setTokenBalancesMap(balancesInfo);
-            }
-
             const tokensL2: TokenListToken[] = tokens.filter((token) => {
                 if (token.chainId === l2ChainId) {
                     return true;
@@ -271,9 +260,6 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
             })
 
             setL2ERC20Tokens(tokensL2);
-
-
-            // set all tokens
 
             setAllERC20Tokens(tokens);
 
