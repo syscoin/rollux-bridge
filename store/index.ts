@@ -38,14 +38,6 @@ const store = configureStore({
     reducer: {
         rootReducer
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(localStorageMiddleware),
-    preloadedState: {
-        rootReducer: {
-            Deposits: {
-                deposits: loadFromLocalStorage('app::deposits'),
-            }
-        }
-    }
 });
 
 export type RootState = ReturnType<typeof store.getState>;

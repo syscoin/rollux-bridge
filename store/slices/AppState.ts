@@ -38,7 +38,7 @@ const AppState = createSlice({
         resetAllErrors: (state) => {
             state.isDepositTxRejected = false;
             state.isWithdrawTxRejected = false;
-        }
+        },
     }
 });
 

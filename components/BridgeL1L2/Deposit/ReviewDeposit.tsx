@@ -29,20 +29,10 @@ export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled, am
     const hasPendingDeposit = useAppSelector(state => state.rootReducer.AppState.isDepositTxSent);
 
 
-    const handleOpen = (review = false) => {
-
-        if (review) {
-            onOpen();
-
-            return;
-        }
-
+    const handleOpen = () => {
         resetAllErrors();
-        setIsDepositTxSent(false);
-        console.log('here')
         onOpen()
         onOpenModal();
-
     }
 
     return (<>
@@ -113,7 +103,7 @@ export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled, am
                         <Flex flex={1} flexDirection={'row'} width={'100%'}>
                             <Button
                                 variant={'primary'}
-                                onClick={() => handleOpen(false)}
+                                onClick={handleOpen}
                                 width={'100%'}
                             >
                                 Try again
@@ -156,7 +146,7 @@ export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled, am
         <Button
             isDisabled={isDisabled}
             variant={'primary'}
-            onClick={() => handleOpen(false)}
+            onClick={() => handleOpen()}
         >
             Review deposit
         </Button>

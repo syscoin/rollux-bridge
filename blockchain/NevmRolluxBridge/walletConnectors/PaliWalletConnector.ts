@@ -13,6 +13,7 @@ interface MetaMaskEthereumProvider {
     removeAllListeners(event?: string | symbol): this;
 }
 
+const isMobile = typeof navigator !== 'undefined' ? /iPhone|iPad|iPod|Android/i.test(navigator.userAgent ?? '') : false;
 
 function detectEthereumProvider<T = MetaMaskEthereumProvider>({
     mustBeMetaMask = false,
@@ -28,6 +29,8 @@ function detectEthereumProvider<T = MetaMaskEthereumProvider>({
 
         // @ts-ignore
         let isReallyPali = String((window as Window).ethereum.wallet ?? '').includes('pali');
+
+
 
         if ((window as Window).ethereum && (window as any).pali && isReallyPali) {
 
@@ -56,8 +59,8 @@ function detectEthereumProvider<T = MetaMaskEthereumProvider>({
             window.removeEventListener('ethereum#initialized', handleEthereum);
 
             const { ethereum } = window as Window;
-            const { pali } = window as any;
 
+            const { pali } = isMobile ? { pali: true } : window as any;
             // @ts-ignore
             let isReallyPali = String(ethereum.wallet ?? '').includes('pali');
 
@@ -89,12 +92,14 @@ function detectEthereumProvider<T = MetaMaskEthereumProvider>({
 }
 
 export async function getMetamaskProvider() {
-    if (!(window as any).pali) {
+
+    if (!(window as any).pali && !isMobile) { // going to skip this check for mobile devices. 
         window.open(GET_PALI_LINK)
         return undefined
     }
 
-    if ((window as any).pali && !(window as any).ethereum) {
+
+    if ((isMobile ? true : (window as any).pali) && !(window as any).ethereum) {
         console.log('Pali not activated for EVM');
 
         return undefined;
@@ -213,11 +218,12 @@ export class PaliWalletConnector implements Connector {
                 // suppose we're at utxo
 
 
-
-                await this.provider!.send(
-                    "eth_changeUTXOEVM",
-                    [{ chainId: 57 }],
-                );
+                if (!isMobile) {
+                    await this.provider!.send(
+                        "eth_changeUTXOEVM",
+                        [{ chainId: 57 }],
+                    );
+                }
 
                 const chainId: string = await this.provider!.send('eth_chainId', [])
                 console.log(chainId)
