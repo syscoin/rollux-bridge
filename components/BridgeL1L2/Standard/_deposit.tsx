@@ -315,7 +315,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                             },
                         }} w={'100%'} value={(amountToSwap.length > 0) ? amountToSwap : ''} variant="secondary" size="md" onChange={(valueAsString) => {
 
-                            setAmountToSwap(valueAsString)
+                            setAmountToSwap(valueAsString.replace(',', '.'))
 
                         }}>
                             <HStack gap={0}>
