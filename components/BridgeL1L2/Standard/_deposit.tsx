@@ -21,7 +21,9 @@ import { useEstimateTransaction } from 'hooks/rolluxBridge/useEstimateTransactio
 import SelectTokenModal from './SelectTokenModal';
 import { RolluxLogo } from 'components/Icons/RolluxLogo';
 import useTxState from 'hooks/rolluxBridge/useTxState';
-import { useAppSelector } from 'store';
+import { useAppDispatch, useAppSelector } from 'store';
+import { setAmountToSwap as setAmountToSwapStore } from 'store/slices/Deposits';
+import { shallowEqual, useSelector } from 'react-redux';
 
 export type DepositPartProps = {
     onClickDepositButton: (amount: string) => void;
@@ -40,7 +42,17 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
     const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
-    const [amountToSwap, setAmountToSwap] = useState<string>('');
+
+    const appDispatch = useAppDispatch();
+
+    const amountToSwap = useAppSelector(state => state.rootReducer.Deposits.amountToSwap, shallowEqual);
+
+    const setAmountToSwap = (amount: string) => {
+        appDispatch(setAmountToSwapStore(amount));
+    }
+
+
+    // const [amountToSwap, setAmountToSwap] = useState<string>('');
     const [maxAmount, setMaxAmount] = useState<string>('0.00');
     const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork, contractsL1 } = useSelectedNetwork();
 
@@ -315,8 +327,13 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                                     borderColor: parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? 'red.400' : 'gray.400'
                                 },
                             }} w={'100%'} value={(amountToSwap.length > 0) ? amountToSwap : ''} variant="secondary" size="md" onChange={(valueAsString) => {
+                                const value = valueAsString.replaceAll('..', '.');
 
-                                setAmountToSwap(valueAsString.replace(',', '.'))
+                                if (!isNaN(parseFloat(value))) {
+                                    setAmountToSwap(value);
+                                } else {
+                                    setAmountToSwap('');
+                                }
 
                             }}>
                             <HStack gap={0}>
@@ -457,9 +474,6 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                         isDisabled={parseFloat(balanceToDisplay) < parseFloat(amountToSwap) || !parseFloat(amountToSwap)}
                     >
                         <>
-
-
-
                             <Button
                                 isLoading={showDepositSent || depositTx !== undefined}
                                 width={'100%'}
@@ -473,9 +487,7 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
                                 Deposit
                             </Button>
                         </>
-
                     </ReviewDeposit>
-
                 </>}
 
 

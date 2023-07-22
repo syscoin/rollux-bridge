@@ -1,18 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Deposit } from "store/types/deposits";
 
 export const initialState = {
-    deposits: [] as Deposit[],
     amountToSwap: '',
 }
 
-const Deposits = createSlice({
-    name: "Deposits",
+const Withdrawals = createSlice({
+    name: "Withdrawals",
     initialState,
     reducers: {
-        addDeposit: (state, action) => {
-            state.deposits.push(action.payload);
-        },
         setAmountToSwap: (state, action) => {
             state = {
                 ...state,
@@ -25,8 +20,7 @@ const Deposits = createSlice({
 });
 
 export const {
-    addDeposit,
     setAmountToSwap
-} = Deposits.actions;
+} = Withdrawals.actions;
 
-export default Deposits.reducer;
+export default Withdrawals.reducer;

@@ -21,6 +21,9 @@ import { MaxBalance } from '../MaxBalance';
 import { ReviewWithdrawal } from '../Withdraw/ReviewWithdrawal';
 import { useEstimateTransaction } from 'hooks/rolluxBridge/useEstimateTransaction';
 import { useCrossChainMessenger } from 'hooks/rolluxBridge/useCrossChainMessenger';
+import { useAppDispatch, useAppSelector } from 'store';
+import { shallowEqual } from 'react-redux';
+import { setAmountToSwap as setAmountToSwapStore } from 'store/slices/Withdrawals';
 
 export type WithdrawPartProps = {
     onClickWithdrawButton: (amount: string) => void;
@@ -46,11 +49,18 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
     const [selectedTokenAddressL2, setSelectedTokenAddressL2] = useState<string | undefined>(undefined);
     const [balanceToDisplay, setBalanceToDisplay] = useState<string>('');
     const [selectedTokenDecimals, setSelectedTokenDecimals] = useState<number>(18);
-    const [amountToSwap, setAmountToSwap] = useState<string>('');
+
+    const appDispatch = useAppDispatch();
+
+    const amountToSwap = useAppSelector(state => state.rootReducer.Withdrawals.amountToSwap, shallowEqual);
+
+    const setAmountToSwap = (amount: string) => {
+        appDispatch(setAmountToSwapStore(amount));
+    }
+
+    // const [amountToSwap, setAmountToSwap] = useState<string>('');
     const { account, chainId, switchNetwork } = useEthers();
     const { l1ChainId, l2ChainId, rpcL1, rpcL2, selectedNetwork } = useSelectedNetwork();
-
-
 
     const balanceNativeToken = useEtherBalance(account, { chainId: l2ChainId });
     const balanceERC20Token = useTokenBalance(selectedTokenAddress, account, { chainId: l2ChainId });
@@ -317,7 +327,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                 borderRadius: '4px',
                 p: 3
             }}>
-                <FormControl isInvalid={ethers.utils.parseUnits(balanceToDisplay || '0', selectedTokenDecimals).lt(ethers.utils.parseUnits(amountToSwap || '0', selectedTokenDecimals))}>
+                <FormControl isInvalid={false}>
                     <Flex justifyContent="space-between">
 
                         <HStack mb={0} color={'gray.500'}>
@@ -342,7 +352,13 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                             },
                         }} w={'100%'} value={(amountToSwap.length > 0) ? amountToSwap : ''} variant="secondary" size="md" onChange={(valueAsString) => {
 
-                            setAmountToSwap(valueAsString)
+                            const value = valueAsString.replaceAll('..', '.');
+
+                            if (!isNaN(parseFloat(value))) {
+                                setAmountToSwap(value);
+                            } else {
+                                setAmountToSwap('');
+                            }
 
                         }}>
                             <HStack gap={0}>
@@ -352,7 +368,7 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                                     tokens={l2ERC20Tokens}
                                     onSelect={(token) => {
                                         setCurrency(token.symbol);
-                                        setAmountToSwap('0.00');
+                                        setAmountToSwap('');
                                     }}
                                     chainId={l2ChainId}
                                     selectedToken={selectedToken !== undefined ? selectedToken : { address: '', chainId: l1ChainId, decimals: 18, name: 'Syscoin', symbol: 'SYS', logoURI: '/syscoin-logo.svg' }}

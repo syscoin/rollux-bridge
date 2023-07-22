@@ -4,7 +4,7 @@ import { useSelectedNetwork } from "hooks/rolluxBridge/useSelectedNetwork";
 import useTxState from "hooks/rolluxBridge/useTxState";
 import React, { FC, useEffect } from "react";
 import { FaCheckCircle } from "react-icons/fa";
-import { MdWarning } from "react-icons/md";
+import { MdInfo, MdWarning } from "react-icons/md";
 import { useAppSelector } from "store";
 
 export type ReviewDepositProps = {
@@ -25,9 +25,6 @@ export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled, am
     const { selectedNetwork, getExplorerLink } = useSelectedNetwork();
 
     const {
-        setIsDepositTxRejected,
-        setIsDepositTxSent,
-        setIsPendingDepositTx,
         resetAllErrors,
     } = useTxState();
 
@@ -164,10 +161,10 @@ export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled, am
 
         {hasPendingDeposit && <>
             <HStack>
-                <Icon as={MdWarning} fontSize={'md'} color={'orange.500'} />
+                <Icon as={MdInfo} fontSize={'xl'} color={'gray.500'} />
 
                 <Text fontSize={'md'} mt={2}>
-                    There is already pending deposit transaction.
+                    There is already a pending deposit transaction.
                 </Text>
             </HStack>
         </>}

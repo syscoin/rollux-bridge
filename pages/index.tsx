@@ -41,6 +41,9 @@ import { MdOutlineShield, MdFastForward } from "react-icons/md";
 import { FaShippingFast } from "react-icons/fa"
 import { UnfinishedWithdrawalsModal } from 'components/BridgeL1L2/Withdraw/UnfinishedWithdrawalsModal';
 import useTxState from 'hooks/rolluxBridge/useTxState';
+import { useAppDispatch } from 'store';
+import { setAmountToSwap as setAmountToSwapDeposits } from 'store/slices/Deposits';
+import { setAmountToSwap as setAmountToSwapWithdrawals } from 'store/slices/Withdrawals';
 
 
 type BridgeNevmRolluxProps = {}
@@ -76,6 +79,16 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
     const [selectedOtherNetwork, setSelectedOtherNetwork] = useState<FiatOrBridged>(BridgedNetwork.SYS);
 
     const messenger = useCrossChainMessenger();
+
+    const reduxDispatcher = useAppDispatch();
+
+    const setAmountDeposits = (amount: string) => {
+        reduxDispatcher(setAmountToSwapDeposits(amount));
+    }
+
+    const setAmountWithdrawals = (amount: string) => {
+        reduxDispatcher(setAmountToSwapWithdrawals(amount));
+    }
 
     const {
         setIsDepositTxSent,
@@ -254,6 +267,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             setIsDepositTxSent(true);
             setDepositTxHash(tx.hash);
 
+            setAmountDeposits('');
+
             toast({
                 title: 'Deposit confirmation.',
                 description: "Waiting for deposit confirmation",
@@ -261,7 +276,10 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 isClosable: false,
             })
 
+
+
             await tx.wait();
+
             await messenger.waitForMessageStatus(tx.hash,
                 MessageStatus.RELAYED)
 
@@ -329,6 +347,9 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 isClosable: true,
             })
 
+
+            setAmountWithdrawals('');
+
             await withdrawTx.wait();
 
             await updateWithdrawalLogs();
@@ -382,6 +403,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 setDepositTxHash(depositTx.hash);
                 setIsDepositTxSent(true);
 
+                setAmountDeposits('');
+
                 const _confirmationToast = toast({
                     title: 'Deposit confirmation.',
                     description: "Waiting for deposit confirmation",
@@ -390,6 +413,7 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
                 })
 
                 const confirmation = await messenger.waitForMessageReceipt(depositTx);
+
 
 
                 toast.close(_confirmationToast);
@@ -458,8 +482,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
         try {
             setIsLoading(true);
 
-            console.log(l1Token, l2Token);
-
             toast({
                 title: 'Withdraw.',
                 description: "Initialising withdrawal transaction",
@@ -474,6 +496,8 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             );
 
             await withDrawERC20Tx.wait();
+
+            setAmountWithdrawals('');
 
             toast({
                 title: 'Withdraw.',
@@ -499,21 +523,6 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             setIsLoading(false);
         }
     }
-
-
-    // useEffect(() => {
-
-    //     if (account) {
-
-    //         getCrossChainMessenger(signer, currentDisplay).then((messenger) => {
-
-    //             setCrossChainMessenger(messenger);
-    //         })
-    //     }
-
-    // }, [signer, account, currentDisplay, getCrossChainMessenger])
-
-
 
 
     const widthdrawalsLogs = useCallback(async () => {
