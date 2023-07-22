@@ -306,18 +306,19 @@ export const DepositPart: FC<DepositPartProps> = ({ onClickDepositButton, onClic
 
                     </Flex>
                     <HStack borderRadius="6px" mt={1} minH="48px" pr={'0px'} >
-                        <NumberInput sx={{
-                            border: '1px solid',
-                            borderColor: parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? 'red.300' : 'gray.300',
-                            borderRadius: '6px',
-                            _hover: {
-                                borderColor: parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? 'red.400' : 'gray.400'
-                            },
-                        }} w={'100%'} value={(amountToSwap.length > 0) ? amountToSwap : ''} variant="secondary" size="md" onChange={(valueAsString) => {
+                        <NumberInput
+                            sx={{
+                                border: '1px solid',
+                                borderColor: parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? 'red.300' : 'gray.300',
+                                borderRadius: '6px',
+                                _hover: {
+                                    borderColor: parseFloat(balanceToDisplay) < parseFloat(amountToSwap) ? 'red.400' : 'gray.400'
+                                },
+                            }} w={'100%'} value={(amountToSwap.length > 0) ? amountToSwap : ''} variant="secondary" size="md" onChange={(valueAsString) => {
 
-                            setAmountToSwap(valueAsString.replace(',', '.'))
+                                setAmountToSwap(valueAsString.replace(',', '.'))
 
-                        }}>
+                            }}>
                             <HStack gap={0}>
                                 <NumberInputField placeholder='0.00' />
 

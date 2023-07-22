@@ -226,9 +226,9 @@ export class PaliWalletConnector implements Connector {
                 }
 
                 const chainId: string = await this.provider!.send('eth_chainId', [])
-                console.log(chainId)
+                // console.log(chainId)
                 const accounts: string[] = await this.provider!.send('eth_requestAccounts', [])
-                console.log(chainId, accounts);
+                // console.log(chainId, accounts);
                 this.update.emit({ chainId: parseInt(chainId), accounts })
 
                 resolved = true;

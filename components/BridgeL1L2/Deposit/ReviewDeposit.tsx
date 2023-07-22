@@ -6,7 +6,6 @@ import React, { FC, useEffect } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { MdWarning } from "react-icons/md";
 import { useAppSelector } from "store";
-import { resetAll, resetAllErrors, setIsDepositTxSent, setIsPendingDepositTx } from "store/slices/AppState";
 
 export type ReviewDepositProps = {
     children: React.ReactNode;
@@ -25,6 +24,13 @@ export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled, am
 
     const { selectedNetwork, getExplorerLink } = useSelectedNetwork();
 
+    const {
+        setIsDepositTxRejected,
+        setIsDepositTxSent,
+        setIsPendingDepositTx,
+        resetAllErrors,
+    } = useTxState();
+
     const hasDepositErrors = useAppSelector(state => state.rootReducer.AppState.isDepositTxRejected);
     const hasPendingDeposit = useAppSelector(state => state.rootReducer.AppState.isDepositTxSent);
 
@@ -33,6 +39,11 @@ export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled, am
         resetAllErrors();
         onOpen()
         onOpenModal();
+    }
+
+    const tryAgain = () => {
+        resetAllErrors();
+        onClose();
     }
 
     return (<>
@@ -103,7 +114,7 @@ export const ReviewDeposit: FC<ReviewDepositProps> = ({ children, isDisabled, am
                         <Flex flex={1} flexDirection={'row'} width={'100%'}>
                             <Button
                                 variant={'primary'}
-                                onClick={handleOpen}
+                                onClick={() => tryAgain()}
                                 width={'100%'}
                             >
                                 Try again
