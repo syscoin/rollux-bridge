@@ -477,13 +477,21 @@ export const WithdrawPart: FC<WithdrawPartProps> = ({ onClickWithdrawButton, onC
                     <ReviewWithdrawal
                         amountToWithdraw={amountToSwap}
                         tokenSymbol={currency}
-                        totalEstimatedFeeUsd={10}
+                        totalEstimatedFeeUsd={0.0141}
                         initiateFeeUsd={0.0001}
-                        proveFeeUsd={3}
-                        claimFeeUsd={7}
+                        proveFeeUsd={0.004}
+                        claimFeeUsd={0.01}
                         onClickWithdrawal={async () => {
                             await preCheckNetwork(l2ChainId, chainId as number);
-                            onClickWithdrawButton(amountToSwap);
+                            if (!selectedToken || selectedToken.symbol === 'SYS') {
+                                onClickWithdrawButton(amountToSwap);
+                            } else {
+                                onClickWithdrawERC20(
+                                    selectedTokenAddressL2 ?? '',
+                                    selectedTokenAddress ?? '',
+                                    ethers.utils.parseUnits(amountToSwap),
+                                );
+                            }
                         }}
                         onClickUseThirdPartyBridge={() => {
                             console.log('closed modal just.')
