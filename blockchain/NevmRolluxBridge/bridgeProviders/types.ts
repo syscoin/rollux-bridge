@@ -50,6 +50,7 @@ export interface OtherBridgeProvider {
     supportedInputs: FiatOrBridged[],
     supportedOutputs: FiatOrBridged[],
     supportedTokens: string[],
+    urlProviderDestination?: string | undefined,
 }
 
 export type OtherBridgeProviderComponentProps<T> = {

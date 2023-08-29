@@ -1,6 +1,7 @@
 import { CexProvider } from "components/BridgeL1L2/OtherProviders/Providers/CexProvider";
 import { ChaingeProvider } from "components/BridgeL1L2/OtherProviders/Providers/ChaingeProvider";
 import { CoinifyProvider } from "components/BridgeL1L2/OtherProviders/Providers/CoinifyProvider";
+import { UrlProvider } from "components/BridgeL1L2/OtherProviders/Providers/UrlProvider";
 import { BridgedNetwork, FiatMethod, OtherBridgeProvider } from "./types";
 
 export const providers: OtherBridgeProvider[] = [
@@ -35,6 +36,38 @@ export const providers: OtherBridgeProvider[] = [
             'USDT',
             'USDC',
             'BTC',
+        ]
+    },
+    // layerswap
+    {
+        label: 'Layerswap',
+        code: 'layerswap',
+        isCex: false,
+        description: 'LayerSwap',
+        url: 'layerswap.io',
+        urlProviderDestination: 'layerswap.io/app',
+        logoUrl: '/bridge-providers/layerswap.png',
+        supportsCrypto: true,
+        supportsFiat: true,
+        enabled: true,
+        component: UrlProvider,
+        askOpenInNewTab: false,
+        supportsDeposits: true,
+        supportsWithdrawals: true,
+        supportedInputs: [
+            BridgedNetwork.SYS,
+            BridgedNetwork.ETH,
+            BridgedNetwork.BSC,
+            BridgedNetwork.MATIC,
+        ],
+        supportedOutputs: [
+            BridgedNetwork.SYS,
+            BridgedNetwork.ETH,
+            BridgedNetwork.BSC,
+            BridgedNetwork.MATIC,
+        ],
+        supportedTokens: [
+            'USDC',
         ]
     },
     {
@@ -262,5 +295,6 @@ export const providers: OtherBridgeProvider[] = [
             'USDC',
 
         ],
-    }
+    },
+
 ]
