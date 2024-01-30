@@ -111,7 +111,6 @@ export const OtherProvidersListing: FC<OtherProvidersListingProps> = ({ currentV
                     if (null === ComponentToRender) return;
 
                     return (
-
                         <ComponentToRender key={index} payload={{
                             token: selectedToken,
                             inputNetwork: selectedInputNetwork,
