@@ -21,6 +21,7 @@ export const networksMap: { [key: string]: string } = {
 export enum SelectedNetworkType {
     Mainnet,
     Testnet,
+    TestnetNebula,
     Unsupported
 }
 
@@ -67,26 +68,38 @@ export const networks: { [key: string]: NetworkData } = {
         chainId: 57000,
         layer: 2,
         contracts: contractsDev.l2_dev,
+    },
+    L2Nebula: {
+        rpcAddress: 'https://rpc-nebula.rollux.com',
+        name: 'RolluxNebula',
+        explorerUrl: 'https://nebula.rollux.com',
+        chainId: 57057,
+        layer: 2,
+        contracts: contractsDev.l2_nebula,
     }
 }
 
 export const NetworkSwitchMap: {
     [key in SelectedNetworkType]: {
         L1: number,
-        L2: number
+        L2: number,
+        L2Nebula: number
     }
 } = {
     [SelectedNetworkType.Mainnet]: {
         L1: 57,
         L2: 570,
+        L2Nebula: 57057
     },
     [SelectedNetworkType.Testnet]: {
         L1: 5700,
         L2: 57000,
+        L2Nebula: 57057
     },
     [SelectedNetworkType.Unsupported]: {
         L1: 0,
-        L2: 0
+        L2: 0,
+        L2Nebula: 0
     }
 }
 

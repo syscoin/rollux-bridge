@@ -24,7 +24,8 @@ export const NetworkSwitcher: FC<{}> = () => {
                 } value={selectedNetwork} onChange={(e) => changeNetworks(Number(e.target.value), atWhichLayer ?? 1)}>
                 <option value="0">Mainnet</option>
                 <option value="1">Testnet</option>
-                <option value="2" disabled>Unsupported</option>
+                <option value="3">Testnet Nebula [L2]</option>
+                <option value="99999" disabled>Unsupported</option>
             </Select>
 
         </>
