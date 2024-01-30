@@ -31,7 +31,9 @@ export const ChainIdsToNetworksMap: { [key: number]: SelectedNetworkType } = {
     57000: SelectedNetworkType.Testnet,
     // mainnet todo fill correct chain Ids
     57: SelectedNetworkType.Mainnet,
-    570: SelectedNetworkType.Mainnet
+    570: SelectedNetworkType.Mainnet,
+    // nebula testnet
+    57057: SelectedNetworkType.TestnetNebula,
 }
 
 
