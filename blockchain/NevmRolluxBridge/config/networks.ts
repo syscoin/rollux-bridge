@@ -69,6 +69,14 @@ export const networks: { [key: string]: NetworkData } = {
         layer: 2,
         contracts: contractsDev.l2_dev,
     },
+    L1Nebula: {
+        rpcAddress: 'https://rpc.tanenbaum.io',
+        name: 'L1Dev',
+        explorerUrl: 'https://tanenbaum.io',
+        chainId: 5700,
+        layer: 1,
+        contracts: contractsDev.l1_nebula,
+    },
     L2Nebula: {
         rpcAddress: 'https://rpc-nebula.rollux.com',
         name: 'RolluxNebula',
@@ -83,23 +91,23 @@ export const NetworkSwitchMap: {
     [key in SelectedNetworkType]: {
         L1: number,
         L2: number,
-        L2Nebula: number
     }
 } = {
     [SelectedNetworkType.Mainnet]: {
         L1: 57,
         L2: 570,
-        L2Nebula: 57057
     },
     [SelectedNetworkType.Testnet]: {
         L1: 5700,
         L2: 57000,
-        L2Nebula: 57057
     },
     [SelectedNetworkType.Unsupported]: {
         L1: 0,
         L2: 0,
-        L2Nebula: 0
+    },
+    [SelectedNetworkType.TestnetNebula]: {
+        L1: 5700,
+        L2: 57057,
     }
 }
 
