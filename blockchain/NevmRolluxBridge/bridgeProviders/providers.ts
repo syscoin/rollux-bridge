@@ -77,7 +77,7 @@ export const providers: OtherBridgeProvider[] = [
         description: 'Coinify',
         url: 'coinify.com',
         logoUrl: '/bridge-providers/coinify-logo.png',
-        supportsCrypto: false,
+        supportsCrypto: true,
         supportsFiat: true,
         enabled: true,
         component: CoinifyProvider,
@@ -91,14 +91,10 @@ export const providers: OtherBridgeProvider[] = [
             FiatMethod.PLN,
             FiatMethod.JPY,
         ],
-        supportedOutputs: [
-            FiatMethod.USD,
-            FiatMethod.EUR,
-            FiatMethod.CNY,
-            FiatMethod.PLN,
-            FiatMethod.JPY,
+        supportedOutputs: [],
+        supportedTokens: [
+            'SYS',
         ],
-        supportedTokens: [],
     },
     // CEX PROVIDERS
     {

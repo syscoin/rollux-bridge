@@ -5,7 +5,7 @@ import React, { FC } from "react"
 import { ProviderCard } from "../ProviderCard";
 
 
-const baseUrl = 'https://trade.sandbox.coinify.com/syscoin?partnerId=5ddbc638-0763-4ad5-a3ea-adb382b085df&partnerName=syscoin&primaryColor=%231f5eff&defaultCryptoCurrency=SYS&noSignup=TRUE&';
+const baseUrl = 'https://trade.coinify.com/syscoin?partnerId=5ddbc638-0763-4ad5-a3ea-adb382b085df&partnerName=syscoin&primaryColor=%231f5eff&defaultCryptoCurrency=SYSROLLUX&noSignup=TRUE&';
 
 export const CoinifyProvider: FC<OtherBridgeComponentBaseProps> = ({
     bridgeDetails,
