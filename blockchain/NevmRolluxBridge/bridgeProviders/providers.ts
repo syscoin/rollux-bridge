@@ -87,7 +87,6 @@ export const providers: OtherBridgeProvider[] = [
         supportedInputs: [
             FiatMethod.USD,
             FiatMethod.EUR,
-            FiatMethod.CNY,
             FiatMethod.PLN,
             FiatMethod.JPY,
         ],
