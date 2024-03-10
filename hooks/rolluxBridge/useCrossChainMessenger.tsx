@@ -1,6 +1,5 @@
 import { CrossChainMessenger } from "@eth-optimism/sdk";
 import { useEthers, useSigner } from "@usedapp/core"
-import { getChainById } from "@usedapp/core/dist/esm/src/helpers";
 import { getNetworkByChainId } from "blockchain/NevmRolluxBridge/config/networks";
 import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
 import { ethers } from "ethers";
@@ -9,16 +8,24 @@ import { useSelectedNetwork } from "./useSelectedNetwork";
 import { networks } from "blockchain/NevmRolluxBridge/config/networks";
 
 export const useCrossChainMessenger = () => {
-    const signer = useSigner();
     const { contractsL1, contractsL2, atWhichLayer, rpcL1, rpcL2, l1ChainId, l2ChainId } = useSelectedNetwork();
     const [messenger, setMessenger] = useState<CrossChainMessenger | undefined>(undefined);
-    const { chainId } = useEthers();
+    const { chainId, library, account } = useEthers();
+    const [signer, setSigner] = useState<ethers.Signer | undefined>(undefined);
+
+
+    useEffect(() => {
+        if (library !== undefined && 'getSigner' in library && account !== undefined) {
+            setSigner(library.getSigner())
+        } else {
+            setSigner(undefined)
+        }
+    }, [library, account]);
 
 
     useEffect(() => {
         if (!signer || !chainId || !atWhichLayer || !contractsL1 || !contractsL2 || !l1ChainId || !l2ChainId) {
             setMessenger(undefined);
-
             return;
         }
 

@@ -262,8 +262,13 @@ export const BridgeNevmRollux: NextPage<BridgeNevmRolluxProps> = ({ }) => {
             })
 
 
-            await setIsPendingDepositTx(true);
-            const tx = await messenger.depositERC20(l1Token, l2Token, amount);
+            setIsPendingDepositTx(true);
+
+            const tx = await messenger.depositERC20(l1Token, l2Token, amount, {
+                overrides: {
+                    gasLimit: 1000000
+                }
+            });
             setIsDepositTxSent(true);
             setDepositTxHash(tx.hash);
 

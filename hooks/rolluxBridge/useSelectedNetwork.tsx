@@ -1,8 +1,5 @@
-import contractsDev from "blockchain/NevmRolluxBridge/config/contracts";
-import { useEthers, useSigner } from "@usedapp/core";
+import { useEthers } from "@usedapp/core";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { CrossChainMessenger } from "@eth-optimism/sdk";
-import { crossChainMessengerFactory } from "blockchain/NevmRolluxBridge/factories/CrossChainMessengerFactory";
 import { ChainIdsToNetworksMap, networks, NetworkSwitchMap, SelectedNetworkType } from "blockchain/NevmRolluxBridge/config/networks";
 
 
@@ -98,7 +95,9 @@ export const useSelectedNetwork = () => {
     // const l2ChainId = 57000;
 
     useEffect(() => {
+        console.log(`Chain Id - ${chainId}`);
         if (!chainId) {
+
             setAtWhichLayer(undefined)
             setSelectedNetwork(SelectedNetworkType.Unsupported);
         } else {
@@ -111,7 +110,16 @@ export const useSelectedNetwork = () => {
                     return;
                 }
 
-                _layer = chainId === NetworkSwitchMap[value as SelectedNetworkType].L1 ? 1 : 2;
+                //_layer = chainId === NetworkSwitchMap[value as SelectedNetworkType].L1 ? 1 : 2;
+
+                const _networkSetup = NetworkSwitchMap[value as SelectedNetworkType];
+
+                if (chainId === _networkSetup.L1) {
+                    _layer = 1;
+                } else if (chainId === _networkSetup.L2) {
+                    _layer = 2;
+                }
+
             })
 
             setAtWhichLayer(_layer)
