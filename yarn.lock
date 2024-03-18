@@ -3293,9 +3293,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@usedapp/core@npm:^1.2.10":
-  version: 1.2.10
-  resolution: "@usedapp/core@npm:1.2.10"
+"@usedapp/core@npm:^1.2.13":
+  version: 1.2.13
+  resolution: "@usedapp/core@npm:1.2.13"
   dependencies:
     "@metamask/detect-provider": ^2.0.0
     "@uniswap/token-lists": ^1.0.0-beta.27
@@ -3308,7 +3308,7 @@ __metadata:
     react: "*"
   bin:
     usedapp-generate-hooks: bin/usedapp-generate-hooks.js
-  checksum: e270f77861524aca4d1442c220f31e1127bbb68ae689363cf32b3dae0df1e2d24bef1c11d9206b8187cf1ba2123136ddd240346ec4ac123bd10997638a105f3d
+  checksum: 5c729092d32865acaaf5b2eca095d039ced3ecf72e2c5168483347981b6da6f6bc0b68becc270819ac397a285c8889fbee277b299a2b2b682b4bfab7da453b84
   languageName: node
   linkType: hard
 
@@ -11770,7 +11770,7 @@ __metadata:
     "@types/node": 17.0.32
     "@types/react": 18.0.9
     "@types/react-dom": 18.0.3
-    "@usedapp/core": ^1.2.10
+    "@usedapp/core": ^1.2.13
     "@usedapp/wallet-connect-v2-connector": ^1.0.3
     "@web3-react/core": ^8.2.0
     "@web3-react/metamask": ^8.2.1

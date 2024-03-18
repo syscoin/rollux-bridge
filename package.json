@@ -18,7 +18,7 @@
     "@emotion/styled": "^11.10.6",
     "@eth-optimism/sdk": "3.0.0",
     "@reduxjs/toolkit": "^1.9.5",
-    "@usedapp/core": "^1.2.10",
+    "@usedapp/core": "^1.2.13",
     "@usedapp/wallet-connect-v2-connector": "^1.0.3",
     "@web3-react/core": "^8.2.0",
     "@web3-react/metamask": "^8.2.1",
