@@ -88,9 +88,35 @@ export const RolluxChain: Chain = {
     blockExplorerUrl: "https://rollux.tanenbaum.io",
 }
 
+export const RolluxNebulaTestnet: Chain = {
+    chainId: 57057,
+    chainName: "Rollux Nebula Testnet",
+    isLocalChain: false,
+    isTestChain: true,
+    nativeCurrency: {
+        name: "tSyscoin",
+        symbol: "TSYS",
+        decimals: 18,
+    },
+    multicallAddress: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697',
+    multicall2Address: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697',
+    getExplorerAddressLink: (address: string) => {
+        return address;
+    },
+    getExplorerTransactionLink: (address: string) => {
+        return address;
+    },
+    rpcUrl: "https://rpc-nebula.rollux.com",
+    blockExplorerUrl: "https://rollux-nebula.tanenbaum.io",
+}
+
+
+
 export const networks: { [key: string]: Chain } = {
     [RolluxChainMainnet.chainId]: RolluxChainMainnet,
     [NEVMChain.chainId]: NEVMChain,
     [TanenbaumChain.chainId]: TanenbaumChain,
     [RolluxChain.chainId]: RolluxChain,
+    [RolluxNebulaTestnet.chainId]: RolluxNebulaTestnet,
 }
+

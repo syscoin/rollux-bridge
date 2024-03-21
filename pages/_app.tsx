@@ -1,6 +1,6 @@
 import { ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
 import { Config, DAppProvider, MetamaskConnector, CoinbaseWalletConnector, Mainnet } from "@usedapp/core";
-import { NEVMChain, RolluxChain, RolluxChainMainnet, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
+import { NEVMChain, RolluxChain, RolluxChainMainnet, RolluxNebulaTestnet, TanenbaumChain } from "blockchain/NevmRolluxBridge/config/chainsUseDapp";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -22,21 +22,24 @@ const dappConfig: Config = {
     [TanenbaumChain.chainId]: 30000,
     [RolluxChainMainnet.chainId]: 30000,
     [NEVMChain.chainId]: 30000,
+    [RolluxNebulaTestnet.chainId]: 30000,
   },
   readOnlyUrls: {
     [TanenbaumChain.chainId]: TanenbaumChain.rpcUrl || '',
     [RolluxChain.chainId]: RolluxChain.rpcUrl || '',
     [RolluxChainMainnet.chainId]: RolluxChainMainnet.rpcUrl || '',
     [NEVMChain.chainId]: NEVMChain.rpcUrl || '',
+    [RolluxNebulaTestnet.chainId]: RolluxNebulaTestnet.rpcUrl || '',
   },
   multicallAddresses: {
     [RolluxChainMainnet.chainId]: RolluxChainMainnet.multicall2Address || '',
     [NEVMChain.chainId]: '0x0c457A8E4bD35eA571956d6bb7443c5C661d7607',
     [TanenbaumChain.chainId]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697', // multicall 2 address.
     [RolluxChain.chainId]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697',
+    [RolluxNebulaTestnet.chainId]: '0x1F359C32b5D8c9678b076eAac411A4d2Eb11E697',
 
   },
-  networks: [RolluxChain, TanenbaumChain, NEVMChain, RolluxChainMainnet]
+  networks: [RolluxChain, TanenbaumChain, NEVMChain, RolluxChainMainnet, RolluxNebulaTestnet]
 }
 
 declare global {
