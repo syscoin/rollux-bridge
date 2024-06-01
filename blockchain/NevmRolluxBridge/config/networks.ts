@@ -21,6 +21,7 @@ export const networksMap: { [key: string]: string } = {
 export enum SelectedNetworkType {
     Mainnet,
     Testnet,
+    TestnetNebula,
     Unsupported
 }
 
@@ -30,7 +31,9 @@ export const ChainIdsToNetworksMap: { [key: number]: SelectedNetworkType } = {
     57000: SelectedNetworkType.Testnet,
     // mainnet todo fill correct chain Ids
     57: SelectedNetworkType.Mainnet,
-    570: SelectedNetworkType.Mainnet
+    570: SelectedNetworkType.Mainnet,
+    // nebula testnet
+    57057: SelectedNetworkType.TestnetNebula,
 }
 
 
@@ -67,13 +70,29 @@ export const networks: { [key: string]: NetworkData } = {
         chainId: 57000,
         layer: 2,
         contracts: contractsDev.l2_dev,
+    },
+    L1Nebula: {
+        rpcAddress: 'https://rpc.tanenbaum.io',
+        name: 'L1Dev',
+        explorerUrl: 'https://tanenbaum.io',
+        chainId: 5700,
+        layer: 1,
+        contracts: contractsDev.l1_nebula,
+    },
+    L2Nebula: {
+        rpcAddress: 'https://rpc-nebula.rollux.com',
+        name: 'RolluxNebula',
+        explorerUrl: 'https://nebula.rollux.com',
+        chainId: 57057,
+        layer: 2,
+        contracts: contractsDev.l2_nebula,
     }
 }
 
 export const NetworkSwitchMap: {
     [key in SelectedNetworkType]: {
         L1: number,
-        L2: number
+        L2: number,
     }
 } = {
     [SelectedNetworkType.Mainnet]: {
@@ -86,7 +105,11 @@ export const NetworkSwitchMap: {
     },
     [SelectedNetworkType.Unsupported]: {
         L1: 0,
-        L2: 0
+        L2: 0,
+    },
+    [SelectedNetworkType.TestnetNebula]: {
+        L1: 5700,
+        L2: 57057,
     }
 }
 
