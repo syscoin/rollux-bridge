@@ -19,7 +19,7 @@
     "@download/blockies": "^1.0.3",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
-    "@eth-optimism/sdk": "^3.3.3",
+    "@eth-optimism/sdk": "3.0.0",
     "@reduxjs/toolkit": "^1.9.5",
     "@usedapp/core": "^1.2.16",
     "@usedapp/wallet-connect-v2-connector": "^1.0.3",
