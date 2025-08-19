@@ -1,6 +1,6 @@
 {
   "name": "syscoin-bridge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -16,21 +16,21 @@
     "@download/blockies": "^1.0.3",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
-    "@eth-optimism/sdk": "3.0.0",
+    "@eth-optimism/sdk": "^3.3.3",
     "@reduxjs/toolkit": "^1.9.5",
-    "@usedapp/core": "^1.2.13",
+    "@usedapp/core": "^1.2.16",
     "@usedapp/wallet-connect-v2-connector": "^1.0.3",
     "@web3-react/core": "^8.2.0",
     "@web3-react/metamask": "^8.2.1",
     "@web3modal/ethereum": "^2.6.2",
     "@web3modal/react": "^2.6.2",
-    "axios": "^0.27.2",
+    "axios": "^1.11.0",
     "ethereum-blockies": "^0.1.1",
     "ethers": "legacy-v5",
     "framer-motion": "^10.2.4",
-    "next": "13.4.8",
-    "react": "18.1.0",
-    "react-dom": "18.1.0",
+    "next": "^15.4.7",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "react-error-boundary": "^3.1.4",
     "react-hook-form": "^7.31.3",
     "react-icons": "^4.9.0",
@@ -42,12 +42,12 @@
     "web3-core": "^4.0.2"
   },
   "devDependencies": {
-    "@types/node": "17.0.32",
+    "@types/node": "^22.17.2",
     "@types/react": "18.0.9",
     "@types/react-dom": "18.0.3",
     "eslint": "8.15.0",
     "eslint-config-next": "12.1.6",
-    "firebase-tools": "^11.0.1",
-    "typescript": "4.9.5"
+    "firebase-tools": "^14.12.1",
+    "typescript": "^5.4.0"
   }
 }
