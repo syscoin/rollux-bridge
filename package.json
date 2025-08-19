@@ -9,6 +9,9 @@
     "lint": "next lint",
     "firebase:dev": "firebase emulators:start"
   },
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.17",
     "@chakra-ui/react": "^2.5.1",
